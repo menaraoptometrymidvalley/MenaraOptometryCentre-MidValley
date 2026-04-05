@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menara Optometry Centre | Mid Valley Megamall</title>
+<meta name="description" content="Kami Optometris Keluarga Anda. Professional eye care, myopia management, digital eye strain solutions & contact lenses at Mid Valley Megamall, Kuala Lumpur.">
+<meta property="og:title" content="Menara Optometry Centre | Mid Valley Megamall">
+<meta property="og:description" content="Kami Optometris Keluarga Anda. Professional eye care & myopia management at Mid Valley Megamall.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LZJ24PH17G"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-LZJ24PH17G');</script>
+<style>
+:root {
+  --navy: #1B1464;
+  --navy-deep: #0D0B6F;
+  --navy-mid: #1B3A5C;
+  --scarlet: #E60012;
+  --cyan: #3EADD6;
+  --teal: #0E7C7B;
+  --gold: #D4A843;
+  --lime: #99CC00;
+  --white: #FFFFFF;
+  --cream: #FAFBFE;
+  --soft: #F4F6FB;
+  --line: #E2E7F0;
+  --ink: #0F1629;
+  --muted: #5A6478;
+  --radius: 18px;
+  --shadow-sm: 0 2px 8px rgba(15,22,41,0.04);
+  --shadow-md: 0 8px 32px rgba(15,22,41,0.06);
+  --shadow-lg: 0 20px 60px rgba(15,22,41,0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--ink);
+  background: var(--white);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ── LAYOUT ── */
+.wrap { width: min(100% - 40px, 1080px); margin: 0 auto; }
+
+/* ── TOPBAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border-bottom: 1px solid rgba(27,20,100,0.06);
+}
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; gap: 16px;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--white); font-size: 18px; font-weight: 800;
+  box-shadow: 0 4px 12px rgba(27,20,100,0.2);
+  letter-spacing: -0.5px;
+}
+.brand-name { font-size: 14px; font-weight: 700; color: var(--navy); line-height: 1.2; }
+.brand-sub { font-size: 11px; color: var(--muted); font-weight: 500; }
+
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+.nav-link {
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  padding: 8px 14px; border-radius: 10px;
+  transition: all 0.2s;
+}
+.nav-link:hover { color: var(--navy); background: var(--soft); }
+.nav-wa {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #25D366; color: var(--white);
+  padding: 9px 18px; border-radius: 10px;
+  font-size: 13px; font-weight: 700;
+  transition: transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(37,211,102,0.25);
+}
+.nav-wa:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(37,211,102,0.35); }
+.nav-wa svg { width: 16px; height: 16px; }
+
+@media (max-width: 600px) {
+  .nav-link { display: none; }
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative; padding: 72px 0 56px;
+  background: linear-gradient(175deg, var(--white) 0%, var(--cream) 40%, var(--soft) 100%);
+  overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -200px; right: -150px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(27,20,100,0.04) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: -100px; left: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(212,168,67,0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-inner { position: relative; z-index: 1; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: 100px;
+  background: rgba(27,20,100,0.05);
+  border: 1px solid rgba(27,20,100,0.08);
+  font-size: 11px; font-weight: 800; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--navy);
+  margin-bottom: 24px;
+}
+.hero-badge::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 8px rgba(14,124,123,0.4);
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 7vw, 56px);
+  font-weight: 700; line-height: 1.08;
+  letter-spacing: -0.02em; color: var(--ink);
+  max-width: 14ch; margin-bottom: 8px;
+}
+
+.hero-tagline {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(16px, 3vw, 20px);
+  color: var(--gold); font-style: italic;
+  margin-bottom: 20px;
+}
+
+.hero-lead {
+  font-size: 16px; line-height: 1.7; color: var(--muted);
+  max-width: 52ch; margin-bottom: 32px;
+}
+
+.hero-stats {
+  display: flex; gap: 32px; flex-wrap: wrap;
+  margin-bottom: 36px;
+  padding: 24px 28px; border-radius: var(--radius);
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
+  max-width: fit-content;
+}
+.h-stat { text-align: left; }
+.h-stat-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 700; color: var(--navy);
+  line-height: 1;
+}
+.h-stat-label {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;
+}
+
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 13px 24px; border-radius: 12px;
+  font-size: 14px; font-weight: 700; border: none; cursor: pointer;
+  transition: all 0.18s ease; text-decoration: none;
+}
+.btn:hover { transform: translateY(-1px); }
+
+.btn-navy {
+  background: var(--navy); color: var(--white);
+  box-shadow: 0 8px 24px rgba(27,20,100,0.2);
+}
+.btn-navy:hover { box-shadow: 0 12px 32px rgba(27,20,100,0.28); }
+
+.btn-outline {
+  background: var(--white); color: var(--navy);
+  border: 1.5px solid var(--line); box-shadow: var(--shadow-sm);
+}
+.btn-outline:hover { border-color: var(--navy); background: var(--soft); }
+
+.btn-wa {
+  background: #25D366; color: var(--white);
+  box-shadow: 0 8px 24px rgba(37,211,102,0.25);
+}
+.btn-wa:hover { box-shadow: 0 12px 32px rgba(37,211,102,0.35); }
+
+.btn-scarlet {
+  background: var(--scarlet); color: var(--white);
+  box-shadow: 0 8px 24px rgba(230,0,18,0.2);
+}
+.btn-scarlet:hover { box-shadow: 0 12px 32px rgba(230,0,18,0.3); }
+
+.btn-gold {
+  background: var(--gold); color: var(--white);
+  box-shadow: 0 8px 24px rgba(212,168,67,0.25);
+}
+.btn-gold:hover { box-shadow: 0 12px 32px rgba(212,168,67,0.35); }
+
+.btn-sm { padding: 10px 18px; font-size: 13px; border-radius: 10px; }
+
+/* ── SECTIONS ── */
+.section { padding: 72px 0; }
+.section-alt { background: var(--soft); }
+.section-dark {
+  background: linear-gradient(170deg, var(--navy) 0%, var(--navy-deep) 60%, var(--navy-mid) 100%);
+  color: var(--white);
+}
+
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--teal); margin-bottom: 14px;
+}
+.section-dark .section-eyebrow { color: var(--gold); }
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 5vw, 38px);
+  font-weight: 700; line-height: 1.15;
+  letter-spacing: -0.01em; margin-bottom: 14px;
+}
+
+.section-sub {
+  font-size: 15px; line-height: 1.7; color: var(--muted); max-width: 54ch;
+}
+.section-dark .section-sub { color: rgba(255,255,255,0.6); }
+
+.section-head { margin-bottom: 40px; }
+
+/* ── SERVICES ── */
+.services-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+.svc-card {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 28px 24px;
+  transition: all 0.2s; position: relative; overflow: hidden;
+}
+.svc-card::after {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: var(--navy); opacity: 0; transition: opacity 0.2s;
+}
+.svc-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+.svc-card:hover::after { opacity: 1; }
+
+.svc-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 16px;
+}
+.svc-icon.i1 { background: rgba(62,173,214,0.1); }
+.svc-icon.i2 { background: rgba(230,0,18,0.07); }
+.svc-icon.i3 { background: rgba(14,124,123,0.08); }
+.svc-icon.i4 { background: rgba(212,168,67,0.1); }
+.svc-icon.i5 { background: rgba(153,204,0,0.1); }
+.svc-icon.i6 { background: rgba(27,20,100,0.06); }
+
+.svc-card h3 { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.svc-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+@media (max-width: 768px) { .services-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } }
+
+/* ── CREDENTIALS ── */
+.cred-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.cred-card {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 28px 24px;
+  display: flex; flex-direction: column; gap: 14px;
+  transition: all 0.2s;
+}
+.cred-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+.cred-issuer {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--teal);
+}
+.cred-issuer-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--teal);
+}
+.cred-card h3 { font-size: 16px; font-weight: 700; color: var(--navy); line-height: 1.35; }
+.cred-card p { font-size: 13px; color: var(--muted); line-height: 1.6; flex-grow: 1; }
+.cred-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 100px;
+  background: rgba(14,124,123,0.06); color: var(--teal);
+  font-size: 12px; font-weight: 700; width: fit-content;
+}
+
+@media (max-width: 600px) { .cred-grid { grid-template-columns: 1fr; } }
+
+/* ── MYOPIA (DARK) ── */
+.myopia-content { max-width: 600px; }
+.myopia-content p {
+  font-size: 15px; line-height: 1.75;
+  color: rgba(255,255,255,0.7); margin-bottom: 28px;
+}
+.myopia-pillars {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px;
+}
+.pillar {
+  padding: 10px 18px; border-radius: 10px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85);
+}
+.myopia-actions {
+  display: flex; gap: 12px; flex-wrap: wrap;
+}
+.btn-myopia-outline {
+  background: rgba(255,255,255,0.08); color: var(--white);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  box-shadow: none;
+}
+.btn-myopia-outline:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.35);
+}
+
+/* ── REVIEWS ── */
+.reviews-scroll {
+  display: flex; gap: 16px; overflow-x: auto;
+  padding-bottom: 16px; scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.reviews-scroll::-webkit-scrollbar { height: 6px; }
+.reviews-scroll::-webkit-scrollbar-track { background: transparent; }
+.reviews-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
+
+.review-card {
+  min-width: 320px; max-width: 380px;
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 28px 24px;
+  scroll-snap-align: start; flex-shrink: 0;
+  transition: all 0.2s;
+}
+.review-card:hover { box-shadow: var(--shadow-md); }
+
+.review-stars { color: #F59E0B; font-size: 16px; letter-spacing: 2px; margin-bottom: 14px; }
+.review-text {
+  font-size: 14px; line-height: 1.7; color: var(--ink);
+  margin-bottom: 16px; font-style: italic;
+}
+.review-author { font-size: 13px; font-weight: 700; color: var(--navy); }
+.review-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.review-source {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 12px; padding: 5px 12px; border-radius: 100px;
+  background: rgba(66,133,244,0.06); color: #4285F4;
+  font-size: 11px; font-weight: 700;
+}
+
+.review-cta {
+  margin-top: 24px; text-align: center;
+}
+
+/* ── TOOLS ── */
+.tools-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+}
+.tool-card {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 28px 24px;
+  display: flex; flex-direction: column; gap: 12px;
+  transition: all 0.2s;
+}
+.tool-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+.tool-tag {
+  display: inline-block; width: fit-content;
+  padding: 4px 12px; border-radius: 100px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.tag-des { background: rgba(14,124,123,0.08); color: var(--teal); }
+.tag-myopia { background: rgba(230,0,18,0.06); color: var(--scarlet); }
+.tag-game { background: rgba(212,168,67,0.1); color: #9A7B2B; }
+.tag-screen { background: rgba(62,173,214,0.1); color: #2886A8; }
+
+.tool-card h3 { font-size: 16px; font-weight: 700; color: var(--navy); }
+.tool-card p { font-size: 13px; color: var(--muted); line-height: 1.6; flex-grow: 1; }
+.tool-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+
+@media (max-width: 600px) { .tools-grid { grid-template-columns: 1fr; } }
+
+/* ── LUCKY DRAW ── */
+.lucky-banner {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #1B1464 0%, #2A1F8C 50%, #1B3A5C 100%);
+  border-radius: var(--radius); padding: 40px 36px;
+  color: var(--white);
+  border: 1px solid rgba(212,168,67,0.15);
+}
+.lucky-banner::before {
+  content: ''; position: absolute;
+  top: -50%; right: -20%; width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(212,168,67,0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+.lucky-banner::after {
+  content: ''; position: absolute;
+  bottom: -30%; left: -10%; width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(230,0,18,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.lucky-inner { position: relative; z-index: 1; }
+.lucky-eyebrow {
+  display: inline-block; padding: 5px 14px; border-radius: 100px;
+  background: rgba(212,168,67,0.15); border: 1px solid rgba(212,168,67,0.25);
+  font-size: 11px; font-weight: 800; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+}
+.lucky-banner h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 4.5vw, 32px);
+  font-weight: 700; line-height: 1.15; margin-bottom: 12px;
+}
+.lucky-banner .lucky-sub {
+  font-size: 14px; line-height: 1.7;
+  color: rgba(255,255,255,0.7); max-width: 52ch; margin-bottom: 8px;
+}
+.lucky-prizes {
+  display: flex; gap: 20px; flex-wrap: wrap; margin: 20px 0 24px;
+}
+.prize {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.prize-icon { font-size: 24px; }
+.prize-text strong { display: block; font-size: 14px; color: var(--gold); }
+.prize-text span { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+/* ── EVERYDAY SCHEDULE ── */
+.schedule-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;
+}
+.day-card {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: 14px; padding: 20px 12px;
+  text-align: center; transition: all 0.2s;
+}
+.day-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+.day-name {
+  font-size: 11px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+}
+.day-icon { font-size: 24px; margin-bottom: 8px; }
+.day-theme {
+  font-size: 11px; font-weight: 700; color: var(--navy); line-height: 1.35;
+}
+.day-sub {
+  font-size: 10px; color: var(--muted); margin-top: 4px; line-height: 1.3;
+}
+
+.day-card.mon { border-top: 3px solid var(--teal); }
+.day-card.tue { border-top: 3px solid var(--scarlet); }
+.day-card.wed { border-top: 3px solid var(--gold); }
+.day-card.thu { border-top: 3px solid var(--cyan); }
+.day-card.fri { border-top: 3px solid var(--lime); }
+.day-card.sat { border-top: 3px solid var(--scarlet); }
+.day-card.sun { border-top: 3px solid var(--navy); }
+
+@media (max-width: 768px) {
+  .schedule-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 480px) {
+  .schedule-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── VISIT / MAP ── */
+.visit-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;
+}
+.visit-map {
+  border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--line); box-shadow: var(--shadow-md); height: 380px;
+}
+.visit-map iframe { width: 100%; height: 100%; border: none; }
+
+.visit-info {
+  background: var(--white); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 32px 28px; box-shadow: var(--shadow-sm);
+}
+.visit-row {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 14px 0; border-bottom: 1px solid var(--line);
+}
+.visit-row:last-child { border-bottom: none; }
+.visit-row-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--soft); display: flex; align-items: center;
+  justify-content: center; font-size: 17px; flex-shrink: 0;
+}
+.visit-row-text { font-size: 14px; line-height: 1.6; color: var(--ink); }
+.visit-row-text strong {
+  display: block; font-size: 11px; font-weight: 700;
+  color: var(--muted); text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 2px;
+}
+.visit-row-text a { color: var(--teal); font-weight: 600; }
+
+@media (max-width: 768px) {
+  .visit-grid { grid-template-columns: 1fr; }
+  .visit-map { height: 260px; }
+}
+
+/* ── SOCIAL STRIP ── */
+.social-strip {
+  display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap; margin-top: 32px;
+}
+.social-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 22px; border-radius: 12px;
+  font-size: 14px; font-weight: 700;
+  transition: all 0.18s; border: 1.5px solid var(--line);
+  background: var(--white); color: var(--navy);
+}
+.social-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.social-btn.fb { border-color: #1877F2; color: #1877F2; }
+.social-btn.ig { border-color: #E4405F; color: #E4405F; }
+
+/* ── FLOATING WA ── */
+.float-wa {
+  position: fixed; bottom: 24px; right: 24px; z-index: 200;
+  display: flex; align-items: center; gap: 8px;
+  background: #25D366; color: var(--white);
+  padding: 14px 24px; border-radius: 100px;
+  font-size: 14px; font-weight: 700;
+  box-shadow: 0 6px 28px rgba(37,211,102,0.35);
+  transition: all 0.2s;
+  animation: float-pulse 3s ease-in-out infinite;
+}
+.float-wa:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 10px 36px rgba(37,211,102,0.45); }
+.float-wa svg { width: 20px; height: 20px; }
+
+@keyframes float-pulse {
+  0%, 100% { box-shadow: 0 6px 28px rgba(37,211,102,0.35); }
+  50% { box-shadow: 0 6px 36px rgba(37,211,102,0.55); }
+}
+
+/* ── FOOTER ── */
+.footer {
+  background: var(--navy); color: rgba(255,255,255,0.5);
+  padding: 36px 0; text-align: center; font-size: 12px; line-height: 1.8;
+}
+.footer a { color: var(--cyan); }
+.footer-links {
+  display: flex; justify-content: center; gap: 24px;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.footer-links a { font-size: 13px; font-weight: 600; }
+.footer-disclaimer {
+  margin-top: 20px; padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 11px; line-height: 1.7;
+  color: rgba(255,255,255,0.35);
+}
+
+/* ── COPY TOAST ── */
+.toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--navy); color: var(--white);
+  padding: 12px 24px; border-radius: 12px;
+  font-size: 13px; font-weight: 600;
+  box-shadow: 0 12px 40px rgba(15,22,41,0.25);
+  opacity: 0; transition: all 0.3s ease; z-index: 300;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOPBAR ═══ -->
+<header class="topbar">
+  <nav class="nav wrap">
+    <a href="#" class="brand">
+      <div class="brand-icon">M</div>
+      <div>
+        <div class="brand-name">Menara Optometry</div>
+        <div class="brand-sub">Mid Valley Megamall</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#tools" class="nav-link">Tools</a>
+      <a href="#visit" class="nav-link">Visit</a>
+      <a href="https://wa.me/601154197980?text=Hi%20Menara%20Optometry%20Mid%20Valley!" class="nav-wa" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
+    </div>
+  </nav>
+</header>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div class="hero-badge">LG-017 &bull; Mid Valley Megamall &bull; Kuala Lumpur</div>
+    <h1>Menara Optometry Centre</h1>
+    <p class="hero-tagline">Kami Optometris Keluarga Anda</p>
+    <p class="hero-lead">Professional eye care for your whole family — from children's myopia management to digital eye strain solutions, all under one roof at Mid Valley Megamall.</p>
+
+    <div class="hero-stats">
+      <div class="h-stat">
+        <div class="h-stat-val">BHVI</div>
+        <div class="h-stat-label">Certified Training</div>
+      </div>
+      <div class="h-stat">
+        <div class="h-stat-val">UNSW</div>
+        <div class="h-stat-label">Myopia Management</div>
+      </div>
+      <div class="h-stat">
+        <div class="h-stat-val">7 Days</div>
+        <div class="h-stat-label">Open Weekly</div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a href="https://wa.me/601154197980?text=Hi%20Menara%20Optometry!%20I%27d%20like%20to%20book%20an%20eye%20examination." class="btn btn-wa" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Book Eye Exam
+      </a>
+      <a href="#services" class="btn btn-outline">Explore Services</a>
+      <a href="#visit" class="btn btn-outline">Visit Us</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SERVICES ═══ -->
+<section class="section" id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="section-eyebrow">Our Services</p>
+      <h2 class="section-title">Complete Eye Care,<br>One Trusted Centre</h2>
+      <p class="section-sub">Every examination is conducted by qualified, registered optometrists — not salespeople. Clinical care comes first.</p>
+    </div>
+    <div class="services-grid">
+      <div class="svc-card reveal">
+        <div class="svc-icon i1">👁️</div>
+        <h3>Comprehensive Eye Examination</h3>
+        <p>Thorough vision and ocular health assessment for adults and children by qualified optometrists.</p>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-icon i2">👧</div>
+        <h3>MyopiaCARE Programme</h3>
+        <p>Evidence-based myopia management for children — slowing down progression with proven clinical strategies.</p>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-icon i3">💻</div>
+        <h3>Digital Eye Strain Solutions</h3>
+        <p>Screening and personalised solutions for screen-related discomfort — headaches, dry eyes, and blurred vision.</p>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-icon i4">🔵</div>
+        <h3>Contact Lens Fitting</h3>
+        <p>Professional fitting and consultation for daily, monthly, and specialty contact lenses including myopia management lenses.</p>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-icon i5">🕶️</div>
+        <h3>Rx Sunglasses &amp; UV Protection</h3>
+        <p>Prescription sunglasses for outdoor lifestyles, UV protection, and long-term cataract prevention.</p>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-icon i6">👨‍👩‍👧‍👦</div>
+        <h3>Family Eye Care</h3>
+        <p>From your child's first eye check to your parents' progressive lenses — the whole family, one trusted centre.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CREDENTIALS ═══ -->
+<section class="section section-alt" id="credentials">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="section-eyebrow">Professional Credentials</p>
+      <h2 class="section-title">Internationally Recognised<br>Clinical Training</h2>
+      <p class="section-sub">Our optometrists hold advanced certifications in myopia management from leading global institutions.</p>
+    </div>
+    <div class="cred-grid reveal">
+      <div class="cred-card">
+        <div class="cred-issuer">
+          <span class="cred-issuer-dot"></span>
+          Brien Holden Vision Institute
+        </div>
+        <h3>Myopia Management Programme</h3>
+        <p>Comprehensive clinical training covering myopia risk assessment, optical interventions, and evidence-based management strategies for progressive myopia in children.</p>
+        <div class="cred-badge">✓ Certified &bull; 2020</div>
+      </div>
+      <a href="https://www.credly.com/badges/ec205b8e-41e1-4b0d-a9e9-d9530bbed1ce/linked_in_profile" class="cred-card" target="_blank" rel="noopener" style="text-decoration:none;">
+        <div class="cred-issuer">
+          <span class="cred-issuer-dot" style="background:var(--scarlet);"></span>
+          UNSW Sydney (University of New South Wales)
+        </div>
+        <h3>Evidence-Based Myopia Management (AOC)</h3>
+        <p>Advanced course covering the latest evidence-based optical, pharmacological, and behavioural interventions to manage progressive myopia. Includes identification of at-risk individuals and development of personalised management plans.</p>
+        <div class="cred-badge">✓ Verified on Credly &bull; 2023</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MYOPIA (DARK) ═══ -->
+<section class="section section-dark" id="myopia">
+  <div class="wrap">
+    <div class="myopia-content reveal">
+      <p class="section-eyebrow">For Parents</p>
+      <h2 class="section-title">Is Your Child's<br>Eyesight Getting Worse?</h2>
+      <p>Myopia (short-sightedness) is rising rapidly among Malaysian children. Early detection and proper management can slow down progression significantly. Even a child with clear 6/6 vision may be at high risk if their hyperopic buffer is insufficient.</p>
+      <p>Our MyopiaCARE programme uses internationally recognised risk assessment frameworks and evidence-based strategies across five pillars:</p>
+      <div class="myopia-pillars">
+        <div class="pillar">🔬 Comprehensive Assessment</div>
+        <div class="pillar">🌳 Outdoor Time</div>
+        <div class="pillar">📏 Working Distance</div>
+        <div class="pillar">👓 Optical Intervention</div>
+        <div class="pillar">📊 Regular Monitoring</div>
+      </div>
+      <div class="myopia-actions">
+        <a href="https://wa.me/601154197980?text=Hi!%20I%27d%20like%20to%20book%20a%20MyopiaCARE%20screening%20for%20my%20child." class="btn btn-scarlet" target="_blank" rel="noopener">Book Free Kid Screening →</a>
+        <a href="https://myopiacare-menaraoptometry-midvalley.netlify.app/" class="btn btn-myopia-outline" target="_blank" rel="noopener">Learn About Myopia</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ GOOGLE REVIEWS ═══ -->
+<section class="section" id="reviews">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="section-eyebrow">What Our Customers Say</p>
+      <h2 class="section-title">Trusted by Families<br>at Mid Valley</h2>
+    </div>
+    <div class="reviews-scroll reveal">
+
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"I have been a customer of Menara Optometry Centre @ Mid Valley outlet for nearly 20 years now and they always provide excellent services apart from selling quality and affordable optical-related products. En Hazwan, the main optometrist has always been the person to look for especially when required eyecare checks and the selections of optical products like a spectacle frame."</p>
+        <div class="review-author">Fadthil Camille</div>
+        <div class="review-date">Google Review</div>
+        <div class="review-source">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"My experience getting new glasses at Menara Optometry Mid Valley was 💯. My optometrist, Izzati did thorough eye examination and gave clear, simple explanations afterwards. My dad and I were very satisfied with her service. Very recommended to reach out to Izzati 👍🏼"</p>
+        <div class="review-author">Nur Aisyah</div>
+        <div class="review-date">Google Review</div>
+        <div class="review-source">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Went to get a brand new raya glasses and couldn't choose one. We were attended by Mr Syafihq and he definitely brought out all the latest glasses that matches our description. He manage to fix the old glasses that is already deemed unfixable by the previous shop without even trying. Mr Syafihq is knowledgeable, friendly and professional. Will definitely come here again in the future."</p>
+        <div class="review-author">Nazeera Fadzil</div>
+        <div class="review-date">Google Review</div>
+        <div class="review-source">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Both Izzati &amp; Haziqa are fantastic ladies! The Optometrist did a very thorough eye check up which I never seen in all the places I made my eye glasses. Sales personnel was very good at guiding me with great patience &amp; tenacity in presenting the right frame and lenses. Not forgetting the amazing wisdom of Nurul when she advised me on so many things related to Spectacles and all. I will recommend Menara Optometrist to my friends and family."</p>
+        <div class="review-author">JPS JP</div>
+        <div class="review-date">Google Review</div>
+        <div class="review-source">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"I had a great experience. Nurul was able to give me a great recommendation within my budget. Very satisfied."</p>
+        <div class="review-author">Hannah Wong</div>
+        <div class="review-date">Google Review</div>
+        <div class="review-source">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </div>
+      </div>
+
+    </div>
+    <div class="review-cta reveal">
+      <a href="https://share.google/gs9h4YL2FWcvMXoxo" class="btn btn-outline btn-sm" target="_blank" rel="noopener">
+        See All Reviews on Google →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LUCKY DRAW BANNER ═══ -->
+<section class="section section-alt">
+  <div class="wrap">
+    <div class="lucky-banner reveal">
+      <div class="lucky-inner">
+        <div class="lucky-eyebrow">Kempen Beli &amp; Menang</div>
+        <h3>Menara Optometry × Essilor<br>Lucky Draw</h3>
+        <p class="lucky-sub">Purchase qualifying Essilor lenses and stand a chance to win amazing prizes. Campaign runs throughout 2026 — every purchase is an entry.</p>
+        <div class="lucky-prizes">
+          <div class="prize">
+            <div class="prize-icon">🚗</div>
+            <div class="prize-text">
+              <strong>Grand Prize</strong>
+              <span>Proton e.MAS 5</span>
+            </div>
+          </div>
+          <div class="prize">
+            <div class="prize-icon">🥇</div>
+            <div class="prize-text">
+              <strong>Monthly Prizes</strong>
+              <span>Gold Bars</span>
+            </div>
+          </div>
+        </div>
+        <a href="https://wa.me/601154197980?text=Hi!%20I%27d%20like%20to%20know%20more%20about%20the%20Essilor%20Lucky%20Draw%20campaign." class="btn btn-wa" target="_blank" rel="noopener">Ask About Lucky Draw →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DIGITAL TOOLS ═══ -->
+<section class="section" id="tools">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="section-eyebrow">Educational Tools</p>
+      <h2 class="section-title">Interactive Eye Care<br>Resources</h2>
+      <p class="section-sub">Try our free digital tools — designed to educate, screen, and help you understand your eye health better.</p>
+    </div>
+    <div class="tools-grid">
+
+      <article class="tool-card reveal">
+        <span class="tool-tag tag-des">Digital Eye Strain</span>
+        <h3>DES Screening Questionnaire</h3>
+        <p>Answer a quick screening to find out if your screen habits are affecting your eyes. Get personalised recommendations.</p>
+        <div class="tool-actions">
+          <a class="btn btn-navy btn-sm" href="https://des-menaraoptometry-midvalley.netlify.app/" target="_blank" rel="noopener">Open Tool</a>
+          <button class="btn btn-outline btn-sm" onclick="copyLink('https://des-menaraoptometry-midvalley.netlify.app/')">Copy Link</button>
+        </div>
+      </article>
+
+      <article class="tool-card reveal">
+        <span class="tool-tag tag-myopia">Myopia Care</span>
+        <h3>MyopiaCARE Parent Guide</h3>
+        <p>An educational guide for parents explaining childhood myopia, risk factors, and what you can do to manage it effectively.</p>
+        <div class="tool-actions">
+          <a class="btn btn-navy btn-sm" href="https://myopiacare-menaraoptometry-midvalley.netlify.app/" target="_blank" rel="noopener">Open Tool</a>
+          <button class="btn btn-outline btn-sm" onclick="copyLink('https://myopiacare-menaraoptometry-midvalley.netlify.app/')">Copy Link</button>
+        </div>
+      </article>
+
+      <article class="tool-card reveal">
+        <span class="tool-tag tag-screen">Simulation</span>
+        <h3>Screen Strain Simulator</h3>
+        <p>Experience what digital eye strain looks and feels like through an interactive visual simulator. Great for awareness.</p>
+        <div class="tool-actions">
+          <a class="btn btn-navy btn-sm" href="https://dessimulator-menaraoptometrymidvalley.netlify.app/" target="_blank" rel="noopener">Open Tool</a>
+          <button class="btn btn-outline btn-sm" onclick="copyLink('https://dessimulator-menaraoptometrymidvalley.netlify.app/')">Copy Link</button>
+        </div>
+      </article>
+
+      <article class="tool-card reveal">
+        <span class="tool-tag tag-game">Interactive Game</span>
+        <h3>Mission Impossible Eye Test</h3>
+        <p>A fun, gamified eye awareness experience. Challenge yourself and learn about eye health in an engaging way.</p>
+        <div class="tool-actions">
+          <a class="btn btn-navy btn-sm" href="https://game-des-menaraoptometry-midvalley.netlify.app/" target="_blank" rel="noopener">Open Tool</a>
+          <button class="btn btn-outline btn-sm" onclick="copyLink('https://game-des-menaraoptometry-midvalley.netlify.app/')">Copy Link</button>
+        </div>
+      </article>
+
+      <article class="tool-card reveal" style="grid-column: 1 / -1;">
+        <span class="tool-tag tag-myopia">Screening</span>
+        <h3>MyopiaCARE Kid Vision Screening</h3>
+        <p>Staff screening tool for paediatric myopia risk assessment. Generates a professional parent-facing report with risk scoring and clinical recommendations.</p>
+        <div class="tool-actions">
+          <a class="btn btn-navy btn-sm" href="https://myopiacarescreening-menaraoptometry.netlify.app/" target="_blank" rel="noopener">Open Tool</a>
+          <button class="btn btn-outline btn-sm" onclick="copyLink('https://myopiacarescreening-menaraoptometry.netlify.app/')">Copy Link</button>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ EVERYDAY IS SPECIAL DAY ═══ -->
+<section class="section section-alt" id="everyday">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="section-eyebrow">Everyday is Special Day</p>
+      <h2 class="section-title">Something for You,<br>Every Day of the Week</h2>
+      <p class="section-sub">Each day at Menara Optometry Mid Valley has a dedicated theme — visit on the day that matters most to you.</p>
+    </div>
+    <div class="schedule-grid reveal">
+      <div class="day-card mon">
+        <div class="day-name">Mon</div>
+        <div class="day-icon">💻</div>
+        <div class="day-theme">Cyber Monday</div>
+        <div class="day-sub">Digital Eye Strain</div>
+      </div>
+      <div class="day-card tue">
+        <div class="day-name">Tue</div>
+        <div class="day-icon">👧</div>
+        <div class="day-theme">MyopiaCARE Tuesday</div>
+        <div class="day-sub">Myopia Screening</div>
+      </div>
+      <div class="day-card wed">
+        <div class="day-name">Wed</div>
+        <div class="day-icon">🏷️</div>
+        <div class="day-theme">Wow Wednesday</div>
+        <div class="day-sub">Volume &amp; Promotions</div>
+      </div>
+      <div class="day-card thu">
+        <div class="day-name">Thu</div>
+        <div class="day-icon">🔵</div>
+        <div class="day-theme">Fresh Look Thursday</div>
+        <div class="day-sub">Free Colour Contact Lens (T&amp;C)</div>
+      </div>
+      <div class="day-card fri">
+        <div class="day-name">Fri</div>
+        <div class="day-icon">🎁</div>
+        <div class="day-theme">Blessed Friday</div>
+        <div class="day-sub">Loyalty &amp; Appreciation</div>
+      </div>
+      <div class="day-card sat">
+        <div class="day-name">Sat</div>
+        <div class="day-icon">👧</div>
+        <div class="day-theme">MyopiaCARE Saturday</div>
+        <div class="day-sub">Myopia Screening</div>
+      </div>
+      <div class="day-card sun">
+        <div class="day-name">Sun</div>
+        <div class="day-icon">🕶️</div>
+        <div class="day-theme">Sun-Day Shield</div>
+        <div class="day-sub">Cataract Screening</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ VISIT US ═══ -->
+<section class="section" id="visit">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="section-eyebrow">Visit Us</p>
+      <h2 class="section-title">Menara Optometry Centre<br>Mid Valley Megamall</h2>
+    </div>
+    <div class="visit-grid reveal">
+      <div class="visit-map">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3983.964!2d101.6728!3d3.1181!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31cc49c701efeae7%3A0xf4d98e5b2f1c287d!2sMid%20Valley%20Megamall!5e0!3m2!1sen!2smy!4v1" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <div class="visit-info">
+        <div class="visit-row">
+          <div class="visit-row-icon">📍</div>
+          <div class="visit-row-text">
+            <strong>Address</strong>
+            LG-017, Lower Ground Floor<br>Mid Valley Megamall, Mid Valley City<br>59200 Kuala Lumpur
+          </div>
+        </div>
+        <div class="visit-row">
+          <div class="visit-row-icon">🕐</div>
+          <div class="visit-row-text">
+            <strong>Operating Hours</strong>
+            10:00 AM – 10:00 PM (Daily)
+          </div>
+        </div>
+        <div class="visit-row">
+          <div class="visit-row-icon">📱</div>
+          <div class="visit-row-text">
+            <strong>WhatsApp</strong>
+            <a href="https://wa.me/601154197980" target="_blank">+6011-5419 7980</a>
+          </div>
+        </div>
+        <div class="visit-row">
+          <div class="visit-row-icon">✉️</div>
+          <div class="visit-row-text">
+            <strong>Email</strong>
+            <a href="mailto:mdv@menaraoptometry.com.my">mdv@menaraoptometry.com.my</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Strip -->
+    <div class="social-strip reveal">
+      <a href="https://www.facebook.com/share/1KvMHxSsCz/" class="social-btn fb" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Menara Optometry Official Page
+      </a>
+      <a href="https://www.facebook.com/menaraoptometrymidvalley" class="social-btn fb" target="_blank" rel="noopener" style="border-color:#1877F2; color:#1877F2;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Mid Valley Branch Page
+      </a>
+      <a href="https://www.instagram.com/menaraoptometrymidvalley" class="social-btn ig" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        Instagram
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FLOATING WA ═══ -->
+<a href="https://wa.me/601154197980?text=Hi%20Menara%20Optometry%20Mid%20Valley!" class="float-wa" target="_blank" rel="noopener">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  Chat With Us
+</a>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-links">
+      <a href="https://www.facebook.com/share/1KvMHxSsCz/" target="_blank">Facebook</a>
+      <a href="https://www.instagram.com/menaraoptometrymidvalley" target="_blank">Instagram</a>
+      <a href="https://wa.me/601154197980" target="_blank">WhatsApp</a>
+    </div>
+    <p>Menara Optometry Centre Sdn. Bhd.<br>
+    LG-017, Mid Valley Megamall, Mid Valley City, 59200 Kuala Lumpur<br><br>
+    &copy; 2026 Menara Optometry Centre Sdn. Bhd. All rights reserved.</p>
+    <div class="footer-disclaimer">
+      <strong>Disclaimer:</strong> This is not the official website of Menara Optometry Centre Sdn. Bhd. This page was created and maintained by Muhammad R. for Menara Optometry Centre Sdn. Bhd. (Mid Valley Megamall Branch) as a digital resource and educational hub. All clinical information presented is for general educational purposes only and does not constitute medical advice. Please consult a qualified optometrist for personalised eye care recommendations.
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ COPY TOAST ═══ -->
+<div class="toast" id="toast">Link copied!</div>
+
+<script>
+function copyLink(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    const toast = document.getElementById('toast');
+    toast.textContent = 'Link copied: ' + url;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2400);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    const toast = document.getElementById('toast');
+    toast.textContent = 'Link copied!';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2400);
+  });
+}
+
+const revealEls = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+revealEls.forEach(el => revealObs.observe(el));
+</script>
+
+</body>
+</html>

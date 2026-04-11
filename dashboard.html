@@ -129,8 +129,11 @@ function waLink(phone,name,reason,date){
 
 function render(){
   const today=new Date().toISOString().slice(0,10);
-  const todayAppts=appts.filter(a=>String(a.date||'').slice(0,10)===today);
-  const todayFUs=fus.filter(f=>String(f.reviewDate||'').slice(0,10)===today && f.status==='PENDING');
+  const td=new Date();const dd=String(td.getDate()).padStart(2,'0');const mm=String(td.getMonth()+1).padStart(2,'0');const yy=td.getFullYear();
+  const todayAlt1=yy+'-'+mm+'-'+dd;const todayAlt2=dd+'/'+mm+'/'+yy;const todayAlt3=mm+'/'+dd+'/'+yy;
+  const matchToday=function(v){if(!v)return false;const s=String(v);return s.includes(todayAlt1)||s.includes(todayAlt2)||s.includes(todayAlt3)};
+  const todayAppts=appts.filter(a=>matchToday(a.date)&&a.status!=='NO_SHOW'&&a.status!=='CANCELLED');
+  const todayFUs=fus.filter(f=>matchToday(f.reviewDate)&&f.status==='PENDING');
   let html='';
   if(todayAppts.length){
     html+='<h3 style="color:var(--navy);font-size:14px;margin:10px 0 8px">📅 Appointments ('+todayAppts.length+')</h3>';

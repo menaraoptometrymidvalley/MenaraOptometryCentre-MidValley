@@ -106,8 +106,15 @@ async function api(payload){
 }
 
 async function loadAll(){
-  const [a,f]=await Promise.all([api({action:'getAppointments'}),api({action:'getFollowUps'})]);
-  appts=a.data||[];fus=f.data||[];render()
+  document.getElementById('queueList').innerHTML='<div class="empty">Loading...</div>';
+  document.getElementById('todayList').innerHTML='<div class="empty">Loading...</div>';
+  try{
+    const [a,f]=await Promise.all([api({action:'getAppointments'}),api({action:'getFollowUps'})]);
+    console.log('Appts response:',a);console.log('FollowUps response:',f);
+    appts=(a&&a.data)||[];fus=(f&&f.data)||[];
+    console.log('Parsed appts:',appts.length,'fus:',fus.length);
+    render();
+  }catch(e){console.error('loadAll error:',e);alert('Load error: '+e.message)}
 }
 
 function daysTo(d){const diff=Math.floor((new Date(d)-new Date().setHours(0,0,0,0))/86400000);return diff}

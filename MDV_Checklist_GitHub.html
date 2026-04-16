@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MDV Digital Checklist 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue: #1B3A6B;
+  --teal: #0B7B8C;
+  --green: #16a34a;
+  --orange: #ea580c;
+  --red: #dc2626;
+  --purple: #7c3aed;
+  --yellow: #d97706;
+  --bg: #0f1923;
+  --card: #162032;
+  --card2: #1c2d42;
+  --border: #243550;
+  --text: #e2eaf4;
+  --muted: #6b8aaa;
+  --light: #a8c0d6;
+  --white: #ffffff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #0d1e33 0%, #1a3a5c 100%);
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.header-title h1 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: 0.3px;
+}
+
+.header-title p {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 1px;
+  font-family: 'DM Mono', monospace;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  color: var(--light);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+
+.btn-icon:active { opacity: 0.7; transform: scale(0.97); }
+
+/* GLOBAL PROGRESS */
+.global-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-track {
+  flex: 1;
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), #4ade80);
+  border-radius: 10px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.progress-label {
+  font-size: 11px;
+  color: var(--light);
+  font-family: 'DM Mono', monospace;
+  white-space: nowrap;
+}
+
+/* TABS */
+.tabs-wrap {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky;
+  top: 89px;
+  z-index: 199;
+}
+.tabs-wrap::-webkit-scrollbar { display: none; }
+
+.tabs {
+  display: flex;
+  padding: 0 4px;
+  min-width: max-content;
+}
+
+.tab {
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.tab.active {
+  color: var(--white);
+  border-bottom-color: var(--teal);
+}
+
+.badge {
+  background: var(--card2);
+  color: var(--muted);
+  border-radius: 20px;
+  padding: 1px 6px;
+  font-size: 9px;
+  font-family: 'DM Mono', monospace;
+  border: 1px solid var(--border);
+}
+
+.badge.complete { background: rgba(74,222,128,0.15); color: #4ade80; border-color: rgba(74,222,128,0.3); }
+
+/* CONTENT */
+.content {
+  padding: 12px;
+  max-width: 680px;
+  margin: 0 auto;
+  padding-bottom: 100px;
+}
+
+.section { display: none; }
+.section.active { display: block; }
+
+/* DASHBOARD */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.stat-card.full { grid-column: 1/-1; }
+
+.stat-label {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  color: var(--white);
+  line-height: 1;
+}
+
+.stat-sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* PIE CHART */
+.pie-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.pie-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--light);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pie-title span {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+}
+
+.pie-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.pie-chart-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.pie-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.pie-pct {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--white);
+  font-family: 'DM Mono', monospace;
+  line-height: 1;
+}
+
+.pie-pct-label {
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.pie-legend {
+  flex: 1;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.legend-item:last-child { border-bottom: none; }
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-name {
+  font-size: 11px;
+  color: var(--light);
+  flex: 1;
+}
+
+.legend-val {
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  color: var(--muted);
+}
+
+/* PLATFORM PROGRESS BARS */
+.platform-progress {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.platform-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  cursor: pointer;
+}
+
+.platform-row:hover .plat-name { color: var(--white); }
+
+.plat-icon { font-size: 14px; width: 20px; text-align: center; }
+.plat-name { font-size: 12px; color: var(--light); width: 90px; flex-shrink: 0; font-weight: 500; transition: color 0.15s; }
+
+.plat-bar-wrap {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border-radius: 6px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.plat-bar {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.plat-count {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  color: var(--muted);
+  width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* QUICK ACTIONS */
+.quick-pending {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.quick-pending h3 {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.quick-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.quick-item:last-child { border-bottom: none; }
+
+.quick-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.quick-text {
+  font-size: 12px;
+  color: var(--light);
+  flex: 1;
+  line-height: 1.3;
+}
+
+.quick-platform {
+  font-size: 9px;
+  color: var(--muted);
+  background: var(--card2);
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* PHASE */
+.phase {
+  margin-bottom: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
+  background: var(--card);
+  cursor: pointer;
+  user-select: none;
+  border-left: 3px solid var(--teal);
+}
+
+.phase-header.col-green { border-left-color: var(--green); }
+.phase-header.col-orange { border-left-color: var(--orange); }
+.phase-header.col-purple { border-left-color: var(--purple); }
+.phase-header.col-red { border-left-color: var(--red); }
+
+.phase-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--light);
+  flex: 1;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.phase-count {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+}
+
+.phase-chevron {
+  font-size: 10px;
+  color: var(--muted);
+  transition: transform 0.2s;
+}
+
+.phase-chevron.open { transform: rotate(180deg); }
+
+.phase-body { background: var(--card2); }
+
+/* ITEM */
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(36,53,80,0.6);
+  transition: background 0.15s;
+  position: relative;
+}
+
+.item:last-child { border-bottom: none; }
+.item:active { background: rgba(255,255,255,0.03); }
+.item.completed { opacity: 0.55; }
+
+.item-check {
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 1px;
+}
+
+.item.completed .item-check {
+  background: #4ade80;
+  border-color: #4ade80;
+}
+
+.check-icon { display: none; color: #0f1923; font-size: 10px; font-weight: 800; }
+.item.completed .check-icon { display: block; }
+
+.item-body { flex: 1; min-width: 0; }
+
+.item-title {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.4;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.item.completed .item-title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.item-note {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.item-remark {
+  font-size: 11px;
+  color: #fbbf24;
+  margin-top: 4px;
+  background: rgba(251,191,36,0.08);
+  border-radius: 6px;
+  padding: 4px 8px;
+  border-left: 2px solid rgba(251,191,36,0.4);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.act-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  color: var(--muted);
+}
+
+.act-btn:hover { background: rgba(255,255,255,0.06); color: var(--light); }
+
+.priority-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 3px;
+  letter-spacing: 0.4px;
+  font-family: 'DM Mono', monospace;
+}
+
+.tag-now { background: rgba(220,38,38,0.15); color: #f87171; }
+.tag-week { background: rgba(234,88,12,0.15); color: #fb923c; }
+.tag-ongoing { background: rgba(11,123,140,0.15); color: #22d3ee; }
+.tag-later { background: rgba(124,58,237,0.15); color: #a78bfa; }
+
+/* ADD TASK BUTTON */
+.add-phase-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1.5px dashed var(--border);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.add-phase-btn:hover { border-color: var(--teal); color: var(--teal); background: rgba(11,123,140,0.05); }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+  padding: 20px 16px 32px;
+  width: 100%;
+  max-width: 680px;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+
+.modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 14px;
+}
+
+.modal label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+  margin-top: 12px;
+}
+
+.modal label:first-of-type { margin-top: 0; }
+
+.modal input, .modal textarea, .modal select {
+  width: 100%;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.modal input:focus, .modal textarea:focus, .modal select:focus {
+  border-color: var(--teal);
+}
+
+.modal textarea { min-height: 70px; resize: vertical; }
+
+.modal select option { background: var(--card2); }
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.btn-primary {
+  flex: 1;
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s;
+}
+
+.btn-primary:active { opacity: 0.8; }
+
+.btn-secondary {
+  background: var(--card2);
+  color: var(--light);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* FLOATING ADD */
+.fab {
+  position: fixed;
+  bottom: 24px;
+  right: 16px;
+  background: linear-gradient(135deg, var(--teal), #1B3A6B);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(11,123,140,0.4);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s;
+}
+
+.fab:active { transform: scale(0.93); }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(74,222,128,0.15);
+  color: #4ade80;
+  border: 1px solid rgba(74,222,128,0.3);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 999;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* EMPTY STATE */
+.empty {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--muted);
+}
+
+.empty p { font-size: 13px; margin-top: 6px; }
+
+/* GOOGLE SCRIPT GUIDE */
+.guide-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.guide-card h3 {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--teal);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.guide-step {
+  display: flex;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+
+.guide-step:last-child { border-bottom: none; }
+
+.step-num {
+  width: 20px;
+  height: 20px;
+  background: var(--teal);
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-text { font-size: 12px; color: var(--light); line-height: 1.5; }
+.step-code {
+  font-family: 'DM Mono', monospace;
+  background: var(--card2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  color: #22d3ee;
+}
+
+.copy-btn {
+  display: block;
+  width: 100%;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  color: var(--light);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+
+.copy-btn:hover { border-color: var(--teal); color: var(--teal); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="header-title">
+      <h1>MDV Digital Checklist</h1>
+      <p>Menara Optometry Mid Valley · 2026</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="switchTab('guide')">📤 Export</button>
+      <button class="btn-icon" onclick="confirmReset()">↺</button>
+    </div>
+  </div>
+  <div class="global-progress">
+    <div class="progress-track">
+      <div class="progress-fill" id="globalBar" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="globalText">0 / 0</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
+    <div class="tab" onclick="switchTab('google')">📍 Google <span class="badge" id="b-google">0</span></div>
+    <div class="tab" onclick="switchTab('whatsapp')">💬 WhatsApp <span class="badge" id="b-whatsapp">0</span></div>
+    <div class="tab" onclick="switchTab('instagram')">📸 Instagram <span class="badge" id="b-instagram">0</span></div>
+    <div class="tab" onclick="switchTab('facebook')">👍 Facebook <span class="badge" id="b-facebook">0</span></div>
+    <div class="tab" onclick="switchTab('posts')">✍️ Posts <span class="badge" id="b-posts">0</span></div>
+    <div class="tab" onclick="switchTab('guide')">🚀 Deploy</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- DASHBOARD -->
+  <div class="section active" id="section-dashboard">
+
+    <div class="pie-section">
+      <div class="pie-title">
+        Today's Progress
+        <span id="pie-date"></span>
+      </div>
+      <div class="pie-container">
+        <div class="pie-chart-wrap">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r="40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="16"/>
+            <circle cx="55" cy="55" r="40" fill="none" stroke="rgba(74,222,128,0.2)" stroke-width="16"
+              id="pie-incomplete" stroke-dasharray="251.2" stroke-dashoffset="0"
+              transform="rotate(-90 55 55)"/>
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#4ade80" stroke-width="16"
+              id="pie-complete" stroke-dasharray="251.2" stroke-dashoffset="251.2"
+              transform="rotate(-90 55 55)" stroke-linecap="round"
+              style="transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1)"/>
+          </svg>
+          <div class="pie-center-text">
+            <div class="pie-pct" id="pie-pct">0%</div>
+            <div class="pie-pct-label">done</div>
+          </div>
+        </div>
+        <div class="pie-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#4ade80"></div>
+            <div class="legend-name">Completed</div>
+            <div class="legend-val" id="leg-done">0</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:rgba(74,222,128,0.2)"></div>
+            <div class="legend-name">Remaining</div>
+            <div class="legend-val" id="leg-remain">0</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#f87171"></div>
+            <div class="legend-name">Do Today</div>
+            <div class="legend-val" id="leg-urgent">0</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#fb923c"></div>
+            <div class="legend-name">This Week</div>
+            <div class="legend-val" id="leg-week">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="platform-progress">
+      <div class="stat-label" style="margin-bottom:10px">By Platform</div>
+      <div id="platform-bars"></div>
+    </div>
+
+    <div class="quick-pending" id="urgent-section">
+      <h3>🔴 Pending — Do Today</h3>
+      <div id="urgent-list"></div>
+    </div>
+
+    <div class="quick-pending" id="week-section">
+      <h3>🟡 Pending — This Week</h3>
+      <div id="week-list"></div>
+    </div>
+
+  </div>
+
+  <!-- PLATFORM SECTIONS -->
+  <div class="section" id="section-google"><div id="items-google"></div></div>
+  <div class="section" id="section-whatsapp"><div id="items-whatsapp"></div></div>
+  <div class="section" id="section-instagram"><div id="items-instagram"></div></div>
+  <div class="section" id="section-facebook"><div id="items-facebook"></div></div>
+  <div class="section" id="section-posts"><div id="items-posts"></div></div>
+
+  <!-- DEPLOY GUIDE -->
+  <div class="section" id="section-guide">
+    <div class="guide-card">
+      <h3>🚀 Deploy to GitHub Pages</h3>
+      <div class="guide-step">
+        <div class="step-num">1</div>
+        <div class="step-text">Go to <span class="step-code">github.com</span> and create a new repository. Name it <span class="step-code">mdv-checklist</span></div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">2</div>
+        <div class="step-text">Upload this HTML file. Rename it to <span class="step-code">index.html</span> when uploading.</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">3</div>
+        <div class="step-text">Go to Settings → Pages → Source: Deploy from branch → main → Save.</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">4</div>
+        <div class="step-text">Your URL will be: <span class="step-code">https://yourusername.github.io/mdv-checklist</span></div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">5</div>
+        <div class="step-text">Bookmark on phone and tablet. Add to Home Screen for app-like access.</div>
+      </div>
+    </div>
+    <div class="guide-card">
+      <h3>💾 How Data Saves</h3>
+      <div class="guide-step">
+        <div class="step-num">•</div>
+        <div class="step-text"><strong>localStorage</strong> — saves automatically in your browser on each device. Works offline. No login needed.</div>
+      </div>
+      <div class="guide-step">
+        <div class="step-num">•</div>
+        <div class="step-text"><strong>To sync across devices</strong> — use Export button to copy your data, then Import on the other device.</div>
+      </div>
+    </div>
+    <div class="guide-card">
+      <h3>📤 Export / Backup Data</h3>
+      <div class="guide-step">
+        <div class="step-num">1</div>
+        <div class="step-text">Click Export below to copy all your task data including remarks and completion status.</div>
+      </div>
+      <button class="copy-btn" onclick="exportData()">📋 Export All Data (JSON)</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openAddModal()" id="fab">+</button>
+
+<!-- MODAL: ADD/EDIT TASK -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">Add New Task</div>
+
+    <input type="hidden" id="editItemId">
+    <input type="hidden" id="editSectionKey">
+
+    <label>Task Title *</label>
+    <input type="text" id="taskTitle" placeholder="e.g. Update Google Business cover photo">
+
+    <label>Note (optional)</label>
+    <textarea id="taskNote" placeholder="Additional details or instructions..."></textarea>
+
+    <label>Remark (optional)</label>
+    <textarea id="taskRemark" placeholder="Your personal notes, observations, or follow-up..." style="min-height:55px"></textarea>
+
+    <label>Platform</label>
+    <select id="taskSection">
+      <option value="google">📍 Google Business</option>
+      <option value="whatsapp">💬 WhatsApp Business</option>
+      <option value="instagram">📸 Instagram</option>
+      <option value="facebook">👍 Facebook</option>
+      <option value="posts">✍️ First Posts</option>
+    </select>
+
+    <label>Phase / Category</label>
+    <select id="taskPhase"></select>
+
+    <label>Priority</label>
+    <select id="taskPriority">
+      <option value="now">🔴 Do Today</option>
+      <option value="week">🟡 This Week</option>
+      <option value="ongoing">🔵 Ongoing</option>
+      <option value="later">🟣 Week 2+</option>
+    </select>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveTask()">Save Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADD REMARK -->
+<div class="modal-overlay" id="remarkModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add Remark</div>
+    <input type="hidden" id="remarkItemId">
+    <label>Your Remark / Note</label>
+    <textarea id="remarkText" placeholder="Add your personal observation, follow-up action, or note..." style="min-height:100px"></textarea>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeRemarkModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveRemark()">Save Remark</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ DATA STRUCTURE ============
+const DEFAULT_DATA = {
+  google: {
+    label: "Google Business", icon: "📍",
+    phases: [
+      { id: "g_done", title: "DONE TONIGHT", color: "col-green", items: [
+        { id: "g1", title: "Hero photo replaced with slit lamp image", note: "Pending Google approval — goes live within hours", priority: "now" },
+        { id: "g2", title: "Hours corrected — all days 10:00 to 22:00", note: "Friday was showing 17:00, now fixed", priority: "now" },
+        { id: "g3", title: "Cover photo updated", note: "Clinical slit lamp image replacing Beli & Menang banner", priority: "now" },
+        { id: "g4", title: "Services listed with prices", note: "Primary Eye Care RM80, Refraction RM30, BVA RM40, etc.", priority: "now" },
+        { id: "g5", title: "Contact info complete", note: "Phone, WhatsApp, website, IG, Facebook all linked", priority: "now" },
+        { id: "g6", title: "Accessibility and payment methods listed", note: "Wheelchair access, all card types noted", priority: "now" },
+      ]},
+      { id: "g_week", title: "DO THIS WEEK", color: "col-orange", items: [
+        { id: "g7", title: "Remove 4 duplicate 'Welder' product listings", note: "Replace with real products or remove — looks like an error", priority: "week" },
+        { id: "g8", title: "Add 'From the business' description", note: "'20+ years in Mid Valley. Clinical eye care for the whole family.'", priority: "week" },
+        { id: "g9", title: "Add opening date to listing", note: "Longevity builds trust. Add approximate year branch opened.", priority: "week" },
+        { id: "g10", title: "Add Q&A section — 3 questions", note: "Appointment needed? How long? Parking? Answer yourself as owner.", priority: "week" },
+        { id: "g11", title: "Post first Google Business update after launch", note: "Look Fresh Thursday post with slit lamp photo and soft CTA", priority: "week" },
+        { id: "g12", title: "Print QR code card for counter", note: "Scan to leave Google review. CSC slides it after every positive consult.", priority: "week" },
+      ]},
+      { id: "g_ongoing", title: "ONGOING HABITS", color: "", items: [
+        { id: "g13", title: "Respond to every new review within 24 hours", note: "Positive and negative. Both matter for ranking.", priority: "ongoing" },
+        { id: "g14", title: "Ask every satisfied customer for Google review", note: "Verbal prompt + QR code at counter. In the moment, not next day.", priority: "ongoing" },
+        { id: "g15", title: "Add minimum 2 new clinical photos per month", note: "Slit lamp, consultation, equipment, team moments with consent.", priority: "ongoing" },
+        { id: "g16", title: "Check Performance dashboard every Sunday", note: "Direction requests, search queries, photo views.", priority: "ongoing" },
+      ]}
+    ]
+  },
+  whatsapp: {
+    label: "WhatsApp Business", icon: "💬",
+    phases: [
+      { id: "w_week", title: "DO THIS WEEK — PROFILE FIXES", color: "col-orange", items: [
+        { id: "w1", title: "Replace cover banner — remove Beli & Menang graphic", note: "Upload same slit lamp landscape photo as Google Business", priority: "week" },
+        { id: "w2", title: "Restructure catalogue — services first, promotions last", note: "Lead with Eye Exam, Myopia Assessment, CL Fitting, Progressive Lens", priority: "week" },
+        { id: "w3", title: "Set up greeting message", note: "'Salam, terima kasih hubungi Menara Optometry Mid Valley. Kami akan balas dalam masa terdekat. Waktu operasi 10 pagi - 10 malam.'", priority: "week" },
+        { id: "w4", title: "Set up away message", note: "'Terima kasih kerana menghubungi kami. Kami buka 10 pagi hingga 10 malam. Akan balas esok.'", priority: "week" },
+        { id: "w5", title: "Programme 5 quick replies", note: "HOURS / WALKIN / DURATION / PARKING / PRICE", priority: "week" },
+        { id: "w6", title: "Create customer labels", note: "MF Wearer / Myopia Management / CL User / Sweet Spot 35-40 / High Myopia / New / VIP", priority: "week" },
+        { id: "w17", title: "Put WhatsApp number on receipt printout", note: "'Save for collection updates and eye care tips'", priority: "week" },
+      ]},
+      { id: "w_story", title: "DAILY STORY SCHEDULE", color: "", items: [
+        { id: "w7", title: "Monday Story — DES tip or Cyber Monday offer", note: "Screen fatigue, blue light, accommodation. Office worker angle.", priority: "ongoing" },
+        { id: "w8", title: "Tuesday Story — Myopia fact or MyopiaCARE reminder", note: "Parent-focused. Child vision. Outdoor time. Progression control.", priority: "ongoing" },
+        { id: "w9", title: "Wednesday Story — Quick eye health tip", note: "Low effort day. Repurpose Monday or Tuesday content.", priority: "ongoing" },
+        { id: "w10", title: "Thursday Story — Look Fresh Thursday offer", note: "Contact lens trial, fresh look angle, younger demographic.", priority: "ongoing" },
+        { id: "w11", title: "Friday Story — Warm community content", note: "Blessed Friday feel. Light, human, not clinical.", priority: "ongoing" },
+        { id: "w12", title: "Saturday Story — Myopia management, family content", note: "Weekend family energy. Parents bringing kids.", priority: "ongoing" },
+        { id: "w13", title: "Sunday Story — UV protection, elderly eye health", note: "Sun-Day Shield. Bring parents for free slit lamp screening.", priority: "ongoing" },
+      ]},
+      { id: "w_habits", title: "ONGOING HABITS", color: "col-green", items: [
+        { id: "w14", title: "Verbal prompt at every transaction", note: "'Simpan nombor ni ye, kalau cermin mata siap kami notify terus sini.'", priority: "ongoing" },
+        { id: "w15", title: "Check Story view count every Sunday", note: "Target: 60 now → 150 by end May → 300 by end June", priority: "ongoing" },
+        { id: "w16", title: "Label every new contact after first interaction", note: "Takes 5 seconds. Invaluable for targeted recall later.", priority: "ongoing" },
+      ]}
+    ]
+  },
+  instagram: {
+    label: "Instagram", icon: "📸",
+    phases: [
+      { id: "i_setup", title: "THIS WEEK — SETUP ONLY", color: "col-orange", items: [
+        { id: "i1", title: "Update bio to clinical positioning", note: "'👁️ Clinical Eye Care — Not Just Glasses. LG-017 Mid Valley Megamall. 20+ years.'", priority: "week" },
+        { id: "i2", title: "Change link in bio to WhatsApp link", note: "wa.me/01154197980 — most important conversion action from IG", priority: "week" },
+        { id: "i3", title: "Create 5 Highlight covers", note: "OUR SERVICES / EYE HEALTH TIPS / MYOPIA CARE / MEET THE TEAM / FIND US", priority: "week" },
+        { id: "i4", title: "Connect Instagram to Facebook via Meta Business Suite", note: "One-time setup. Every IG post auto-publishes to Facebook.", priority: "week" },
+        { id: "i5", title: "Pin slit lamp photo as first post", note: "Same photo as Google Business hero. Caption: what a proper eye exam includes.", priority: "week" },
+      ]},
+      { id: "i_posts", title: "WEEK 2+ — POSTING RHYTHM", color: "col-purple", items: [
+        { id: "i6", title: "Monday 11:00 AM — Educational carousel or Reel", note: "Clinical authority. DES, myopia, lens education, annual check importance.", priority: "later" },
+        { id: "i7", title: "Thursday 11:00 AM — Clinic life post", note: "Behind the scenes, equipment, hands-on clinical moment. No full face required.", priority: "later" },
+        { id: "i8", title: "Saturday 10:30 AM — Community post", note: "Patient stories anonymised, local Mid Valley content, family eye health.", priority: "later" },
+      ]},
+      { id: "i_capture", title: "EVERY 2 WEEKS — CONTENT CAPTURE", color: "col-green", items: [
+        { id: "i9", title: "Block 45 minutes for content capture session", note: "Film 6-8 clips. Take 10 photos. Raw material only — no editing during capture.", priority: "ongoing" },
+        { id: "i10", title: "Maintain 2 weeks of content in reserve", note: "Never post just to fill calendar. Quality over frequency.", priority: "ongoing" },
+      ]}
+    ]
+  },
+  facebook: {
+    label: "Facebook", icon: "👍",
+    phases: [
+      { id: "f_setup", title: "ONE-TIME SETUP THIS WEEK", color: "col-orange", items: [
+        { id: "f1", title: "Connect Facebook to Instagram via Meta Business Suite", note: "Set once, forget forever. Every IG post auto-publishes.", priority: "week" },
+        { id: "f2", title: "Update Facebook cover photo with slit lamp image", note: "Consistent with Google Business and WhatsApp Business.", priority: "week" },
+        { id: "f3", title: "Update Facebook bio to match Instagram", note: "Same clinical positioning. 'Clinical Eye Care — Not Just Glasses.'", priority: "week" },
+      ]},
+      { id: "f_habits", title: "ONGOING", color: "", items: [
+        { id: "f4", title: "Facebook mirrors Instagram automatically", note: "Zero original effort needed after setup.", priority: "ongoing" },
+        { id: "f5", title: "Respond to any Facebook messages or comments", note: "Don't let messages go unanswered.", priority: "ongoing" },
+      ]}
+    ]
+  },
+  posts: {
+    label: "First 6 Posts", icon: "✍️",
+    phases: [
+      { id: "p_w2", title: "WEEK 2 — FIRST POSTS", color: "col-purple", items: [
+        { id: "p1", title: "Post 1 — Mon Week 2: DES Carousel", note: "'Are Your Eyes Aging Faster Than Your Age?' — 5 slides, office worker angle, free Monday screening CTA", priority: "later" },
+        { id: "p2", title: "Post 2 — Thu Week 2: Slit Lamp Reel", note: "'What We Actually Check That Others Skip' — over-shoulder shot, 30-45 sec, voiceover or text overlay", priority: "later" },
+        { id: "p3", title: "Post 3 — Sat Week 2: Community Post", note: "'Berapa Lama Dah Tak Check Mata?' — Snellen chart visual, warm BM caption", priority: "later" },
+      ]},
+      { id: "p_w3", title: "WEEK 3 — CONTINUING", color: "", items: [
+        { id: "p4", title: "Post 4 — Mon Week 3: Myopia Carousel", note: "'Your Child's Myopia — What The Numbers Mean' — 4 slides, parent audience, BM primary", priority: "later" },
+        { id: "p5", title: "Post 5 — Thu Week 3: Lens Comparison", note: "'Thin vs Thick' — hands holding index 1.56 vs 1.74 for same prescription", priority: "later" },
+        { id: "p6", title: "Post 6 — Sat Week 3: Brand Story", note: "'20 Tahun Di Mid Valley' — outlet photo, what changed and what hasn't", priority: "later" },
+      ]}
+    ]
+  }
+};
+
+const PLATFORM_COLORS = {
+  google: '#1B3A6B', whatsapp: '#16a34a',
+  instagram: '#e1306c', facebook: '#1877f2', posts: '#7c3aed'
+};
+
+const PRIORITY_LABELS = { now: 'DO TODAY', week: 'THIS WEEK', ongoing: 'ONGOING', later: 'WEEK 2+' };
+const PRIORITY_CLASSES = { now: 'tag-now', week: 'tag-week', ongoing: 'tag-ongoing', later: 'tag-later' };
+
+let appData = {};
+let checkState = {};
+let remarks = {};
+let currentTab = 'dashboard';
+
+// ============ STORAGE — localStorage (works everywhere: GitHub, local, GAS) ============
+const STORAGE_KEY = 'mdv_v3';
+
+function loadAll() {
+  appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  checkState = {};
+  remarks = {};
+}
+
+function loadSaved() {
+  try {
+    var r = localStorage.getItem(STORAGE_KEY);
+    if (r) {
+      var p = JSON.parse(r);
+      if (p.appData) appData = p.appData;
+      if (p.checkState) checkState = p.checkState;
+      if (p.remarks) remarks = p.remarks;
+    }
+  } catch(e) {}
+}
+
+function saveAll() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({appData, checkState, remarks}));
+  } catch(e) {}
+}
+
+// ============ RENDER ============
+function getAllItems() {
+  let items = [];
+  Object.keys(appData).forEach(key => {
+    appData[key].phases.forEach(phase => {
+      phase.items.forEach(item => {
+        items.push({ ...item, section: key, phaseId: phase.id });
+      });
+    });
+  });
+  return items;
+}
+
+function getSectionStats(key) {
+  let total = 0, done = 0;
+  appData[key].phases.forEach(phase => {
+    phase.items.forEach(item => {
+      total++;
+      if (checkState[item.id]) done++;
+    });
+  });
+  return { total, done };
+}
+
+function renderDashboard() {
+  const all = getAllItems();
+  const total = all.length;
+  const done = all.filter(i => checkState[i.id]).length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  // Pie
+  const circ = 251.2;
+  const offset = circ - (circ * pct / 100);
+  document.getElementById('pie-complete').style.strokeDashoffset = offset;
+  document.getElementById('pie-pct').textContent = pct + '%';
+  document.getElementById('leg-done').textContent = done;
+  document.getElementById('leg-remain').textContent = total - done;
+  document.getElementById('leg-urgent').textContent = all.filter(i => !checkState[i.id] && i.priority === 'now').length;
+  document.getElementById('leg-week').textContent = all.filter(i => !checkState[i.id] && i.priority === 'week').length;
+  document.getElementById('pie-date').textContent = new Date().toLocaleDateString('en-MY', { day:'numeric', month:'short' });
+
+  // Platform bars
+  const barsEl = document.getElementById('platform-bars');
+  barsEl.innerHTML = Object.keys(appData).map(key => {
+    const s = getSectionStats(key);
+    const p = s.total > 0 ? Math.round(s.done / s.total * 100) : 0;
+    return `<div class="platform-row" onclick="switchTab('${key}')">
+      <span class="plat-icon">${appData[key].icon}</span>
+      <span class="plat-name">${appData[key].label.split(' ')[0]}</span>
+      <div class="plat-bar-wrap">
+        <div class="plat-bar" style="width:${p}%;background:${PLATFORM_COLORS[key]}"></div>
+      </div>
+      <span class="plat-count">${s.done}/${s.total}</span>
+    </div>`;
+  }).join('');
+
+  // Urgent list
+  const urgent = all.filter(i => !checkState[i.id] && i.priority === 'now');
+  const urgentEl = document.getElementById('urgent-list');
+  urgentEl.innerHTML = urgent.length === 0
+    ? '<div style="font-size:12px;color:#4ade80;padding:4px 0">✓ All done today!</div>'
+    : urgent.slice(0, 6).map(i => `
+      <div class="quick-item" onclick="switchTab('${i.section}')">
+        <div class="quick-dot" style="background:#f87171"></div>
+        <div class="quick-text">${i.title}</div>
+        <span class="quick-platform">${appData[i.section].label.split(' ')[0]}</span>
+      </div>`).join('') + (urgent.length > 6 ? `<div style="font-size:11px;color:var(--muted);padding:5px 0">+${urgent.length-6} more</div>` : '');
+
+  // Week list
+  const weekItems = all.filter(i => !checkState[i.id] && i.priority === 'week');
+  const weekEl = document.getElementById('week-list');
+  weekEl.innerHTML = weekItems.length === 0
+    ? '<div style="font-size:12px;color:#4ade80;padding:4px 0">✓ All this week\'s tasks done!</div>'
+    : weekItems.slice(0, 6).map(i => `
+      <div class="quick-item" onclick="switchTab('${i.section}')">
+        <div class="quick-dot" style="background:#fb923c"></div>
+        <div class="quick-text">${i.title}</div>
+        <span class="quick-platform">${appData[i.section].label.split(' ')[0]}</span>
+      </div>`).join('') + (weekItems.length > 6 ? `<div style="font-size:11px;color:var(--muted);padding:5px 0">+${weekItems.length-6} more</div>` : '');
+}
+
+function renderSection(key) {
+  const container = document.getElementById('items-' + key);
+  if (!container) return;
+  const sec = appData[key];
+  let html = '';
+
+  sec.phases.forEach(phase => {
+    const pDone = phase.items.filter(i => checkState[i.id]).length;
+    html += `<div class="phase">
+      <div class="phase-header ${phase.color || ''}" onclick="togglePhase('pb_${phase.id}', 'pc_${phase.id}')">
+        <span class="phase-title">${phase.title}</span>
+        <span class="phase-count">${pDone}/${phase.items.length}</span>
+        <span class="phase-chevron open" id="pc_${phase.id}">▼</span>
+      </div>
+      <div class="phase-body" id="pb_${phase.id}">`;
+
+    if (phase.items.length === 0) {
+      html += '<div class="empty"><p>No tasks yet. Tap + to add one.</p></div>';
+    }
+
+    phase.items.forEach(item => {
+      const done = !!checkState[item.id];
+      const remark = remarks[item.id] || '';
+      html += `<div class="item ${done ? 'completed' : ''}" id="item_${item.id}">
+        <div class="item-check" onclick="toggleCheck('${item.id}')">
+          <span class="check-icon">✓</span>
+        </div>
+        <div class="item-body" onclick="toggleCheck('${item.id}')">
+          <div class="item-title">${item.title}</div>
+          ${item.note ? `<div class="item-note">${item.note}</div>` : ''}
+          <span class="priority-tag ${PRIORITY_CLASSES[item.priority]}">${PRIORITY_LABELS[item.priority]}</span>
+          ${remark ? `<div class="item-remark">📝 ${remark}</div>` : ''}
+        </div>
+        <div class="item-actions">
+          <button class="act-btn" onclick="openRemarkModal('${item.id}','${escHtml(remark)}')" title="Add remark">💬</button>
+          <button class="act-btn" onclick="openEditModal('${item.id}','${key}')" title="Edit">✏️</button>
+          <button class="act-btn" onclick="deleteItem('${item.id}','${key}')" title="Delete">🗑️</button>
+        </div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+    html += `<button class="add-phase-btn" onclick="openAddModal('${key}','${phase.id}')">+ Add task to "${phase.title}"</button>`;
+  });
+
+  container.innerHTML = html;
+
+  // Badge
+  const s = getSectionStats(key);
+  const badge = document.getElementById('b-' + key);
+  if (badge) {
+    badge.textContent = s.done + '/' + s.total;
+    badge.className = 'badge' + (s.done === s.total && s.total > 0 ? ' complete' : '');
+  }
+}
+
+function renderGlobal() {
+  const all = getAllItems();
+  const total = all.length;
+  const done = all.filter(i => checkState[i.id]).length;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  document.getElementById('globalBar').style.width = pct + '%';
+  document.getElementById('globalText').textContent = done + ' / ' + total;
+}
+
+function render() {
+  renderGlobal();
+  Object.keys(appData).forEach(key => renderSection(key));
+  renderDashboard();
+}
+
+// ============ INTERACTIONS ============
+function toggleCheck(id) {
+  checkState[id] = !checkState[id];
+  saveAll();
+  render();
+  showToast(checkState[id] ? '✓ Marked complete' : 'Unmarked');
+}
+
+function togglePhase(bodyId, chevronId) {
+  const body = document.getElementById(bodyId);
+  const chev = document.getElementById(chevronId);
+  if (!body) return;
+  const hidden = body.style.display === 'none';
+  body.style.display = hidden ? 'block' : 'none';
+  if (chev) chev.classList.toggle('open', hidden);
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const tabMap = ['dashboard','google','whatsapp','instagram','facebook','posts','guide'];
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    if (tabMap[i] === tab) t.classList.add('active');
+  });
+  document.querySelectorAll('.section').forEach(s => {
+    s.classList.toggle('active', s.id === 'section-' + tab);
+  });
+  const fab = document.getElementById('fab');
+  fab.style.display = (tab === 'guide' || tab === 'dashboard') ? 'none' : 'flex';
+  if (tab === 'dashboard') renderDashboard();
+}
+
+// ============ ADD/EDIT MODAL ============
+let currentAddSection = null;
+let currentAddPhase = null;
+let currentEditId = null;
+
+function openAddModal(sectionKey, phaseId) {
+  currentAddSection = sectionKey || currentTab;
+  currentAddPhase = phaseId || null;
+  currentEditId = null;
+
+  document.getElementById('modalTitle').textContent = 'Add New Task';
+  document.getElementById('taskTitle').value = '';
+  document.getElementById('taskNote').value = '';
+  document.getElementById('taskRemark').value = '';
+  document.getElementById('taskSection').value = currentAddSection;
+  document.getElementById('taskPriority').value = 'week';
+  updatePhaseDropdown(currentAddSection, phaseId);
+  document.getElementById('taskModal').classList.add('open');
+}
+
+function openEditModal(itemId, sectionKey) {
+  currentEditId = itemId;
+  currentAddSection = sectionKey;
+
+  let found = null;
+  appData[sectionKey].phases.forEach(phase => {
+    phase.items.forEach(item => {
+      if (item.id === itemId) { found = item; currentAddPhase = phase.id; }
+    });
+  });
+
+  if (!found) return;
+  document.getElementById('modalTitle').textContent = 'Edit Task';
+  document.getElementById('taskTitle').value = found.title;
+  document.getElementById('taskNote').value = found.note || '';
+  document.getElementById('taskRemark').value = remarks[itemId] || '';
+  document.getElementById('taskSection').value = sectionKey;
+  document.getElementById('taskPriority').value = found.priority;
+  updatePhaseDropdown(sectionKey, currentAddPhase);
+  document.getElementById('taskModal').classList.add('open');
+}
+
+function updatePhaseDropdown(sectionKey, selectedPhaseId) {
+  const select = document.getElementById('taskPhase');
+  if (!appData[sectionKey]) return;
+  select.innerHTML = appData[sectionKey].phases.map(p =>
+    `<option value="${p.id}" ${p.id === selectedPhaseId ? 'selected' : ''}>${p.title}</option>`
+  ).join('');
+}
+
+document.getElementById('taskSection').addEventListener('change', function() {
+  updatePhaseDropdown(this.value, null);
+});
+
+function saveTask() {
+  const title = document.getElementById('taskTitle').value.trim();
+  if (!title) { showToast('Please enter a task title'); return; }
+
+  const sectionKey = document.getElementById('taskSection').value;
+  const phaseId = document.getElementById('taskPhase').value;
+  const note = document.getElementById('taskNote').value.trim();
+  const remark = document.getElementById('taskRemark').value.trim();
+  const priority = document.getElementById('taskPriority').value;
+
+  if (currentEditId) {
+    // Edit existing
+    appData[sectionKey].phases.forEach(phase => {
+      phase.items.forEach(item => {
+        if (item.id === currentEditId) {
+          item.title = title;
+          item.note = note;
+          item.priority = priority;
+        }
+      });
+    });
+    if (remark) remarks[currentEditId] = remark;
+    else delete remarks[currentEditId];
+  } else {
+    // Add new
+    const newId = 'custom_' + Date.now();
+    const phase = appData[sectionKey].phases.find(p => p.id === phaseId);
+    if (phase) {
+      phase.items.push({ id: newId, title, note, priority });
+      if (remark) remarks[newId] = remark;
+    }
+  }
+
+  saveAll();
+  render();
+  closeModal();
+  showToast(currentEditId ? '✓ Task updated' : '✓ Task added');
+}
+
+function closeModal() {
+  document.getElementById('taskModal').classList.remove('open');
+}
+
+// ============ REMARK MODAL ============
+function openRemarkModal(itemId, existingRemark) {
+  document.getElementById('remarkItemId').value = itemId;
+  document.getElementById('remarkText').value = existingRemark || '';
+  document.getElementById('remarkModal').classList.add('open');
+}
+
+function saveRemark() {
+  const id = document.getElementById('remarkItemId').value;
+  const text = document.getElementById('remarkText').value.trim();
+  if (text) remarks[id] = text;
+  else delete remarks[id];
+  saveAll();
+  render();
+  closeRemarkModal();
+  showToast('✓ Remark saved');
+}
+
+function closeRemarkModal() {
+  document.getElementById('remarkModal').classList.remove('open');
+}
+
+// ============ DELETE ============
+function deleteItem(itemId, sectionKey) {
+  if (!confirm('Delete this task?')) return;
+  appData[sectionKey].phases.forEach(phase => {
+    phase.items = phase.items.filter(i => i.id !== itemId);
+  });
+  delete checkState[itemId];
+  delete remarks[itemId];
+  saveAll();
+  render();
+  showToast('Task deleted');
+}
+
+// ============ RESET ============
+function confirmReset() {
+  if (confirm('Reset all progress? Tasks will remain but all checkmarks will be cleared.')) {
+    checkState = {};
+    saveAll();
+    render();
+    showToast('Progress reset');
+  }
+}
+
+// ============ EXPORT ============
+function exportData() {
+  const exportObj = { appData, checkState, remarks, exported: new Date().toISOString() };
+  const json = JSON.stringify(exportObj, null, 2);
+  try {
+    navigator.clipboard.writeText(json);
+    showToast('✓ Data copied to clipboard');
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = json;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✓ Data copied');
+  }
+}
+
+
+
+// ============ TOAST ============
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function escHtml(str) {
+  return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeModal();
+      closeRemarkModal();
+    }
+  });
+});
+
+// Date display
+document.getElementById('pie-date').textContent = new Date().toLocaleDateString('en-MY', { weekday:'short', day:'numeric', month:'short' });
+
+// ============ INIT ============
+window.onload = function() {
+  loadAll();
+  loadSaved();
+  render();
+  switchTab('dashboard');
+};
+</script>
+</body>
+</html>

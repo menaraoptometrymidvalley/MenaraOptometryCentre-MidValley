@@ -820,6 +820,87 @@ body {
 }
 
 .copy-btn:hover { border-color: var(--teal); color: var(--teal); }
+
+.item-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #22d3ee;
+  background: rgba(34,211,238,0.08);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-top: 3px;
+  font-family: 'DM Mono', monospace;
+  cursor: pointer;
+  border: 1px solid rgba(34,211,238,0.2);
+  text-decoration: none;
+}
+
+.item-date:hover { background: rgba(34,211,238,0.15); }
+.item-date.overdue { color: #f87171; background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.2); }
+.item-date.today { color: #4ade80; background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.2); }
+
+.milestone-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.milestone-card h3 {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.milestone-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.milestone-row:last-child { border-bottom: none; }
+
+.milestone-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.milestone-date {
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  color: var(--muted);
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.milestone-title {
+  font-size: 12px;
+  color: var(--light);
+  flex: 1;
+}
+
+.milestone-cal {
+  font-size: 11px;
+  color: var(--teal);
+  text-decoration: none;
+  padding: 3px 7px;
+  border: 1px solid rgba(11,123,140,0.3);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.milestone-cal:hover { background: rgba(11,123,140,0.1); }
 </style>
 </head>
 <body>
@@ -924,6 +1005,58 @@ body {
       <div id="week-list"></div>
     </div>
 
+    <div class="milestone-card">
+      <h3>📅 Key Milestones</h3>
+      <div class="milestone-row" onclick="addToCalendar('MDV Pilot Day 1 — Launch','2026-04-16','Look Fresh Thursday launch. 5 WhatsApp recalls. Story post. Team briefing at 11:35am.')">
+        <div class="milestone-dot" style="background:#4ade80"></div>
+        <div class="milestone-date">16 Apr</div>
+        <div class="milestone-title">Day 1 — Pilot Launch 🟢 TODAY</div>
+        <a class="milestone-cal" onclick="event.stopPropagation();addToCalendar('MDV Pilot Day 1','2026-04-16','Look Fresh Thursday launch')">+ Cal</a>
+      </div>
+      <div class="milestone-row" onclick="addToCalendar('MDV WhatsApp Business fixes','2026-04-18','Fix cover banner, catalogue, greeting message, away message, quick replies, labels')">
+        <div class="milestone-dot" style="background:#fb923c"></div>
+        <div class="milestone-date">18 Apr</div>
+        <div class="milestone-title">WhatsApp Business fixes due</div>
+        <a class="milestone-cal" onclick="event.stopPropagation();addToCalendar('MDV WhatsApp Business fixes','2026-04-18','Fix cover banner, catalogue, greeting message')">+ Cal</a>
+      </div>
+      <div class="milestone-row" onclick="addToCalendar('MDV Instagram setup','2026-04-20','Update bio, link in bio, highlights, connect to Facebook via Meta Business Suite')">
+        <div class="milestone-dot" style="background:#fb923c"></div>
+        <div class="milestone-date">20 Apr</div>
+        <div class="milestone-title">Instagram setup complete</div>
+        <a class="milestone-cal" onclick="event.stopPropagation();addToCalendar('MDV Instagram setup','2026-04-20','Bio, highlights, Facebook mirror setup')">+ Cal</a>
+      </div>
+      <div class="milestone-row" onclick="addToCalendar('MDV Google Business week 1 tasks','2026-04-22','Remove Welder duplicates, add From the business, Q&A section, opening date')">
+        <div class="milestone-dot" style="background:#fb923c"></div>
+        <div class="milestone-date">22 Apr</div>
+        <div class="milestone-title">Google Business week 1 tasks done</div>
+        <a class="milestone-cal" onclick="event.stopPropagation();addToCalendar('MDV Google Business tasks','2026-04-22','Q&A, opening date, remove Welder duplicates')">+ Cal</a>
+      </div>
+      <div class="milestone-row" onclick="addToCalendar('MDV Pilot Day 14 Review','2026-04-29','Review: WhatsApp recall results, Story views, first Instagram posts, walk-in conversions')">
+        <div class="milestone-dot" style="background:#a78bfa"></div>
+        <div class="milestone-date">29 Apr</div>
+        <div class="milestone-title">Day 14 — Pilot Review</div>
+        <a class="milestone-cal" onclick="event.stopPropagation();addToCalendar('MDV Pilot Day 14 Review','2026-04-29','Review recalls, Story views, Instagram, walk-ins')">+ Cal</a>
+      </div>
+      <div class="milestone-row" onclick="addToCalendar('MDV Day 30 Review','2026-05-16','Check: Story views target 150, Google reviews added, Instagram rhythm sustainable')">
+        <div class="milestone-dot" style="background:#22d3ee"></div>
+        <div class="milestone-date">16 May</div>
+        <div class="milestone-title">Day 30 — First Month Review</div>
+        <a class="milestone-cal" onclick="event.stopPropagation();addToCalendar('MDV Day 30 Review','2026-05-16','Story views 150 target, Google reviews, Instagram rhythm')">+ Cal</a>
+      </div>
+      <div class="milestone-row" onclick="addToCalendar('MDV Day 60 Review','2026-06-15','Check: Story views 150+, walk-ins attributable to digital, Instagram saves & shares')">
+        <div class="milestone-dot" style="background:#22d3ee"></div>
+        <div class="milestone-date">15 Jun</div>
+        <div class="milestone-title">Day 60 — Mid Review</div>
+        <a class="milestone-cal" onclick="event.stopPropagation();addToCalendar('MDV Day 60 Review','2026-06-15','Story views, walk-in attribution, Instagram engagement')">+ Cal</a>
+      </div>
+      <div class="milestone-row" onclick="addToCalendar('MDV Day 90 Full Review','2026-07-15','Full framework review. TikTok decision. Handover guide. Story views 300 target.')">
+        <div class="milestone-dot" style="background:#f87171"></div>
+        <div class="milestone-date">15 Jul</div>
+        <div class="milestone-title">Day 90 — Full Framework Review</div>
+        <a class="milestone-cal" onclick="event.stopPropagation();addToCalendar('MDV Day 90 Full Review','2026-07-15','TikTok decision, handover guide, Story views 300')">+ Cal</a>
+      </div>
+    </div>
+
   </div>
 
   <!-- PLATFORM SECTIONS -->
@@ -1021,6 +1154,9 @@ body {
       <option value="ongoing">🔵 Ongoing</option>
       <option value="later">🟣 Week 2+</option>
     </select>
+
+    <label>Due Date (optional)</label>
+    <input type="date" id="taskDueDate">
 
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancel</button>
@@ -1309,6 +1445,7 @@ function renderSection(key) {
           <div class="item-title">${item.title}</div>
           ${item.note ? `<div class="item-note">${item.note}</div>` : ''}
           <span class="priority-tag ${PRIORITY_CLASSES[item.priority]}">${PRIORITY_LABELS[item.priority]}</span>
+          ${item.dueDate ? `<a class="item-date ${getDueDateClass(item.dueDate)}" onclick="event.stopPropagation();addToCalendar('${escHtml(item.title)}','${item.dueDate}','${escHtml(item.note||'')}')" title="Add to Google Calendar">📅 ${formatDate(item.dueDate)} → Cal</a>` : ''}
           ${remark ? `<div class="item-remark">📝 ${remark}</div>` : ''}
         </div>
         <div class="item-actions">
@@ -1419,6 +1556,7 @@ function openEditModal(itemId, sectionKey) {
   document.getElementById('taskRemark').value = remarks[itemId] || '';
   document.getElementById('taskSection').value = sectionKey;
   document.getElementById('taskPriority').value = found.priority;
+  document.getElementById('taskDueDate').value = found.dueDate || '';
   updatePhaseDropdown(sectionKey, currentAddPhase);
   document.getElementById('taskModal').classList.add('open');
 }
@@ -1453,6 +1591,7 @@ function saveTask() {
           item.title = title;
           item.note = note;
           item.priority = priority;
+          item.dueDate = document.getElementById('taskDueDate').value || '';
         }
       });
     });
@@ -1463,7 +1602,8 @@ function saveTask() {
     const newId = 'custom_' + Date.now();
     const phase = appData[sectionKey].phases.find(p => p.id === phaseId);
     if (phase) {
-      phase.items.push({ id: newId, title, note, priority });
+      const dueDate = document.getElementById('taskDueDate').value || '';
+      phase.items.push({ id: newId, title, note, priority, dueDate });
       if (remark) remarks[newId] = remark;
     }
   }
@@ -1567,6 +1707,40 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
 
 // Date display
 document.getElementById('pie-date').textContent = new Date().toLocaleDateString('en-MY', { weekday:'short', day:'numeric', month:'short' });
+
+// ============ DATE HELPERS ============
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-MY', { day: 'numeric', month: 'short' });
+  } catch(e) { return dateStr; }
+}
+
+function getDueDateClass(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const due = new Date(dateStr + 'T00:00:00');
+    const today = new Date(); today.setHours(0,0,0,0);
+    if (due < today) return 'overdue';
+    if (due.getTime() === today.getTime()) return 'today';
+  } catch(e) {}
+  return '';
+}
+
+function addToCalendar(title, dateStr, details) {
+  try {
+    const d = new Date(dateStr + 'T10:00:00');
+    const end = new Date(dateStr + 'T11:00:00');
+    const fmt = d => d.toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+    const url = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+      '&text=' + encodeURIComponent(title) +
+      '&dates=' + fmt(d) + '/' + fmt(end) +
+      '&details=' + encodeURIComponent(details || '') +
+      '&location=' + encodeURIComponent('Menara Optometry Mid Valley, LG-017 Mid Valley Megamall');
+    window.open(url, '_blank');
+  } catch(e) { showToast('Could not open calendar'); }
+}
 
 // ============ INIT ============
 window.onload = function() {

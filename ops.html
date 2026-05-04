@@ -310,6 +310,99 @@
     font-style: italic;
   }
 
+  /* === STAFF LEADERBOARD === */
+  .staff-leaderboard {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 2px dashed var(--line);
+  }
+  .leaderboard-head {
+    margin-bottom: 12px;
+  }
+  .leaderboard-head h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .leaderboard-head p {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .leaderboard-list {
+    display: grid;
+    gap: 10px;
+  }
+  .leaderboard-row {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    border-left: 4px solid var(--line-2);
+  }
+  .leaderboard-row.rank-1 { border-left-color: #fbbf24; }
+  .leaderboard-row.rank-2 { border-left-color: #94a3b8; }
+  .leaderboard-row.rank-3 { border-left-color: #d97706; }
+  .leaderboard-row.tier-cleared { background: var(--bg-2); }
+  .lb-rank {
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .leaderboard-row.rank-1 .lb-rank { color: #f59e0b; }
+  .leaderboard-row.rank-2 .lb-rank { color: #64748b; }
+  .leaderboard-row.rank-3 .lb-rank { color: #b45309; }
+  .lb-info { min-width: 0; }
+  .lb-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .lb-alert {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .lb-alert.cleared { color: var(--success); font-weight: 600; }
+  .lb-alert.urgent { color: var(--accent); font-weight: 600; }
+  .lb-amount {
+    font-size: 17px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .lb-progress {
+    grid-column: 1 / -1;
+    height: 4px;
+    background: var(--bg-3);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .lb-progress-bar {
+    height: 100%;
+    background: var(--success);
+    transition: width .4s;
+  }
+  .lb-progress-bar.tier2 { background: var(--warn); }
+  .lb-progress-bar.below { background: var(--accent); }
+  .leaderboard-empty {
+    color: var(--muted);
+    font-style: italic;
+    padding: 14px;
+    text-align: center;
+    font-size: 12px;
+  }
+
   /* === SECTION HEADER === */
   .section-head {
     display: flex;
@@ -889,6 +982,15 @@
   <div class="sales-body" id="salesBody">
     <div class="sales-grid" id="salesGrid"></div>
     <div class="sales-meta" id="salesMeta"></div>
+
+    <!-- Staff leaderboard -->
+    <div class="staff-leaderboard" id="staffLeaderboard">
+      <div class="leaderboard-head">
+        <h4>🏆 Staff Leaderboard · MTD</h4>
+        <p id="leaderboardSummary">— · sorted by sales · daily run-rate auto-calculated</p>
+      </div>
+      <div class="leaderboard-list" id="leaderboardList"></div>
+    </div>
   </div>
 </div>
 
@@ -1155,14 +1257,25 @@ const FALLBACK = {
 
   sales: {
     period: "May 2026",
-    tier1: 150000,
-    tier2: 110000,
-    std: 89400,
-    quarterTarget: 450000,
-    quarterStd: 245000,
+    tier1: 85000,
+    tier2: 105000,
+    std: 28500,
+    quarterTarget: 270000,
+    quarterStd: 95000,
     staffCount: 5,
-    lastUpdated: "2026-05-04"
-  }
+    lastUpdated: "2026-05-04",
+    customerCount: 42,
+    customerTarget: 350,
+    patientCount: 18
+  },
+
+  staffSales: [
+    { name: "Hazwan", mtdSales: 28500, lastUpdated: "2026-05-04", notes: "", status: "active" },
+    { name: "Nurul", mtdSales: 22000, lastUpdated: "2026-05-04", notes: "", status: "active" },
+    { name: "Haziqah", mtdSales: 18500, lastUpdated: "2026-05-04", notes: "", status: "active" },
+    { name: "Izzati", mtdSales: 12000, lastUpdated: "2026-05-04", notes: "", status: "active" },
+    { name: "Syafiq", mtdSales: 8400, lastUpdated: "2026-05-04", notes: "", status: "active" }
+  ]
 };
 
 // =============================================================
@@ -1449,6 +1562,10 @@ function renderSales() {
   let tier2Bar = tier2Pct >= 100 ? "" : "below";
 
   const grid = document.getElementById("salesGrid");
+  // Customer count progress (TCx target, default 350)
+  const custTarget = s.customerTarget || 350;
+  const custPct = custTarget > 0 ? Math.round(((s.customerCount || 0) / custTarget) * 100) : 0;
+  const custBar = custPct >= 100 ? "" : (custPct >= 75 ? "tier2" : "below");
   grid.innerHTML = `
     <div class="sales-card">
       <div class="label">Sales To Date · ${s.period || "This Month"}</div>
@@ -1456,16 +1573,27 @@ function renderSales() {
       <div class="sub">RM${(s.std/1000).toFixed(1)}k actual</div>
     </div>
     <div class="sales-card">
-      <div class="label">Tier 1 Target</div>
+      <div class="label">Tier 1 Target (3%)</div>
       <div class="value">${fmtMoney(s.tier1)}</div>
-      <div class="sub">${tier1Pct}% achieved · ${fmtMoneyShort(Math.max(0, s.tier1 - s.std))} to go</div>
+      <div class="sub">${tier1Pct}% achieved · ${tier1Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, s.tier1 - s.std)) + " to go"}</div>
       <div class="progress"><div class="progress-bar ${tier1Bar}" style="width: ${Math.min(100, tier1Pct)}%"></div></div>
     </div>
     <div class="sales-card">
-      <div class="label">Tier 2 Target</div>
+      <div class="label">Tier 2 Target (4%)</div>
       <div class="value">${fmtMoney(s.tier2)}</div>
       <div class="sub">${tier2Pct}% achieved · ${tier2Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, s.tier2 - s.std)) + " to go"}</div>
       <div class="progress"><div class="progress-bar ${tier2Bar}" style="width: ${Math.min(100, tier2Pct)}%"></div></div>
+    </div>
+    <div class="sales-card">
+      <div class="label">Customers · TCx Target</div>
+      <div class="value">${fmtNumber(s.customerCount || 0)} / ${fmtNumber(custTarget)}</div>
+      <div class="sub">${custPct}% achieved · ${custPct >= 100 ? "✓ cleared" : fmtNumber(Math.max(0, custTarget - (s.customerCount||0))) + " to go"}</div>
+      <div class="progress"><div class="progress-bar ${custBar}" style="width: ${Math.min(100, custPct)}%"></div></div>
+    </div>
+    <div class="sales-card">
+      <div class="label">Patients · Eye Exams</div>
+      <div class="value">${fmtNumber(s.patientCount || 0)}</div>
+      <div class="sub">No target · clinical metric</div>
     </div>
     <div class="sales-card">
       <div class="label">Quarter STD</div>
@@ -1473,13 +1601,60 @@ function renderSales() {
       <div class="sub">${qPct}% of ${fmtMoneyShort(s.quarterTarget)} quarter target</div>
       <div class="progress"><div class="progress-bar ${qPct >= 100 ? '' : (qPct >= 75 ? 'tier2' : 'below')}" style="width: ${Math.min(100, qPct)}%"></div></div>
     </div>
-    <div class="sales-card">
-      <div class="label">Staff On Floor</div>
-      <div class="value">${s.staffCount}</div>
-      <div class="sub">Active headcount this period</div>
-    </div>
   `;
   document.getElementById("salesMeta").textContent = `Last updated: ${s.lastUpdated || "—"}`;
+  renderLeaderboard();
+}
+
+// =============================================================
+//  STAFF LEADERBOARD (PIN-gated, inside Sales section)
+//  Option 4: clean ranking only — no daily run-rate, no alerts.
+//  Lets staff see their position; pace is up to them.
+// =============================================================
+function renderLeaderboard() {
+  const staff = (state.data.staffSales || []).filter(p => (p.status || "active") !== "inactive");
+  const wrap = document.getElementById("staffLeaderboard");
+  const list = document.getElementById("leaderboardList");
+  const summary = document.getElementById("leaderboardSummary");
+
+  if (!wrap || !list) return;
+  if (staff.length === 0) {
+    wrap.style.display = "none";
+    return;
+  }
+  wrap.style.display = "";
+
+  // Sort by MTD descending
+  const sorted = [...staff].sort((a,b) => (b.mtdSales||0) - (a.mtdSales||0));
+  const topAmount = sorted[0].mtdSales || 1; // for proportional progress bar
+  const lastUpdates = sorted.map(p => p.lastUpdated).filter(d => d).sort();
+  const latestUpdate = lastUpdates.length ? lastUpdates[lastUpdates.length-1] : "—";
+
+  summary.textContent = `${sorted.length} staff · sorted by MTD · last update ${latestUpdate}`;
+
+  list.innerHTML = sorted.map((p, idx) => {
+    const rank = idx + 1;
+    const mtd = p.mtdSales || 0;
+    const rankIcon = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`;
+    const rowClass = `leaderboard-row rank-${rank}`;
+    // Progress bar shows position relative to top performer (visual only)
+    const progressPct = (mtd / topAmount) * 100;
+
+    return `
+      <div class="${rowClass}">
+        <div class="lb-rank">${rankIcon}</div>
+        <div class="lb-info">
+          <div class="lb-name">${escapeHtml(p.name)}</div>
+        </div>
+        <div class="lb-amount">RM ${fmtNumber(mtd)}</div>
+        <div class="lb-progress"><div class="lb-progress-bar" style="width: ${Math.min(100, progressPct)}%"></div></div>
+      </div>
+    `;
+  }).join("");
+}
+
+function fmtNumber(n) {
+  return Math.round(n).toLocaleString("en-MY");
 }
 
 // =============================================================

@@ -117,10 +117,76 @@
     background: var(--primary-soft);
     border-left: 4px solid var(--primary);
     border-radius: 6px;
+    cursor: pointer;
+    transition: background .15s;
+    position: relative;
   }
+  .today-special:hover { background: rgba(27,20,100,.08); }
   .today-special-tag { font-size: 10px; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
   .today-special h2 { font-size: 22px; margin-top: 4px; font-weight: 700; }
   .today-special p { color: var(--muted); margin-top: 4px; font-size: 13px; }
+  .today-special .expand-hint {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .today-special .expand-hint .arrow {
+    transition: transform .2s;
+    display: inline-block;
+  }
+  .today-special.expanded .expand-hint .arrow {
+    transform: rotate(180deg);
+  }
+  .today-special .promo-summary {
+    color: var(--text);
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .today-special .promo-list {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(27,20,100,.1);
+  }
+  .today-special.expanded .promo-list { display: block; }
+  .today-special .promo-item {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(27,20,100,.08);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 13px;
+  }
+  .today-special .promo-item:last-child { border-bottom: none; }
+  .today-special .promo-item .num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .today-special .promo-item .promo-text {
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .today-special .empty-promos {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 12px;
+    padding: 6px 0;
+  }
 
   .hero-card {
     background: var(--bg);
@@ -367,6 +433,83 @@
   .past-toggle:hover { color: var(--text); }
   .past-list { display: none; margin-top: 12px; }
   .past-list.show { display: grid; }
+
+  /* === STAFF INCENTIVES === */
+  .incentives-section {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--warn);
+  }
+  .incentive-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .incentive {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    transition: .15s;
+    cursor: pointer;
+  }
+  .incentive:hover { background: var(--bg-3); }
+  .incentive.live { border-left: 4px solid var(--success); }
+  .incentive.upcoming { border-left: 4px solid var(--warn); }
+  .incentive.expired { opacity: .55; border-left: 4px solid var(--muted-2); }
+  .incentive-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .incentive-head h4 { font-size: 13px; font-weight: 700; line-height: 1.3; }
+  .incentive-supplier {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    flex-shrink: 0;
+    background: var(--bg-3);
+    color: var(--muted);
+  }
+  .incentive-supplier.HOYA { background: #fb923c; color: #fff; }
+  .incentive-supplier.ESSILOR { background: #1e3a8a; color: #fff; }
+  .incentive-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .incentive-reward {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .incentive-mechanic {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.5;
+    display: none;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+  .incentive.expanded .incentive-mechanic { display: block; }
+  .incentive .expand-arrow {
+    font-size: 10px;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .incentive.expanded .expand-arrow { transform: rotate(180deg); display: inline-block; }
 
   /* === CALENDAR === */
   .calendar-section {
@@ -678,10 +821,16 @@
       <div class="today-date" id="todayDateLabel"></div>
       <div class="today-day" id="todayDayName"></div>
       <div class="today-rest" id="todayFullDate"></div>
-      <div class="today-special">
+      <div class="today-special" id="todaySpecial" onclick="toggleTodayPromos()">
+        <div class="expand-hint" id="expandHint" style="display:none;">
+          <span id="expandHintText">Tap to see promos</span>
+          <span class="arrow">▾</span>
+        </div>
         <div class="today-special-tag">Today's Theme · Everyday is Special Day</div>
         <h2 id="weekdayThemeTitle"></h2>
         <p id="weekdayThemeDesc"></p>
+        <div class="promo-summary" id="promoSummary"></div>
+        <div class="promo-list" id="promoList"></div>
       </div>
     </div>
     <div class="hero-card">
@@ -736,6 +885,22 @@
     ▾ Show past campaigns (<span id="pastCount">0</span>)
   </div>
   <div class="campaign-list past-list" id="pastCampaigns"></div>
+</div>
+
+<!-- STAFF INCENTIVES (supplier-driven) -->
+<div class="incentives-section">
+  <div class="section-head" style="margin-top: 0;">
+    <div>
+      <h2>🎁 Staff Incentives & Rewards</h2>
+      <p id="incentiveSummary">— · supplier-driven rewards · click any card for full mechanic</p>
+    </div>
+  </div>
+  <div class="incentive-list" id="activeIncentives"></div>
+
+  <div class="past-toggle" id="pastIncentiveToggle" onclick="togglePastIncentives()">
+    ▾ Show past incentives (<span id="pastIncentiveCount">0</span>)
+  </div>
+  <div class="incentive-list past-list" id="pastIncentives"></div>
 </div>
 
 <!-- CALENDAR -->
@@ -803,13 +968,13 @@ const CONFIG = {
 // =============================================================
 const FALLBACK = {
   weekdayThemes: {
-    Mon: { title: "Cyber Monday", focus: "Digital Eye Strain", desc: "Office workers, students. Anti-fatigue & blue-light protection focus." },
-    Tue: { title: "MyopiaCARE Tuesday", focus: "Child myopia management", desc: "Parents with kids age 6-16. MiYOSMART · Stellest · MiSight CL." },
-    Wed: { title: "Wow Wednesday", focus: "Volume + MF retention", desc: "Budget-conscious customers and regulars. Mid-week retention push." },
-    Thu: { title: "Look Fresh Thursday", focus: "Contact lens + style", desc: "CL users, young professionals 25-40. CL fitting, T&Go promos, lens care." },
-    Fri: { title: "Blessed Friday", focus: "Loyalty + community", desc: "Everyone. Loyalty appreciation, community & doa, blessing-driven engagement." },
-    Sat: { title: "MyopiaCARE Saturday", focus: "Family weekend myopia", desc: "Walk-in families. Weekend kids' screening, family eye health." },
-    Sun: { title: "Sun-Day Shield", focus: "Cataract + UV protection", desc: "Age 40+, parents. Rx sunglasses, Transitions/Sensity, UVNEX 420." }
+    Mon: { title: "Cyber Monday", focus: "Digital Eye Strain", desc: "Office workers, students. Anti-fatigue & blue-light protection focus.", promos: [] },
+    Tue: { title: "MyopiaCARE Tuesday", focus: "Child myopia management", desc: "Parents with kids age 6-16. MiYOSMART · Stellest · MiSight CL.", promos: [] },
+    Wed: { title: "Wow Wednesday", focus: "Volume + MF retention", desc: "Budget-conscious customers and regulars. Mid-week retention push.", promos: [] },
+    Thu: { title: "Look Fresh Thursday", focus: "Contact lens + style", desc: "CL users, young professionals 25-40. CL fitting, T&Go promos, lens care.", promos: [] },
+    Fri: { title: "Blessed Friday", focus: "Loyalty + community", desc: "Everyone. Loyalty appreciation, community & doa, blessing-driven engagement.", promos: [] },
+    Sat: { title: "MyopiaCARE Saturday", focus: "Family weekend myopia", desc: "Walk-in families. Weekend kids' screening, family eye health.", promos: [] },
+    Sun: { title: "Sun-Day Shield", focus: "Cataract + UV protection", desc: "Age 40+, parents. Rx sunglasses, Transitions/Sensity, UVNEX 420.", promos: [] }
   },
 
   monthlyThemes: {
@@ -911,7 +1076,19 @@ const FALLBACK = {
   ],
 
   campaigns: [
-    { id: "lucky_draw_essilor", title: "Lucky Draw Menara × Essilor", source: "HQ", start: "2026-02-01", end: "2026-12-31", detail: "SV = 1 entry · EYEZEN = 2 entries · MF = 3 entries. Hadiah utama: Proton e-MAS. 5 hadiah bulanan: Emas, 3 pemenang.", status: "live", priority: 1 }
+    { id: "lucky_draw_essilor", title: "Lucky Draw Menara × Essilor", source: "HQ", start: "2026-02-01", end: "2026-12-31", detail: "SV = 1 entry · EYEZEN = 2 entries · MF = 3 entries. Hadiah utama: Proton e-MAS. 5 hadiah bulanan: Emas, 3 pemenang.", status: "live", priority: 1 },
+    { id: "jualan_murah_may", title: "Jualan Murah May 2026", source: "INTERNAL", start: "2026-05-02", end: "2026-05-31", detail: "KPDN-approved sale. Discount up to 50%. Reg: B.PgkPJ(CS)2026/10579/131.", status: "live", priority: 2 },
+    { id: "varilux_upgrade", title: "Varilux Design Upgrade", source: "SUPPLIER", start: "2026-05-01", end: "2026-06-30", detail: "Free upgrade to next-tier Varilux design at lower-tier price. e.g. XR Pro → priced as XR Track. Order via EssilorOrder only based on order date.", status: "live", priority: 2 },
+    { id: "hoya_idsd_supereader", title: "HOYA iDSD Free Supereader", source: "SUPPLIER", start: "2026-04-02", end: "2026-06-30", detail: "Buy 1 iDSD Progressive (MySelf / MyStyle V+ / Lifestyle), get 1 SUPEREADER pair free. Promo code: 26FOCSPR. Order via HOYA CS only.", status: "live", priority: 3 },
+    { id: "miyosmart_subsidy", title: "HOYA MiYOSMART Subsidy", source: "SUPPLIER", start: "2026-04-01", end: "2027-03-31", detail: "27% subsidy off list price for myopia Rx ≤ -3.00D. Covers MiYOSMART, Full Control, Chameleon, Sunbird. Mixed-Rx pair: subsidy on -3.00D eye only.", status: "live", priority: 3 },
+    { id: "stellest_entry", title: "Essilor Stellest Entry-Level", source: "SUPPLIER", start: "2026-04-01", end: "2026-06-30", detail: "New entry-level Stellest from RM 650. Plus up to RM 750 consumer subsidy for Rx +2.00 to -2.00. H.A.L.T. tech, slows myopia 67% on avg.", status: "live", priority: 3 },
+    { id: "essilor_laptop_bag", title: "Essilor Laptop Sleeve Bag", source: "SUPPLIER", start: "2026-04-01", end: "2026-06-30", detail: "Free Menara-exclusive laptop sleeve bag with any Varilux or Eyezen purchase. While stocks last. Berdasarkan tarikh pesanan.", status: "live", priority: 4 }
+  ],
+
+  staffIncentives: [
+    { id: "hoya_dynamic_boost", title: "HOYA Dynamic Boost On", supplier: "HOYA", start: "2026-04-02", end: "2026-05-31", reward: "Free design upgrade (RM200–300 margin)", mechanic: "Prescribe Dynamic Premium → bill at Dynamic Summit price (+RM300). Prescribe Dynamic Summit → bill at Amplitude Plus (+RM200). Index 1.50/1.60/1.67 only. Coatings: Full Control, Hi-Vision Meiryo, HVLL-UA. Not valid with other HOYA promos.", status: "live", priority: 1 },
+    { id: "essilor_essirewards", title: "Essilor EssiRewards", supplier: "ESSILOR", start: "2026-04-01", end: "2026-05-31", reward: "RM 10–45 per pair (TNG voucher)", mechanic: "Min 5 pairs/mth Varilux, 3 pairs/mth Eyezen, 2 pairs/mth Stellest. Varilux XR series RM45 (BCT) / RM60 (+Trans). Liberty/Comfort Max/Physio: RM25 / RM40. Eyezen: RM25 / RM40. Stellest: RM40 BCT only. Compiled June, paid via TNG July 2026.", status: "live", priority: 2 },
+    { id: "essilor_thailand_tour", title: "Thailand Lab Tour Challenge 2026", supplier: "ESSILOR", start: "2026-01-01", end: "2026-12-31", reward: "4D3N Thailand trip · 16 winners total", mechanic: "Phase 1 (Jan–Jun) + Phase 2 (Jul–Dec). 8 winners per phase. Eligibility: min RM 4,000 Essilor sales/mth. Expert group (top 2 by sales value + top 1 by growth) · Senior group (same) · Junior group (top 2 by growth). CONFIDENTIAL — internal reference only.", status: "live", priority: 3 }
   ],
 
   sales: {
@@ -934,6 +1111,7 @@ let state = {
   source: "fallback",
   showFullYear: false,
   showPast: false,
+  showPastIncentives: false,
   salesUnlocked: false
 };
 
@@ -1076,6 +1254,37 @@ function renderHero() {
   if (theme) {
     document.getElementById("weekdayThemeTitle").textContent = theme.title;
     document.getElementById("weekdayThemeDesc").textContent = theme.desc;
+
+    // Promos handling — array, or pipe-separated string from sheet
+    let promos = theme.promos;
+    if (typeof promos === "string") {
+      promos = promos.split("|").map(s => s.trim()).filter(Boolean);
+    }
+    promos = Array.isArray(promos) ? promos : [];
+
+    const summaryEl = document.getElementById("promoSummary");
+    const listEl = document.getElementById("promoList");
+    const hintEl = document.getElementById("expandHint");
+    const hintText = document.getElementById("expandHintText");
+    const card = document.getElementById("todaySpecial");
+
+    if (promos.length === 0) {
+      summaryEl.textContent = "";
+      listEl.innerHTML = '<div class="empty-promos">No specific promos linked to today\'s theme yet.</div>';
+      hintEl.style.display = "none";
+      card.style.cursor = "default";
+    } else {
+      summaryEl.innerHTML = `<strong>${promos.length} promo${promos.length===1?"":"s"} active</strong> — tap to view`;
+      listEl.innerHTML = promos.map((p, i) => `
+        <div class="promo-item">
+          <div class="num">${i+1}</div>
+          <div class="promo-text">${escapeHtml(p)}</div>
+        </div>
+      `).join("");
+      hintEl.style.display = "flex";
+      hintText.textContent = card.classList.contains("expanded") ? "Tap to hide" : "Tap to expand";
+      card.style.cursor = "pointer";
+    }
   }
 
   // This week (next 7 days events)
@@ -1101,6 +1310,18 @@ function renderHero() {
       </div>
     `).join("");
   }
+}
+
+function toggleTodayPromos() {
+  const card = document.getElementById("todaySpecial");
+  const dowKey = DOW[TODAY.getDay()];
+  const theme = state.data.weekdayThemes[dowKey];
+  let promos = theme && theme.promos;
+  if (typeof promos === "string") promos = promos.split("|").map(s=>s.trim()).filter(Boolean);
+  if (!Array.isArray(promos) || promos.length === 0) return; // nothing to toggle
+  card.classList.toggle("expanded");
+  const hintText = document.getElementById("expandHintText");
+  hintText.textContent = card.classList.contains("expanded") ? "Tap to hide" : "Tap to expand";
 }
 
 // =============================================================
@@ -1275,6 +1496,81 @@ function togglePast() {
 }
 
 // =============================================================
+//  STAFF INCENTIVES
+// =============================================================
+function classifyIncentive(c) {
+  const today = TODAY_ISO;
+  if (c.status === "done" || c.end < today) return "expired";
+  if (c.start > today) return "upcoming";
+  return "live";
+}
+
+function renderIncentives() {
+  const all = (state.data.staffIncentives || []).map(c => ({ ...c, _class: classifyIncentive(c) }));
+  const active = all.filter(c => c._class === "live" || c._class === "upcoming")
+                    .sort((a,b) => (a.priority||99) - (b.priority||99));
+  const past = all.filter(c => c._class === "expired")
+                  .sort((a,b) => b.end.localeCompare(a.end));
+
+  document.getElementById("incentiveSummary").textContent =
+    `${active.length} active · ${past.length} past · supplier-driven · click any card for full mechanic`;
+
+  const activeEl = document.getElementById("activeIncentives");
+  if (active.length === 0) {
+    activeEl.innerHTML = '<div style="color: var(--muted); font-style: italic; padding: 12px;">No active staff incentives.</div>';
+  } else {
+    activeEl.innerHTML = active.map(renderIncentiveCard).join("");
+  }
+
+  document.getElementById("pastIncentiveCount").textContent = past.length;
+  document.getElementById("pastIncentives").innerHTML = past.map(c => renderIncentiveCard(c)).join("");
+
+  if (past.length === 0) {
+    document.getElementById("pastIncentiveToggle").style.display = "none";
+  } else {
+    document.getElementById("pastIncentiveToggle").style.display = "block";
+  }
+}
+
+function renderIncentiveCard(c) {
+  const start = parseDate(c.start);
+  const end = parseDate(c.end);
+  const today = TODAY;
+  let meta = "";
+  if (c._class === "live") {
+    const daysLeft = daysBetween(today, end);
+    meta = `Live · ends in ${daysLeft} day${daysLeft===1?"":"s"} (${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)})`;
+  } else if (c._class === "upcoming") {
+    const daysUntil = daysBetween(today, start);
+    meta = `Starts in ${daysUntil} day${daysUntil===1?"":"s"} · ${pad(start.getDate())} ${MONTH_NAMES[start.getMonth()].slice(0,3)}`;
+  } else {
+    meta = `Ended ${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
+  }
+  const supplier = (c.supplier || "").toUpperCase();
+  return `
+    <div class="incentive ${c._class}" onclick="this.classList.toggle('expanded')">
+      <div class="incentive-head">
+        <h4>${escapeHtml(c.title)} <span class="expand-arrow">▾</span></h4>
+        ${supplier ? `<span class="incentive-supplier ${supplier}">${supplier}</span>` : ""}
+      </div>
+      <div class="incentive-meta">${meta}</div>
+      ${c.reward ? `<div class="incentive-reward">${escapeHtml(c.reward)}</div>` : ""}
+      ${c.mechanic ? `<div class="incentive-mechanic">${escapeHtml(c.mechanic)}</div>` : ""}
+    </div>
+  `;
+}
+
+function togglePastIncentives() {
+  state.showPastIncentives = !state.showPastIncentives;
+  const el = document.getElementById("pastIncentives");
+  el.classList.toggle("show", state.showPastIncentives);
+  const count = (state.data.staffIncentives||[]).filter(c=>classifyIncentive(c)==="expired").length;
+  document.getElementById("pastIncentiveToggle").innerHTML = state.showPastIncentives
+    ? `▴ Hide past incentives (<span id="pastIncentiveCount">${count}</span>)`
+    : `▾ Show past incentives (<span id="pastIncentiveCount">${count}</span>)`;
+}
+
+// =============================================================
 //  CALENDAR
 // =============================================================
 function toggleCalendarView() {
@@ -1377,6 +1673,7 @@ function renderAll() {
   renderHero();
   renderMonthlyThemes();
   renderCampaigns();
+  renderIncentives();
   renderCalendar();
   if (state.salesUnlocked) renderSales();
 }

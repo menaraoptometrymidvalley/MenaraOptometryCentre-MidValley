@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<title>MDV Marketing Calendar 2026 — Operations Dashboard</title>
+<style>
+  :root {
+    /* Menara brand palette — light mode, easy on the eyes */
+    --bg: #f7f7f5;
+    --bg-2: #ffffff;
+    --bg-3: #eef0f3;
+    --line: #e2e5ea;
+    --line-2: #cbd1d8;
+    --text: #1B1464;       /* Menara navy */
+    --text-2: #2d2399;
+    --muted: #6b7280;
+    --muted-2: #9ca3af;
+    --primary: #1B1464;    /* navy = primary */
+    --accent: #ED1C24;     /* Menara scarlet */
+    --accent-soft: rgba(237,28,36,.06);
+    --primary-soft: rgba(27,20,100,.06);
+    --success: #15803d;
+    --warn: #b45309;
+    --shadow: 0 1px 3px rgba(27,20,100,.06), 0 4px 12px rgba(27,20,100,.04);
+    --shadow-lg: 0 4px 12px rgba(27,20,100,.08), 0 16px 40px rgba(27,20,100,.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { padding: 20px 24px 80px; max-width: 1600px; margin: 0 auto; }
+
+  @media (min-width: 1200px) {
+    body { padding: 28px 36px 80px; }
+  }
+
+  /* === TOP BAR === */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: #fff;
+  }
+  .brand-text h1 { font-size: 16px; letter-spacing: 1px; font-weight: 700; }
+  .brand-text p { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+  .topright { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .clock { font-variant-numeric: tabular-nums; font-size: 14px; color: var(--muted); }
+  .data-status {
+    font-size: 11px;
+    color: var(--muted);
+    padding: 4px 10px;
+    background: var(--bg-3);
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .data-status.live::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+  .data-status.cached::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--muted);
+  }
+  .data-status.error::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* === HERO TODAY === */
+  .hero {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+
+  .today-date { font-size: 12px; color: var(--accent); font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 4px; }
+  .today-day { font-size: 64px; line-height: 1; font-weight: 800; color: var(--text); letter-spacing: -1.5px; }
+  @media (min-width: 1200px) { .today-day { font-size: 80px; } }
+  .today-rest { font-size: 18px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+  .today-special {
+    margin-top: 18px; padding: 14px 18px;
+    background: var(--primary-soft);
+    border-left: 4px solid var(--primary);
+    border-radius: 6px;
+  }
+  .today-special-tag { font-size: 10px; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+  .today-special h2 { font-size: 22px; margin-top: 4px; font-weight: 700; }
+  .today-special p { color: var(--muted); margin-top: 4px; font-size: 13px; }
+
+  .hero-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .hero-card h3 { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; font-weight: 700; }
+  .hero-card .item { padding: 8px 0; border-bottom: 1px solid var(--line); display: flex; gap: 10px; align-items: flex-start; font-size: 13px; }
+  .hero-card .item:last-child { border-bottom: none; }
+  .hero-card .item .dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; background: var(--accent); }
+  .hero-card .item .dot.muted { background: var(--muted-2); }
+  .hero-card .item .text { flex: 1; }
+  .hero-card .item .text strong { color: var(--text); display: block; font-size: 13px; font-weight: 600; }
+  .hero-card .item .text span { color: var(--muted); font-size: 11px; }
+  .hero-card .empty { color: var(--muted); font-style: italic; font-size: 12px; padding: 6px 0; }
+
+  /* === SALES PANEL === */
+  .sales-panel {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .sales-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s;
+  }
+  .sales-header:hover { background: var(--bg-3); }
+  .sales-header h3 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sales-header h3 .lock-icon { font-size: 14px; }
+  .sales-header .toggle-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  .sales-header .toggle-btn.shown {
+    background: var(--bg-3);
+    color: var(--muted);
+  }
+  .sales-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--line);
+  }
+  .sales-body.show { display: block; }
+  .sales-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .sales-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .sales-card .label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .sales-card .value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .sales-card .value.accent { color: var(--accent); }
+  .sales-card .sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .sales-card .progress {
+    height: 6px;
+    background: var(--bg-3);
+    border-radius: 999px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .sales-card .progress-bar {
+    height: 100%;
+    background: var(--success);
+    transition: width .4s;
+  }
+  .sales-card .progress-bar.tier2 { background: var(--warn); }
+  .sales-card .progress-bar.below { background: var(--accent); }
+  .sales-meta {
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    font-style: italic;
+  }
+
+  /* === SECTION HEADER === */
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 24px 0 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .section-head h2 { font-size: 18px; font-weight: 700; letter-spacing: .3px; }
+  .section-head p { color: var(--muted); font-size: 12px; }
+  .section-head .actions { display: flex; gap: 8px; align-items: center; }
+
+  .btn {
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--line-2);
+    background: var(--bg-2);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .15s;
+  }
+  .btn:hover { background: var(--bg-3); }
+  .btn.primary {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .btn.primary:hover { background: var(--text-2); }
+  .btn.accent {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  /* === CAMPAIGNS === */
+  .campaigns-section {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .campaign-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .campaign {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--line-2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    transition: .15s;
+  }
+  .campaign.live {
+    border-left-color: var(--success);
+    background: var(--bg-2);
+  }
+  .campaign.upcoming {
+    border-left-color: var(--warn);
+  }
+  .campaign.expired,
+  .campaign.done {
+    opacity: .6;
+    border-left-color: var(--muted-2);
+  }
+  .campaign-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .campaign-head h4 {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .campaign-source {
+    font-size: 9px;
+    padding: 2px 6px;
+    background: var(--bg-3);
+    border-radius: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .campaign-source.HQ { background: var(--primary); color: #fff; }
+  .campaign-source.SUPPLIER { background: var(--warn); color: #fff; }
+  .campaign-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .campaign-detail {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .campaign-detail.hide { display: none; }
+
+  .past-toggle {
+    margin-top: 14px;
+    text-align: center;
+    padding: 10px;
+    border-top: 1px dashed var(--line);
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    transition: .15s;
+  }
+  .past-toggle:hover { color: var(--text); }
+  .past-list { display: none; margin-top: 12px; }
+  .past-list.show { display: grid; }
+
+  /* === CALENDAR === */
+  .calendar-section {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 18px;
+  }
+  .legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend .swatch { width: 9px; height: 9px; border-radius: 50%; }
+
+  .year-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 1100px) { .year-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px) { .year-grid { grid-template-columns: 1fr; } }
+
+  .year-grid.full {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  @media (max-width: 1100px) { .year-grid.full { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px) { .year-grid.full { grid-template-columns: 1fr; } }
+
+  .month {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .month.current {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-soft);
+  }
+  .month-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 4px 8px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 8px;
+  }
+  .month-head .name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .month-head .theme { font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; max-width: 65%; text-align: right; line-height: 1.3; }
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    font-size: 10px;
+  }
+  .month-grid .dow {
+    color: var(--muted);
+    text-align: center;
+    padding: 3px 0;
+    font-weight: 600;
+    font-size: 9px;
+    text-transform: uppercase;
+  }
+  .day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: .12s;
+    position: relative;
+    padding: 1px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .day:hover { background: var(--bg-3); }
+  .day.today {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 800;
+  }
+  .day.has-event::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--warn);
+  }
+  .day.holiday {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .day.school-holiday {
+    background: rgba(180,83,9,.08);
+  }
+  .day.muted {
+    color: var(--muted-2);
+    font-weight: 400;
+  }
+
+  /* === MONTHLY THEMES STRIP === */
+  .theme-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 900px) { .theme-strip { grid-template-columns: 1fr; } }
+  .theme-card {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: var(--shadow);
+  }
+  .theme-card.myopia { border-left: 4px solid var(--primary); }
+  .theme-card.digital { border-left: 4px solid var(--accent); }
+  .theme-card.activation { border-left: 4px solid var(--warn); }
+  .theme-card .label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .theme-card .value {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .theme-card .sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* === DAY POPUP === */
+  .day-detail {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--bg-2);
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 18px 22px;
+    max-width: 380px;
+    box-shadow: var(--shadow-lg);
+    z-index: 50;
+  }
+  .day-detail.show { display: block; }
+  .day-detail h3 { font-size: 16px; margin-bottom: 4px; color: var(--text); }
+  .day-detail .close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .day-detail .events { margin-top: 12px; }
+  .day-detail .event {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+  }
+  .day-detail .event:last-child { border-bottom: none; }
+  .day-detail .event strong { display: block; color: var(--text); font-size: 13px; }
+  .day-detail .event .meta { color: var(--muted); font-size: 11px; }
+
+  /* === MODAL (PIN) === */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(27,20,100,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: var(--bg-2);
+    border-radius: 14px;
+    padding: 24px;
+    width: 90%;
+    max-width: 360px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+  }
+  .modal h2 { margin-bottom: 8px; color: var(--text); font-size: 18px; }
+  .modal p { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+  .modal input {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 18px;
+    font-family: inherit;
+    text-align: center;
+    letter-spacing: 8px;
+    margin-bottom: 12px;
+  }
+  .modal input:focus { outline: none; border-color: var(--primary); }
+  .modal .modal-error { color: var(--accent); font-size: 12px; min-height: 16px; margin-bottom: 12px; }
+  .modal .modal-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .modal .modal-actions .btn { flex: 1; }
+
+  /* === LOADING === */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(247,247,245,.85);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--line);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .footer-hint {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 30px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .footer-hint kbd {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-family: inherit;
+  }
+  .footer-hint a { color: var(--primary); text-decoration: none; }
+  .footer-hint a:hover { text-decoration: underline; }
+
+  /* Tablet/iPad sizing */
+  @media (min-width: 768px) and (max-width: 1100px) {
+    body { padding: 24px 28px 60px; }
+    .today-day { font-size: 72px; }
+  }
+
+  /* Phone */
+  @media (max-width: 600px) {
+    body { padding: 14px 14px 60px; }
+    .topbar { gap: 10px; padding-bottom: 12px; margin-bottom: 14px; }
+    .brand-text h1 { font-size: 14px; }
+    .brand-text p { font-size: 10px; }
+    .hero { padding: 18px; }
+    .today-day { font-size: 48px; }
+    .today-special h2 { font-size: 18px; }
+    .section-head h2 { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">M</div>
+    <div class="brand-text">
+      <h1>MENARA OPTOMETRY</h1>
+      <p>Mid Valley · Operations Dashboard 2026</p>
+    </div>
+  </div>
+  <div class="topright">
+    <div class="data-status cached" id="dataStatus" title="Data source"><span id="dataStatusText">Loading…</span></div>
+    <div class="clock" id="clock"></div>
+  </div>
+</div>
+
+<!-- HERO TODAY -->
+<div class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="today-date" id="todayDateLabel"></div>
+      <div class="today-day" id="todayDayName"></div>
+      <div class="today-rest" id="todayFullDate"></div>
+      <div class="today-special">
+        <div class="today-special-tag">Today's Theme · Everyday is Special Day</div>
+        <h2 id="weekdayThemeTitle"></h2>
+        <p id="weekdayThemeDesc"></p>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h3>📅 This Week</h3>
+      <div id="thisWeekEvents"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SALES PANEL (PIN-gated) -->
+<div class="sales-panel">
+  <div class="sales-header" onclick="toggleSales()">
+    <h3><span class="lock-icon" id="salesLock">🔒</span> Sales Performance · This Month</h3>
+    <button class="toggle-btn" id="salesToggle">SHOW</button>
+  </div>
+  <div class="sales-body" id="salesBody">
+    <div class="sales-grid" id="salesGrid"></div>
+    <div class="sales-meta" id="salesMeta"></div>
+  </div>
+</div>
+
+<!-- MONTHLY THEMES -->
+<div class="theme-strip">
+  <div class="theme-card myopia">
+    <div class="label">MyopiaCARE · This Month</div>
+    <div class="value" id="themeMyopia">—</div>
+    <div class="sub">Monthly content & community awareness</div>
+  </div>
+  <div class="theme-card digital">
+    <div class="label">Digital Eye Care · This Month</div>
+    <div class="value" id="themeDigital">—</div>
+    <div class="sub">By age group / profession focus</div>
+  </div>
+  <div class="theme-card activation">
+    <div class="label">Activation Focus · This Month</div>
+    <div class="value" id="themeActivation">—</div>
+    <div class="sub">Customer offers + staff push</div>
+  </div>
+</div>
+
+<!-- ACTIVE CAMPAIGNS (priority placement) -->
+<div class="campaigns-section">
+  <div class="section-head" style="margin-top: 0;">
+    <div>
+      <h2>🚀 Active Campaigns & Promos</h2>
+      <p id="campaignSummary">—</p>
+    </div>
+  </div>
+  <div class="campaign-list" id="activeCampaigns"></div>
+
+  <div class="past-toggle" id="pastToggle" onclick="togglePast()">
+    ▾ Show past campaigns (<span id="pastCount">0</span>)
+  </div>
+  <div class="campaign-list past-list" id="pastCampaigns"></div>
+</div>
+
+<!-- CALENDAR -->
+<div class="calendar-section">
+  <div class="section-head" style="margin-top: 0;">
+    <div>
+      <h2>📆 Calendar</h2>
+      <p id="calendarSubtitle">Showing current + next 2 months</p>
+    </div>
+    <div class="actions">
+      <button class="btn" id="viewToggle" onclick="toggleCalendarView()">Show Full Year</button>
+    </div>
+  </div>
+  <div class="legend">
+    <span><span class="swatch" style="background: var(--accent)"></span> Public Holiday</span>
+    <span><span class="swatch" style="background: rgba(180,83,9,.4)"></span> School Holiday</span>
+    <span><span class="swatch" style="background: var(--warn)"></span> Awareness / Event</span>
+    <span><span class="swatch" style="background: var(--primary)"></span> Today</span>
+  </div>
+  <div class="year-grid" id="yearGrid"></div>
+</div>
+
+<!-- DAY DETAIL POPUP -->
+<div class="day-detail" id="dayDetail">
+  <button class="close" onclick="document.getElementById('dayDetail').classList.remove('show')">×</button>
+  <h3 id="dayDetailTitle"></h3>
+  <div class="events" id="dayDetailEvents"></div>
+</div>
+
+<!-- PIN MODAL -->
+<div class="modal-bg" id="pinModal">
+  <div class="modal">
+    <h2>🔒 Enter PIN</h2>
+    <p>Sales data is protected. Enter your 4-digit PIN to view.</p>
+    <input type="password" id="pinInput" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="••••">
+    <div class="modal-error" id="pinError">&nbsp;</div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closePin()">Cancel</button>
+      <button class="btn primary" onclick="checkPin()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer-hint">
+  Source: <span id="dataSourceLabel">—</span> · Last refresh: <span id="lastRefreshLabel">—</span> · <a href="#" onclick="forceRefresh(); return false;">Refresh now</a>
+</div>
+
+<script>
+// =============================================================
+//  CONFIG
+// =============================================================
+const CONFIG = {
+  // Apps Script web app URL (paste yours after deploying — see APPS_SCRIPT_GUIDE.md)
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzfKpsRKscvPerFFYs5HASskPhp4t8CBWKN05AxsTtWECKuHQ1mFggEfscWChjcqFH87w/exec",  // e.g. "https://script.google.com/macros/s/AKfyc.../exec"
+  CACHE_TTL_MS: 5 * 60 * 1000,         // 5 minutes
+  CACHE_KEY: "mdv_dashboard_cache_v2",
+  PIN: "1234",                         // <-- CHANGE THIS PIN before deploying
+  PIN_SESSION_KEY: "mdv_sales_unlocked"
+};
+
+// =============================================================
+//  FALLBACK DATA — used if Apps Script is unreachable
+//  Verified KL public holidays + KL Kumpulan B school holidays
+//  for 2026, sourced from KPM and the gazetted federal holiday list.
+// =============================================================
+const FALLBACK = {
+  weekdayThemes: {
+    Mon: { title: "Cyber Monday", focus: "Digital Eye Strain", desc: "Office workers, students. Anti-fatigue & blue-light protection focus." },
+    Tue: { title: "MyopiaCARE Tuesday", focus: "Child myopia management", desc: "Parents with kids age 6-16. MiYOSMART · Stellest · MiSight CL." },
+    Wed: { title: "Wow Wednesday", focus: "Volume + MF retention", desc: "Budget-conscious customers and regulars. Mid-week retention push." },
+    Thu: { title: "Look Fresh Thursday", focus: "Contact lens + style", desc: "CL users, young professionals 25-40. CL fitting, T&Go promos, lens care." },
+    Fri: { title: "Blessed Friday", focus: "Loyalty + community", desc: "Everyone. Loyalty appreciation, community & doa, blessing-driven engagement." },
+    Sat: { title: "MyopiaCARE Saturday", focus: "Family weekend myopia", desc: "Walk-in families. Weekend kids' screening, family eye health." },
+    Sun: { title: "Sun-Day Shield", focus: "Cataract + UV protection", desc: "Age 40+, parents. Rx sunglasses, Transitions/Sensity, UVNEX 420." }
+  },
+
+  monthlyThemes: {
+    1: { myopia: "Back-to-school Readiness", digital: "Digital Habit Reset", activation: "TQ NFC card · Back-to-school WhatsApp recall" },
+    2: { myopia: "Early Detection Baseline", digital: "Ramadhan habits", activation: "Puasa lens trade-in · Lucky Draw Emas · CNY engagement" },
+    3: { myopia: "Raya Break & Outdoor Vision", digital: "Ramadhan: adjust your habits", activation: "Zakat convenience · Pre-Hajj eye comfort checks" },
+    4: { myopia: "Study Strain & Screen Balance", digital: "Haji prep · Accountants & auditors", activation: "Secretary's Special (KIV)" },
+    5: { myopia: "Mid-Year Progress Check", digital: "Students focus", activation: "Teacher's Day · Mother's Day · SPM extra pair" },
+    6: { myopia: "School Holiday Myopia Drive", digital: "Students · Football fans (FIFA)", activation: "Father's Day · SPM readiness · Extra pair" },
+    7: { myopia: "New Term Habit Reinforcement", digital: "Dry Eye Awareness · Football fans", activation: "30 Tahun MDV — Friends are chosen family" },
+    8: { myopia: "Myopia Awareness Peak / Exam Readiness", digital: "Digital exposure & contact lens", activation: "Celebrating Merdeka Month" },
+    9: { myopia: "Progress Monitoring", digital: "IT pros / Software Engineers / BAs", activation: "Hari Malaysia · ANSARA Run collab" },
+    10: { myopia: "Testimonials & Success Stories", digital: "IT pros continued", activation: "Optical Calm · World Sight Day — A Million Visions" },
+    11: { myopia: "Year-End Review · BTS Early Prep", digital: "Pensioners or students", activation: "Travel offers · Diabetes Day clinic collab" },
+    12: { myopia: "Holiday Balance & Outdoor Play", digital: "Pensioners · Students", activation: "Back-to-school 2027 — Start Year with Healthy Eyes" }
+  },
+
+  // Verified 2026 KL/Federal events. Sources:
+  //   - https://cutisekolah.com.my/2026-tarikh/ (KPM Kumpulan B + gazetted PH)
+  //   - https://www.kabinet.gov.my/storage/2025/08/HKA-2026.pdf (federal gazette)
+  //   - https://www.e2consulting.com.my (Hari Raya extra holiday + Wesak/Agong overlap)
+  events: [
+    // ── January
+    { date: "2026-01-01", title: "Tahun Baru / New Year", type: "holiday", scope: "KL" },
+    { date: "2026-01-12", title: "Sekolah Buka — Sesi 2026 (Kumpulan B)", type: "school" },
+    { range: ["2026-01-01","2026-01-31"], title: "Glaucoma Awareness Month", type: "awareness" },
+
+    // ── February
+    { date: "2026-02-01", title: "Thaipusam (KL)", type: "holiday", scope: "KL" },
+    { date: "2026-02-01", title: "Hari Wilayah Persekutuan", type: "holiday", scope: "KL" },
+    { date: "2026-02-02", title: "Cuti Thaipusam (replacement)", type: "holiday", scope: "KL" },
+    { date: "2026-02-03", title: "Cuti Hari WP (replacement)", type: "holiday", scope: "KL" },
+    { date: "2026-02-14", title: "Valentine's Day", type: "occasion" },
+    { date: "2026-02-17", title: "Tahun Baru Cina / Chinese New Year", type: "holiday", scope: "MY" },
+    { date: "2026-02-18", title: "Chinese New Year — Day 2", type: "holiday", scope: "MY" },
+    { date: "2026-02-19", title: "1 Ramadhan 1447H", type: "islamic" },
+    { range: ["2026-02-01","2026-02-28"], title: "ARMD / Low Vision Month", type: "awareness" },
+
+    // ── March
+    { date: "2026-03-07", title: "Nuzul Al-Quran (KL)", type: "holiday", scope: "KL" },
+    { date: "2026-03-08", title: "International Women's Day", type: "occasion" },
+    { range: ["2026-03-08","2026-03-14"], title: "World Glaucoma Week", type: "awareness" },
+    { date: "2026-03-20", title: "Cuti Tambahan Hari Raya (PM declared)", type: "holiday", scope: "MY" },
+    { date: "2026-03-21", title: "Hari Raya Aidilfitri", type: "holiday", scope: "MY" },
+    { date: "2026-03-22", title: "Hari Raya Aidilfitri — Day 2", type: "holiday", scope: "MY" },
+    { date: "2026-03-23", title: "Cuti Replacement Raya Day 2", type: "holiday", scope: "MY" },
+    { date: "2026-03-23", title: "World Optometry Day", type: "awareness" },
+    { range: ["2026-03-21","2026-03-29"], title: "Cuti Penggal 1 (KL Kumpulan B)", type: "school" },
+    { range: ["2026-03-01","2026-03-31"], title: "Jualan Hebat Malaysia", type: "campaign" },
+
+    // ── April
+    { date: "2026-04-07", title: "World Health Day", type: "awareness" },
+    { date: "2026-04-22", title: "Earth Day", type: "occasion" },
+
+    // ── May
+    { date: "2026-05-01", title: "Hari Pekerja / Labour Day", type: "holiday", scope: "MY" },
+    { date: "2026-05-10", title: "Mother's Day (2nd Sunday)", type: "occasion" },
+    { date: "2026-05-16", title: "Teacher's Day (Hari Guru)", type: "occasion" },
+    { range: ["2026-05-23","2026-06-07"], title: "Cuti Pertengahan Tahun (KL Kumpulan B)", type: "school" },
+    { date: "2026-05-27", title: "Hari Raya Aidiladha (Korban)", type: "holiday", scope: "MY" },
+    { date: "2026-05-31", title: "Wesak Day", type: "holiday", scope: "MY" },
+
+    // ── June
+    { date: "2026-06-01", title: "Hari Keputeraan YDP Agong", type: "holiday", scope: "MY" },
+    { date: "2026-06-02", title: "Wesak replacement (carried forward)", type: "holiday", scope: "MY" },
+    { date: "2026-06-05", title: "World Environment Day", type: "awareness" },
+    { range: ["2026-06-11","2026-07-19"], title: "FIFA World Cup", type: "occasion" },
+    { date: "2026-06-17", title: "Awal Muharram / Maal Hijrah", type: "holiday", scope: "MY" },
+    { date: "2026-06-21", title: "Father's Day (3rd Sunday)", type: "occasion" },
+    { range: ["2026-06-15","2026-07-31"], title: "Karnival Jualan Mega", type: "campaign" },
+    { range: ["2026-06-01","2026-06-30"], title: "Cataract Awareness Month", type: "awareness" },
+
+    // ── July
+    { range: ["2026-07-01","2026-07-31"], title: "Dry Eye Awareness Month", type: "awareness" },
+
+    // ── August
+    { date: "2026-08-25", title: "Maulidur Rasul", type: "holiday", scope: "MY" },
+    { date: "2026-08-31", title: "Hari Kebangsaan (Merdeka)", type: "holiday", scope: "MY" },
+    { range: ["2026-08-15","2026-08-21"], title: "Contact Lens Health Week", type: "awareness" },
+
+    // ── September
+    { range: ["2026-08-29","2026-09-06"], title: "Cuti Penggal 2 (KL Kumpulan B)", type: "school" },
+    { date: "2026-09-16", title: "Hari Malaysia", type: "holiday", scope: "MY" },
+
+    // ── October
+    { date: "2026-10-08", title: "World Sight Day (2nd Thursday)", type: "awareness" },
+
+    // ── November
+    { date: "2026-11-08", title: "Deepavali", type: "holiday", scope: "MY" },
+    { date: "2026-11-09", title: "Cuti Deepavali (replacement)", type: "holiday", scope: "MY" },
+    { date: "2026-11-14", title: "World Diabetes Day", type: "awareness" },
+    { date: "2026-11-19", title: "International Men's Day", type: "occasion" },
+    { date: "2026-11-20", title: "World Children's Day", type: "occasion" },
+
+    // ── December
+    { range: ["2026-12-05","2026-12-31"], title: "Cuti Akhir Tahun (KL Kumpulan B)", type: "school" },
+    { date: "2026-12-25", title: "Hari Krismas", type: "holiday", scope: "MY" },
+    { range: ["2026-11-15","2027-01-03"], title: "Jualan Akhir Tahun", type: "campaign" }
+  ],
+
+  campaigns: [
+    { id: "lucky_draw_essilor", title: "Lucky Draw Menara × Essilor", source: "HQ", start: "2026-02-01", end: "2026-12-31", detail: "SV = 1 entry · EYEZEN = 2 entries · MF = 3 entries. Hadiah utama: Proton e-MAS. 5 hadiah bulanan: Emas, 3 pemenang.", status: "live", priority: 1 }
+  ],
+
+  sales: {
+    period: "May 2026",
+    tier1: 150000,
+    tier2: 110000,
+    std: 89400,
+    quarterTarget: 450000,
+    quarterStd: 245000,
+    staffCount: 5,
+    lastUpdated: "2026-05-04"
+  }
+};
+
+// =============================================================
+//  STATE
+// =============================================================
+let state = {
+  data: FALLBACK,
+  source: "fallback",
+  showFullYear: false,
+  showPast: false,
+  salesUnlocked: false
+};
+
+// =============================================================
+//  HELPERS
+// =============================================================
+const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const DOW_FULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+const TODAY = new Date();
+const TODAY_ISO = fmtDate(TODAY);
+
+function pad(n) { return String(n).padStart(2,"0"); }
+function fmtDate(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function parseDate(s) { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); }
+function fmtMoney(n) { return "RM" + n.toLocaleString("en-MY", {maximumFractionDigits: 0}); }
+function fmtMoneyShort(n) {
+  if (n >= 1000000) return "RM" + (n/1000000).toFixed(1) + "m";
+  if (n >= 1000) return "RM" + (n/1000).toFixed(0) + "k";
+  return "RM" + n;
+}
+function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
+
+function eventsOn(date) {
+  const iso = fmtDate(date);
+  const out = [];
+  for (const e of state.data.events) {
+    if (e.date === iso) out.push(e);
+    else if (e.range) {
+      const [s,en] = e.range;
+      if (iso >= s && iso <= en) out.push(e);
+    }
+  }
+  return out;
+}
+
+function isSchoolHoliday(date) {
+  return eventsOn(date).some(e => e.type === "school" && e.range);
+}
+
+function isPublicHoliday(date) {
+  return eventsOn(date).some(e => e.type === "holiday");
+}
+
+// =============================================================
+//  DATA FETCH
+// =============================================================
+async function fetchData() {
+  // Try cache first
+  const cached = readCache();
+  if (cached) {
+    state.data = cached.data;
+    state.source = "cache";
+    setStatus("cached", `Cached · ${new Date(cached.ts).toLocaleTimeString("en-MY", {hour:"2-digit", minute:"2-digit"})}`);
+    document.getElementById("dataSourceLabel").textContent = "Sheet (cached)";
+    document.getElementById("lastRefreshLabel").textContent = new Date(cached.ts).toLocaleString("en-MY");
+  }
+
+  // No URL configured → stay on fallback
+  if (!CONFIG.APPS_SCRIPT_URL) {
+    if (!cached) {
+      state.source = "fallback";
+      setStatus("error", "No sheet linked");
+      document.getElementById("dataSourceLabel").textContent = "Built-in (no sheet linked)";
+      document.getElementById("lastRefreshLabel").textContent = "—";
+    }
+    return;
+  }
+
+  // Try live fetch
+  try {
+    const res = await fetch(CONFIG.APPS_SCRIPT_URL, { method: "GET" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const json = await res.json();
+    if (!json || !json.events) throw new Error("Bad payload");
+    state.data = json;
+    state.source = "live";
+    writeCache(json);
+    setStatus("live", "Live · sheet");
+    document.getElementById("dataSourceLabel").textContent = "Google Sheet (live)";
+    document.getElementById("lastRefreshLabel").textContent = new Date().toLocaleString("en-MY");
+  } catch (err) {
+    console.warn("Live fetch failed:", err.message);
+    if (!cached) {
+      setStatus("error", "Offline · using built-in");
+      document.getElementById("dataSourceLabel").textContent = "Built-in (offline)";
+    }
+  }
+}
+
+function readCache() {
+  try {
+    const raw = sessionStorage.getItem(CONFIG.CACHE_KEY);
+    if (!raw) return null;
+    const cached = JSON.parse(raw);
+    if (Date.now() - cached.ts > CONFIG.CACHE_TTL_MS) return null;
+    return cached;
+  } catch { return null; }
+}
+function writeCache(data) {
+  try {
+    sessionStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+  } catch {}
+}
+function setStatus(cls, text) {
+  const el = document.getElementById("dataStatus");
+  el.className = "data-status " + cls;
+  document.getElementById("dataStatusText").textContent = text;
+}
+
+async function forceRefresh() {
+  sessionStorage.removeItem(CONFIG.CACHE_KEY);
+  document.getElementById("loadingOverlay").classList.add("show");
+  await fetchData();
+  renderAll();
+  document.getElementById("loadingOverlay").classList.remove("show");
+}
+
+// =============================================================
+//  CLOCK
+// =============================================================
+function tickClock() {
+  const now = new Date();
+  document.getElementById("clock").textContent = now.toLocaleTimeString("en-MY", {hour:"2-digit", minute:"2-digit"});
+}
+
+// =============================================================
+//  HERO
+// =============================================================
+function renderHero() {
+  const dowKey = DOW[TODAY.getDay()];
+  document.getElementById("todayDateLabel").textContent =
+    `${DOW_FULL[TODAY.getDay()]} · ${MONTH_NAMES[TODAY.getMonth()]} ${TODAY.getDate()}`;
+  document.getElementById("todayDayName").textContent = TODAY.getDate();
+  document.getElementById("todayFullDate").textContent =
+    `${MONTH_NAMES[TODAY.getMonth()]} ${TODAY.getFullYear()}`;
+
+  const theme = state.data.weekdayThemes[dowKey];
+  if (theme) {
+    document.getElementById("weekdayThemeTitle").textContent = theme.title;
+    document.getElementById("weekdayThemeDesc").textContent = theme.desc;
+  }
+
+  // This week (next 7 days events)
+  const weekEvents = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(TODAY); d.setDate(TODAY.getDate() + i);
+    const evs = eventsOn(d).filter(e => e.type === "holiday" || e.type === "occasion" || (e.type === "awareness" && !e.range));
+    for (const ev of evs) {
+      weekEvents.push({ date: d, ev });
+    }
+  }
+  const weekEl = document.getElementById("thisWeekEvents");
+  if (weekEvents.length === 0) {
+    weekEl.innerHTML = '<div class="empty">No events in the next 7 days.</div>';
+  } else {
+    weekEl.innerHTML = weekEvents.slice(0, 5).map(({date, ev}) => `
+      <div class="item">
+        <div class="dot ${ev.type === 'holiday' ? '' : 'muted'}"></div>
+        <div class="text">
+          <strong>${ev.title}</strong>
+          <span>${DOW[date.getDay()]} · ${pad(date.getDate())} ${MONTH_NAMES[date.getMonth()].slice(0,3)}</span>
+        </div>
+      </div>
+    `).join("");
+  }
+}
+
+// =============================================================
+//  MONTHLY THEMES
+// =============================================================
+function renderMonthlyThemes() {
+  const m = TODAY.getMonth() + 1;
+  const t = state.data.monthlyThemes[m];
+  if (!t) return;
+  document.getElementById("themeMyopia").textContent = t.myopia;
+  document.getElementById("themeDigital").textContent = t.digital;
+  document.getElementById("themeActivation").textContent = t.activation;
+}
+
+// =============================================================
+//  SALES
+// =============================================================
+function toggleSales() {
+  if (state.salesUnlocked) {
+    const body = document.getElementById("salesBody");
+    body.classList.toggle("show");
+    document.getElementById("salesToggle").textContent = body.classList.contains("show") ? "HIDE" : "SHOW";
+    document.getElementById("salesLock").textContent = body.classList.contains("show") ? "🔓" : "🔒";
+  } else {
+    openPin();
+  }
+}
+
+function openPin() {
+  document.getElementById("pinModal").classList.add("show");
+  document.getElementById("pinError").innerHTML = "&nbsp;";
+  document.getElementById("pinInput").value = "";
+  setTimeout(() => document.getElementById("pinInput").focus(), 100);
+}
+function closePin() {
+  document.getElementById("pinModal").classList.remove("show");
+}
+function checkPin() {
+  const val = document.getElementById("pinInput").value;
+  if (val === CONFIG.PIN) {
+    state.salesUnlocked = true;
+    sessionStorage.setItem(CONFIG.PIN_SESSION_KEY, "1");
+    closePin();
+    document.getElementById("salesBody").classList.add("show");
+    document.getElementById("salesToggle").textContent = "HIDE";
+    document.getElementById("salesToggle").classList.add("shown");
+    document.getElementById("salesLock").textContent = "🔓";
+    renderSales();
+  } else {
+    document.getElementById("pinError").textContent = "Wrong PIN. Try again.";
+    document.getElementById("pinInput").value = "";
+  }
+}
+
+function renderSales() {
+  if (!state.salesUnlocked) return;
+  const s = state.data.sales || FALLBACK.sales;
+  const tier1Pct = Math.round((s.std / s.tier1) * 100);
+  const tier2Pct = Math.round((s.std / s.tier2) * 100);
+  const qPct = s.quarterTarget ? Math.round((s.quarterStd / s.quarterTarget) * 100) : 0;
+
+  let tier1Bar = tier1Pct >= 100 ? "" : (tier1Pct >= 75 ? "tier2" : "below");
+  let tier2Bar = tier2Pct >= 100 ? "" : "below";
+
+  const grid = document.getElementById("salesGrid");
+  grid.innerHTML = `
+    <div class="sales-card">
+      <div class="label">Sales To Date · ${s.period || "This Month"}</div>
+      <div class="value accent">${fmtMoney(s.std)}</div>
+      <div class="sub">RM${(s.std/1000).toFixed(1)}k actual</div>
+    </div>
+    <div class="sales-card">
+      <div class="label">Tier 1 Target</div>
+      <div class="value">${fmtMoney(s.tier1)}</div>
+      <div class="sub">${tier1Pct}% achieved · ${fmtMoneyShort(Math.max(0, s.tier1 - s.std))} to go</div>
+      <div class="progress"><div class="progress-bar ${tier1Bar}" style="width: ${Math.min(100, tier1Pct)}%"></div></div>
+    </div>
+    <div class="sales-card">
+      <div class="label">Tier 2 Target</div>
+      <div class="value">${fmtMoney(s.tier2)}</div>
+      <div class="sub">${tier2Pct}% achieved · ${tier2Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, s.tier2 - s.std)) + " to go"}</div>
+      <div class="progress"><div class="progress-bar ${tier2Bar}" style="width: ${Math.min(100, tier2Pct)}%"></div></div>
+    </div>
+    <div class="sales-card">
+      <div class="label">Quarter STD</div>
+      <div class="value">${fmtMoney(s.quarterStd)}</div>
+      <div class="sub">${qPct}% of ${fmtMoneyShort(s.quarterTarget)} quarter target</div>
+      <div class="progress"><div class="progress-bar ${qPct >= 100 ? '' : (qPct >= 75 ? 'tier2' : 'below')}" style="width: ${Math.min(100, qPct)}%"></div></div>
+    </div>
+    <div class="sales-card">
+      <div class="label">Staff On Floor</div>
+      <div class="value">${s.staffCount}</div>
+      <div class="sub">Active headcount this period</div>
+    </div>
+  `;
+  document.getElementById("salesMeta").textContent = `Last updated: ${s.lastUpdated || "—"}`;
+}
+
+// =============================================================
+//  CAMPAIGNS
+// =============================================================
+function classifyCampaign(c) {
+  const today = TODAY_ISO;
+  if (c.status === "done" || c.end < today) return "expired";
+  if (c.start > today) return "upcoming";
+  return "live";
+}
+
+function renderCampaigns() {
+  const all = (state.data.campaigns || []).map(c => ({ ...c, _class: classifyCampaign(c) }));
+  const active = all.filter(c => c._class === "live" || c._class === "upcoming")
+                    .sort((a,b) => (a.priority||99) - (b.priority||99));
+  const past = all.filter(c => c._class === "expired")
+                  .sort((a,b) => b.end.localeCompare(a.end));
+
+  document.getElementById("campaignSummary").textContent =
+    `${active.length} active · ${past.length} past · sorted by priority`;
+
+  const activeEl = document.getElementById("activeCampaigns");
+  if (active.length === 0) {
+    activeEl.innerHTML = '<div class="empty" style="color: var(--muted); font-style: italic; padding: 12px;">No active campaigns.</div>';
+  } else {
+    activeEl.innerHTML = active.map(renderCampaignCard).join("");
+  }
+
+  document.getElementById("pastCount").textContent = past.length;
+  document.getElementById("pastCampaigns").innerHTML = past.map(c => renderCampaignCard(c, true)).join("");
+
+  if (past.length === 0) {
+    document.getElementById("pastToggle").style.display = "none";
+  }
+}
+
+function renderCampaignCard(c, isPast = false) {
+  const start = parseDate(c.start);
+  const end = parseDate(c.end);
+  const today = TODAY;
+  let meta = "";
+  if (c._class === "live") {
+    const daysLeft = daysBetween(today, end);
+    meta = `Live · ends in ${daysLeft} day${daysLeft===1?"":"s"} (${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)})`;
+  } else if (c._class === "upcoming") {
+    const daysUntil = daysBetween(today, start);
+    meta = `Starts in ${daysUntil} day${daysUntil===1?"":"s"} · ${pad(start.getDate())} ${MONTH_NAMES[start.getMonth()].slice(0,3)}`;
+  } else {
+    meta = `Ended ${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
+  }
+  const source = (c.source || "").toUpperCase();
+  return `
+    <div class="campaign ${c._class}">
+      <div class="campaign-head">
+        <h4>${escapeHtml(c.title)}</h4>
+        ${source ? `<span class="campaign-source ${source}">${source}</span>` : ""}
+      </div>
+      <div class="campaign-meta">${meta}</div>
+      ${c.detail ? `<div class="campaign-detail ${isPast ? 'hide' : ''}">${escapeHtml(c.detail)}</div>` : ""}
+    </div>
+  `;
+}
+
+function escapeHtml(s) {
+  return String(s||"").replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function togglePast() {
+  state.showPast = !state.showPast;
+  const el = document.getElementById("pastCampaigns");
+  el.classList.toggle("show", state.showPast);
+  document.getElementById("pastToggle").innerHTML = state.showPast
+    ? `▴ Hide past campaigns (<span id="pastCount">${(state.data.campaigns||[]).filter(c=>classifyCampaign(c)==="expired").length}</span>)`
+    : `▾ Show past campaigns (<span id="pastCount">${(state.data.campaigns||[]).filter(c=>classifyCampaign(c)==="expired").length}</span>)`;
+}
+
+// =============================================================
+//  CALENDAR
+// =============================================================
+function toggleCalendarView() {
+  state.showFullYear = !state.showFullYear;
+  document.getElementById("viewToggle").textContent = state.showFullYear ? "Show Current + Next 2" : "Show Full Year";
+  document.getElementById("calendarSubtitle").textContent = state.showFullYear ? "Showing all 12 months · Jan → Dec" : "Showing current + next 2 months";
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const grid = document.getElementById("yearGrid");
+  grid.classList.toggle("full", state.showFullYear);
+  const currentMonth = TODAY.getMonth();
+  const monthsToShow = state.showFullYear
+    ? Array.from({length: 12}, (_, i) => i)
+    : [currentMonth, (currentMonth+1) % 12, (currentMonth+2) % 12].slice(0, currentMonth >= 10 ? 12 - currentMonth : 3);
+
+  // For year wraparound when current month is Nov or Dec, just show what fits in 2026
+  const months = state.showFullYear
+    ? Array.from({length: 12}, (_, i) => ({m: i, y: 2026}))
+    : (function() {
+        const out = [];
+        for (let i = 0; i < 3; i++) {
+          const target = currentMonth + i;
+          if (target < 12) out.push({m: target, y: 2026});
+        }
+        return out;
+      })();
+
+  grid.innerHTML = months.map(({m, y}) => renderMonth(m, y)).join("");
+}
+
+function renderMonth(m, y) {
+  const monthName = MONTH_NAMES[m];
+  const isCurrent = m === TODAY.getMonth() && y === TODAY.getFullYear();
+  const theme = state.data.monthlyThemes[m+1];
+  const themeShort = theme ? theme.myopia : "";
+
+  const firstDay = new Date(y, m, 1);
+  const lastDay = new Date(y, m+1, 0);
+  const startDow = firstDay.getDay();
+  const daysInMonth = lastDay.getDate();
+
+  let cells = '';
+  // empty cells before day 1
+  for (let i = 0; i < startDow; i++) cells += '<div class="day muted"></div>';
+  // actual days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(y, m, d);
+    const iso = fmtDate(date);
+    const evs = eventsOn(date);
+    const cls = [];
+    if (iso === TODAY_ISO) cls.push("today");
+    if (isPublicHoliday(date)) cls.push("holiday");
+    if (isSchoolHoliday(date)) cls.push("school-holiday");
+    if (evs.some(e => e.type === "awareness" || e.type === "occasion")) cls.push("has-event");
+    cells += `<div class="day ${cls.join(' ')}" onclick="showDay('${iso}')">${d}</div>`;
+  }
+
+  return `
+    <div class="month ${isCurrent ? 'current' : ''}">
+      <div class="month-head">
+        <span class="name">${monthName} ${y}</span>
+        <span class="theme">${escapeHtml(themeShort)}</span>
+      </div>
+      <div class="month-grid">
+        ${["S","M","T","W","T","F","S"].map(d => `<div class="dow">${d}</div>`).join("")}
+        ${cells}
+      </div>
+    </div>
+  `;
+}
+
+function showDay(iso) {
+  const date = parseDate(iso);
+  const evs = eventsOn(date);
+  document.getElementById("dayDetailTitle").textContent =
+    `${DOW_FULL[date.getDay()]} · ${pad(date.getDate())} ${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
+  const list = document.getElementById("dayDetailEvents");
+  if (evs.length === 0) {
+    list.innerHTML = '<div class="event"><span class="meta">No special events.</span></div>';
+  } else {
+    list.innerHTML = evs.map(e => {
+      const meta = e.type === "holiday" ? `Public Holiday${e.scope ? " ("+e.scope+")" : ""}`
+        : e.type === "school" ? "School"
+        : e.type === "islamic" ? "Islamic"
+        : e.type === "occasion" ? "Occasion"
+        : e.type === "campaign" ? "Campaign"
+        : "Awareness";
+      return `<div class="event"><strong>${escapeHtml(e.title)}</strong><span class="meta">${meta}</span></div>`;
+    }).join("");
+  }
+  document.getElementById("dayDetail").classList.add("show");
+}
+
+// =============================================================
+//  RENDER ALL
+// =============================================================
+function renderAll() {
+  renderHero();
+  renderMonthlyThemes();
+  renderCampaigns();
+  renderCalendar();
+  if (state.salesUnlocked) renderSales();
+}
+
+// =============================================================
+//  INIT
+// =============================================================
+async function init() {
+  if (sessionStorage.getItem(CONFIG.PIN_SESSION_KEY) === "1") {
+    state.salesUnlocked = true;
+  }
+  document.getElementById("pinInput").addEventListener("keyup", e => {
+    if (e.key === "Enter") checkPin();
+    if (e.key === "Escape") closePin();
+  });
+  tickClock();
+  setInterval(tickClock, 30000);
+  await fetchData();
+  renderAll();
+}
+
+init();
+</script>
+</body>
+</html>

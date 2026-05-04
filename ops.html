@@ -310,6 +310,68 @@
     font-style: italic;
   }
 
+  /* === DAILY RUN-RATE BANNER (public) === */
+  .runrate-banner {
+    background: linear-gradient(135deg, var(--primary) 0%, #2d246b 100%);
+    color: #fff;
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .runrate-head { margin-bottom: 14px; }
+  .runrate-head h3 {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    margin-bottom: 4px;
+    color: #fff;
+  }
+  .runrate-head p {
+    font-size: 11px;
+    color: rgba(255,255,255,.7);
+  }
+  .runrate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .runrate-card {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    padding: 14px 16px;
+    backdrop-filter: blur(4px);
+  }
+  .runrate-card .label {
+    font-size: 10px;
+    color: rgba(255,255,255,.7);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .runrate-card .value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .runrate-card .value.cleared {
+    color: #4ade80;
+    font-size: 18px;
+  }
+  .runrate-card .sub {
+    font-size: 11px;
+    color: rgba(255,255,255,.65);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .runrate-card.tier1-card { border-left: 3px solid #fbbf24; }
+  .runrate-card.tier2-card { border-left: 3px solid #4ade80; }
+  .runrate-card.q-card { border-left: 3px solid var(--accent); }
+
   /* === STAFF LEADERBOARD === */
   .staff-leaderboard {
     margin-top: 20px;
@@ -973,6 +1035,15 @@
   </div>
 </div>
 
+<!-- DAILY RUN-RATE BANNER (public, motivational) -->
+<div class="runrate-banner" id="runrateBanner">
+  <div class="runrate-head">
+    <h3>🎯 What we need daily</h3>
+    <p id="runrateMeta">— · auto-calculated · resets at month-end</p>
+  </div>
+  <div class="runrate-grid" id="runrateGrid"></div>
+</div>
+
 <!-- SALES PANEL (PIN-gated) -->
 <div class="sales-panel">
   <div class="sales-header" onclick="toggleSales()">
@@ -1260,7 +1331,8 @@ const FALLBACK = {
     tier1: 85000,
     tier2: 105000,
     std: 28500,
-    quarterTarget: 270000,
+    quarterT1: 250000,
+    quarterT2: 290000,
     quarterStd: 95000,
     staffCount: 5,
     lastUpdated: "2026-05-04",
@@ -1556,7 +1628,11 @@ function renderSales() {
   const s = state.data.sales || FALLBACK.sales;
   const tier1Pct = Math.round((s.std / s.tier1) * 100);
   const tier2Pct = Math.round((s.std / s.tier2) * 100);
-  const qPct = s.quarterTarget ? Math.round((s.quarterStd / s.quarterTarget) * 100) : 0;
+  const qT1 = s.quarterT1 || 0;
+  const qT2 = s.quarterT2 || 0;
+  const qStd = s.quarterStd || 0;
+  const qT1Pct = qT1 > 0 ? Math.round((qStd / qT1) * 100) : 0;
+  const qT2Pct = qT2 > 0 ? Math.round((qStd / qT2) * 100) : 0;
 
   let tier1Bar = tier1Pct >= 100 ? "" : (tier1Pct >= 75 ? "tier2" : "below");
   let tier2Bar = tier2Pct >= 100 ? "" : "below";
@@ -1596,10 +1672,16 @@ function renderSales() {
       <div class="sub">No target · clinical metric</div>
     </div>
     <div class="sales-card">
-      <div class="label">Quarter STD</div>
-      <div class="value">${fmtMoney(s.quarterStd)}</div>
-      <div class="sub">${qPct}% of ${fmtMoneyShort(s.quarterTarget)} quarter target</div>
-      <div class="progress"><div class="progress-bar ${qPct >= 100 ? '' : (qPct >= 75 ? 'tier2' : 'below')}" style="width: ${Math.min(100, qPct)}%"></div></div>
+      <div class="label">Quarter T1</div>
+      <div class="value">${fmtMoney(qStd)}</div>
+      <div class="sub">${qT1Pct}% of ${fmtMoneyShort(qT1)} · ${qT1Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, qT1 - qStd)) + " to go"}</div>
+      <div class="progress"><div class="progress-bar ${qT1Pct >= 100 ? '' : (qT1Pct >= 75 ? 'tier2' : 'below')}" style="width: ${Math.min(100, qT1Pct)}%"></div></div>
+    </div>
+    <div class="sales-card">
+      <div class="label">Quarter T2</div>
+      <div class="value">${fmtMoney(qStd)}</div>
+      <div class="sub">${qT2Pct}% of ${fmtMoneyShort(qT2)} · ${qT2Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, qT2 - qStd)) + " to go"}</div>
+      <div class="progress"><div class="progress-bar ${qT2Pct >= 100 ? '' : (qT2Pct >= 75 ? 'tier2' : 'below')}" style="width: ${Math.min(100, qT2Pct)}%"></div></div>
     </div>
   `;
   document.getElementById("salesMeta").textContent = `Last updated: ${s.lastUpdated || "—"}`;
@@ -1655,6 +1737,74 @@ function renderLeaderboard() {
 
 function fmtNumber(n) {
   return Math.round(n).toLocaleString("en-MY");
+}
+
+// =============================================================
+//  DAILY RUN-RATE BANNER (public)
+//  Calculates "RM X/day needed" for monthly T1, T2 + quarterly T1, T2.
+//  All 7 days count as working days (per KNM's call).
+// =============================================================
+function renderRunRate() {
+  const s = state.data.sales;
+  const banner = document.getElementById("runrateBanner");
+  const grid = document.getElementById("runrateGrid");
+  const meta = document.getElementById("runrateMeta");
+  if (!s || !banner || !grid) return;
+
+  const today = TODAY;
+  const yr = today.getFullYear();
+  const mo = today.getMonth();
+  const dayOfMonth = today.getDate();
+  const lastDayOfMonth = new Date(yr, mo + 1, 0).getDate();
+  const daysLeftMonth = Math.max(1, lastDayOfMonth - dayOfMonth + 1);
+
+  // Quarter math: figure out current quarter's last month
+  const qStartMo = Math.floor(mo / 3) * 3; // 0,3,6,9
+  const qEndMo = qStartMo + 2;
+  const qLastDay = new Date(yr, qEndMo + 1, 0);
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const daysLeftQuarter = Math.max(1, Math.ceil((qLastDay - today) / msPerDay) + 1);
+  const qNum = Math.floor(mo / 3) + 1;
+
+  meta.textContent = `${daysLeftMonth} day${daysLeftMonth===1?'':'s'} left in month · ${daysLeftQuarter} days left in Q${qNum} · all 7 days count`;
+
+  function buildCard(label, target, current, daysLeft, tierClass) {
+    const remaining = Math.max(0, target - current);
+    if (target === 0) {
+      return `
+        <div class="runrate-card ${tierClass}">
+          <div class="label">${label}</div>
+          <div class="value cleared">— set target —</div>
+          <div class="sub">No target configured in sheet</div>
+        </div>
+      `;
+    }
+    if (remaining === 0) {
+      const above = current - target;
+      return `
+        <div class="runrate-card ${tierClass}">
+          <div class="label">${label}</div>
+          <div class="value cleared">✓ Cleared</div>
+          <div class="sub">RM ${fmtNumber(above)} above target</div>
+        </div>
+      `;
+    }
+    const ratePerDay = Math.ceil(remaining / daysLeft);
+    return `
+      <div class="runrate-card ${tierClass}">
+        <div class="label">${label}</div>
+        <div class="value">RM ${fmtNumber(ratePerDay)}<span style="font-size:13px;font-weight:600;opacity:.7">/day</span></div>
+        <div class="sub">RM ${fmtNumber(remaining)} to go · ${daysLeft} day${daysLeft===1?'':'s'}</div>
+      </div>
+    `;
+  }
+
+  grid.innerHTML = [
+    buildCard(`Monthly T1 (${s.period || ''})`, s.tier1, s.std, daysLeftMonth, "tier1-card"),
+    buildCard(`Monthly T2 (${s.period || ''})`, s.tier2, s.std, daysLeftMonth, "tier2-card"),
+    buildCard(`Q${qNum} T1`, s.quarterT1 || 0, s.quarterStd || 0, daysLeftQuarter, "q-card"),
+    buildCard(`Q${qNum} T2`, s.quarterT2 || 0, s.quarterStd || 0, daysLeftQuarter, "q-card")
+  ].join("");
 }
 
 // =============================================================
@@ -1930,6 +2080,7 @@ function showDay(iso) {
 // =============================================================
 function renderAll() {
   renderHero();
+  renderRunRate();
   renderMonthlyThemes();
   renderCampaigns();
   renderIncentives();

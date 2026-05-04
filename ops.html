@@ -368,7 +368,9 @@
     border-radius: 8px;
     padding: 12px 14px;
     transition: .15s;
+    cursor: pointer;
   }
+  .campaign:hover { background: var(--bg-3); }
   .campaign.live {
     border-left-color: var(--success);
     background: var(--bg-2);
@@ -380,6 +382,7 @@
   .campaign.done {
     opacity: .6;
     border-left-color: var(--muted-2);
+    cursor: default;
   }
   .campaign-head {
     display: flex;
@@ -393,6 +396,14 @@
     font-weight: 700;
     line-height: 1.3;
   }
+  .campaign .expand-arrow {
+    font-size: 10px;
+    color: var(--muted);
+    margin-left: 4px;
+    display: inline-block;
+    transition: transform .15s;
+  }
+  .campaign.expanded .expand-arrow { transform: rotate(180deg); }
   .campaign-source {
     font-size: 9px;
     padding: 2px 6px;
@@ -406,6 +417,7 @@
   }
   .campaign-source.HQ { background: var(--primary); color: #fff; }
   .campaign-source.SUPPLIER { background: var(--warn); color: #fff; }
+  .campaign-source.INTERNAL { background: var(--accent); color: #fff; }
   .campaign-meta {
     font-size: 11px;
     color: var(--muted);
@@ -415,9 +427,37 @@
   .campaign-detail {
     font-size: 12px;
     color: var(--text);
-    line-height: 1.5;
+    line-height: 1.55;
+    display: none;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+    white-space: pre-wrap;
   }
-  .campaign-detail.hide { display: none; }
+  .campaign.expanded .campaign-detail { display: block; }
+  .campaign.expired .campaign-detail,
+  .campaign.done .campaign-detail { display: none; }
+
+  /* === BRAND GROUPS === */
+  .brand-group {
+    margin-bottom: 18px;
+  }
+  .brand-group:empty { display: none; }
+  .brand-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .brand-group-title.brand-HOYA { background: #fb923c; color: #fff; }
+  .brand-group-title.brand-ESSILOR { background: #1e3a8a; color: #fff; }
+  .brand-group-title.brand-HQ { background: var(--primary); color: #fff; }
+  .brand-group-title.brand-INTERNAL { background: var(--accent); color: #fff; }
+  .brand-group-title.brand-OTHER { background: var(--muted-2); color: #fff; }
 
   .past-toggle {
     margin-top: 14px;
@@ -876,10 +916,31 @@
   <div class="section-head" style="margin-top: 0;">
     <div>
       <h2>🚀 Active Campaigns & Promos</h2>
-      <p id="campaignSummary">—</p>
+      <p id="campaignSummary">— · click any card to see full details</p>
     </div>
   </div>
-  <div class="campaign-list" id="activeCampaigns"></div>
+
+  <!-- Brand-grouped active campaigns -->
+  <div class="brand-group" id="brandGroup_HOYA">
+    <h3 class="brand-group-title brand-HOYA">HOYA</h3>
+    <div class="campaign-list" id="activeCampaigns_HOYA"></div>
+  </div>
+  <div class="brand-group" id="brandGroup_ESSILOR">
+    <h3 class="brand-group-title brand-ESSILOR">Essilor</h3>
+    <div class="campaign-list" id="activeCampaigns_ESSILOR"></div>
+  </div>
+  <div class="brand-group" id="brandGroup_HQ">
+    <h3 class="brand-group-title brand-HQ">HQ Campaigns</h3>
+    <div class="campaign-list" id="activeCampaigns_HQ"></div>
+  </div>
+  <div class="brand-group" id="brandGroup_INTERNAL">
+    <h3 class="brand-group-title brand-INTERNAL">Menara Internal</h3>
+    <div class="campaign-list" id="activeCampaigns_INTERNAL"></div>
+  </div>
+  <div class="brand-group" id="brandGroup_OTHER">
+    <h3 class="brand-group-title brand-OTHER">Other</h3>
+    <div class="campaign-list" id="activeCampaigns_OTHER"></div>
+  </div>
 
   <div class="past-toggle" id="pastToggle" onclick="togglePast()">
     ▾ Show past campaigns (<span id="pastCount">0</span>)
@@ -1076,18 +1137,19 @@ const FALLBACK = {
   ],
 
   campaigns: [
-    { id: "lucky_draw_essilor", title: "Lucky Draw Menara × Essilor", source: "HQ", start: "2026-02-01", end: "2026-12-31", detail: "SV = 1 entry · EYEZEN = 2 entries · MF = 3 entries. Hadiah utama: Proton e-MAS. 5 hadiah bulanan: Emas, 3 pemenang.", status: "live", priority: 1 },
-    { id: "jualan_murah_may", title: "Jualan Murah May 2026", source: "INTERNAL", start: "2026-05-02", end: "2026-05-31", detail: "KPDN-approved sale. Discount up to 50%. Reg: B.PgkPJ(CS)2026/10579/131.", status: "live", priority: 2 },
-    { id: "varilux_upgrade", title: "Varilux Design Upgrade", source: "SUPPLIER", start: "2026-05-01", end: "2026-06-30", detail: "Free upgrade to next-tier Varilux design at lower-tier price. e.g. XR Pro → priced as XR Track. Order via EssilorOrder only based on order date.", status: "live", priority: 2 },
-    { id: "hoya_idsd_supereader", title: "HOYA iDSD Free Supereader", source: "SUPPLIER", start: "2026-04-02", end: "2026-06-30", detail: "Buy 1 iDSD Progressive (MySelf / MyStyle V+ / Lifestyle), get 1 SUPEREADER pair free. Promo code: 26FOCSPR. Order via HOYA CS only.", status: "live", priority: 3 },
-    { id: "miyosmart_subsidy", title: "HOYA MiYOSMART Subsidy", source: "SUPPLIER", start: "2026-04-01", end: "2027-03-31", detail: "27% subsidy off list price for myopia Rx ≤ -3.00D. Covers MiYOSMART, Full Control, Chameleon, Sunbird. Mixed-Rx pair: subsidy on -3.00D eye only.", status: "live", priority: 3 },
-    { id: "stellest_entry", title: "Essilor Stellest Entry-Level", source: "SUPPLIER", start: "2026-04-01", end: "2026-06-30", detail: "New entry-level Stellest from RM 650. Plus up to RM 750 consumer subsidy for Rx +2.00 to -2.00. H.A.L.T. tech, slows myopia 67% on avg.", status: "live", priority: 3 },
-    { id: "essilor_laptop_bag", title: "Essilor Laptop Sleeve Bag", source: "SUPPLIER", start: "2026-04-01", end: "2026-06-30", detail: "Free Menara-exclusive laptop sleeve bag with any Varilux or Eyezen purchase. While stocks last. Berdasarkan tarikh pesanan.", status: "live", priority: 4 }
+    { id: "lucky_draw_essilor", title: "Lucky Draw Menara × Essilor", source: "HQ", brand: "HQ", start: "2026-02-01", end: "2026-12-31", detail: "SV = 1 entry · EYEZEN = 2 entries · MF = 3 entries. Hadiah utama: Proton e-MAS. 5 hadiah bulanan: Emas, 3 pemenang.", status: "live", priority: 1 },
+    { id: "jualan_murah_may", title: "Jualan Murah May 2026", source: "INTERNAL", brand: "INTERNAL", start: "2026-05-02", end: "2026-05-31", detail: "KPDN-approved discount sale. Up to 50% off on edging stock from 2020 and below. Reg: B.PgkPJ(CS)2026/10579/131. Valid 2–31 May 2026.", status: "live", priority: 2 },
+    { id: "varilux_upgrade", title: "Varilux Design Upgrade", source: "SUPPLIER", brand: "ESSILOR", start: "2026-05-01", end: "2026-06-30", detail: "Customer pays lower-tier price, receives next-tier UP lens — FREE upgrade. e.g. XR Track price → XR Pro lens. Order via EssilorOrder only.", status: "live", priority: 2 },
+    { id: "hoya_dynamic_boost", title: "HOYA Dynamic Boost Upgrade", source: "SUPPLIER", brand: "HOYA", start: "2026-04-02", end: "2026-05-31", detail: "Customer pays lower-tier price, receives next-tier UP HOYA Dynamic lens — FREE upgrade. Summit price → Premium lens. Amplitude price → Summit lens. Order via HOYA CS.", status: "live", priority: 2 },
+    { id: "hoya_idsd_supereader", title: "HOYA iDSD Free Supereader", source: "SUPPLIER", brand: "HOYA", start: "2026-04-02", end: "2026-06-30", detail: "Buy 1 iDSD Progressive (MySelf / MyStyle V+ / Lifestyle), get 1 SUPEREADER pair free. Promo code: 26FOCSPR. Order via HOYA CS only.", status: "live", priority: 3 },
+    { id: "miyosmart_subsidy", title: "HOYA MiYOSMART Subsidy", source: "SUPPLIER", brand: "HOYA", start: "2026-04-01", end: "2027-03-31", detail: "27% subsidy off list price for myopia Rx ≤ -3.00D. Covers MiYOSMART, Full Control, Chameleon, Sunbird. Mixed-Rx pair: subsidy on -3.00D eye only.", status: "live", priority: 3 },
+    { id: "stellest_entry", title: "Essilor Stellest Entry-Level", source: "SUPPLIER", brand: "ESSILOR", start: "2026-04-01", end: "2026-06-30", detail: "New entry-level Stellest from RM 650. Plus up to RM 750 consumer subsidy for Rx +2.00 to -2.00. H.A.L.T. tech, slows myopia 67% on avg.", status: "live", priority: 3 },
+    { id: "essilor_stellast", title: "Essilor Stellast", source: "HQ", brand: "HQ", start: "2026-01-01", end: "2026-12-31", detail: "Limited board game while stock lasts.", status: "live", priority: 4 },
+    { id: "essilor_laptop_bag", title: "Essilor Laptop Sleeve Bag", source: "SUPPLIER", brand: "ESSILOR", start: "2026-04-01", end: "2026-06-30", detail: "Free Menara-exclusive laptop sleeve bag with any Varilux or Eyezen purchase. While stocks last. Berdasarkan tarikh pesanan.", status: "live", priority: 4 }
   ],
 
   staffIncentives: [
-    { id: "hoya_dynamic_boost", title: "HOYA Dynamic Boost On", supplier: "HOYA", start: "2026-04-02", end: "2026-05-31", reward: "Free design upgrade (RM200–300 margin)", mechanic: "Prescribe Dynamic Premium → bill at Dynamic Summit price (+RM300). Prescribe Dynamic Summit → bill at Amplitude Plus (+RM200). Index 1.50/1.60/1.67 only. Coatings: Full Control, Hi-Vision Meiryo, HVLL-UA. Not valid with other HOYA promos.", status: "live", priority: 1 },
-    { id: "essilor_essirewards", title: "Essilor EssiRewards", supplier: "ESSILOR", start: "2026-04-01", end: "2026-05-31", reward: "RM 10–45 per pair (TNG voucher)", mechanic: "Min 5 pairs/mth Varilux, 3 pairs/mth Eyezen, 2 pairs/mth Stellest. Varilux XR series RM45 (BCT) / RM60 (+Trans). Liberty/Comfort Max/Physio: RM25 / RM40. Eyezen: RM25 / RM40. Stellest: RM40 BCT only. Compiled June, paid via TNG July 2026.", status: "live", priority: 2 },
+    { id: "essilor_essirewards", title: "Essilor EssiRewards", supplier: "ESSILOR", start: "2026-04-01", end: "2026-05-31", reward: "RM 10–45 per pair (TNG voucher)", mechanic: "Each month evaluated independently. Monthly thresholds: Varilux 5 pairs, Eyezen 3 pairs, Stellest 2 pairs. Per-pair payout (BCT / +Trans): Varilux XR series RM45/RM60, Liberty/Comfort Max/Physio RM25/RM40, Start RM10/RM20. Eyezen RM25/RM40. Stellest RM40 BCT only. Paid via TNG July 2026.", status: "live", priority: 2 },
     { id: "essilor_thailand_tour", title: "Thailand Lab Tour Challenge 2026", supplier: "ESSILOR", start: "2026-01-01", end: "2026-12-31", reward: "4D3N Thailand trip · 16 winners total", mechanic: "Phase 1 (Jan–Jun) + Phase 2 (Jul–Dec). 8 winners per phase. Eligibility: min RM 4,000 Essilor sales/mth. Expert group (top 2 by sales value + top 1 by growth) · Senior group (same) · Junior group (top 2 by growth). CONFIDENTIAL — internal reference only.", status: "live", priority: 3 }
   ],
 
@@ -1438,20 +1500,39 @@ function renderCampaigns() {
                   .sort((a,b) => b.end.localeCompare(a.end));
 
   document.getElementById("campaignSummary").textContent =
-    `${active.length} active · ${past.length} past · sorted by priority`;
+    `${active.length} active · ${past.length} past · click any card to see full details`;
 
-  const activeEl = document.getElementById("activeCampaigns");
-  if (active.length === 0) {
-    activeEl.innerHTML = '<div class="empty" style="color: var(--muted); font-style: italic; padding: 12px;">No active campaigns.</div>';
-  } else {
-    activeEl.innerHTML = active.map(renderCampaignCard).join("");
-  }
+  // Group active campaigns by Brand
+  const brandOrder = ["HOYA", "ESSILOR", "HQ", "INTERNAL", "OTHER"];
+  const groups = {};
+  brandOrder.forEach(b => groups[b] = []);
+  active.forEach(c => {
+    const b = (c.brand || "OTHER").toUpperCase();
+    if (groups[b]) groups[b].push(c);
+    else groups.OTHER.push(c);
+  });
+
+  // Render each brand group, hide if empty
+  brandOrder.forEach(b => {
+    const wrapEl = document.getElementById(`brandGroup_${b}`);
+    const listEl = document.getElementById(`activeCampaigns_${b}`);
+    if (!wrapEl || !listEl) return;
+    if (groups[b].length === 0) {
+      wrapEl.style.display = "none";
+      listEl.innerHTML = "";
+    } else {
+      wrapEl.style.display = "";
+      listEl.innerHTML = groups[b].map(c => renderCampaignCard(c)).join("");
+    }
+  });
 
   document.getElementById("pastCount").textContent = past.length;
   document.getElementById("pastCampaigns").innerHTML = past.map(c => renderCampaignCard(c, true)).join("");
 
   if (past.length === 0) {
     document.getElementById("pastToggle").style.display = "none";
+  } else {
+    document.getElementById("pastToggle").style.display = "";
   }
 }
 
@@ -1470,14 +1551,17 @@ function renderCampaignCard(c, isPast = false) {
     meta = `Ended ${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
   }
   const source = (c.source || "").toUpperCase();
+  // Past cards don't expand; active cards do
+  const onClick = isPast ? "" : "onclick=\"this.classList.toggle('expanded')\"";
+  const arrow = isPast ? "" : `<span class="expand-arrow">▾</span>`;
   return `
-    <div class="campaign ${c._class}">
+    <div class="campaign ${c._class}" ${onClick}>
       <div class="campaign-head">
-        <h4>${escapeHtml(c.title)}</h4>
+        <h4>${escapeHtml(c.title)} ${arrow}</h4>
         ${source ? `<span class="campaign-source ${source}">${source}</span>` : ""}
       </div>
       <div class="campaign-meta">${meta}</div>
-      ${c.detail ? `<div class="campaign-detail ${isPast ? 'hide' : ''}">${escapeHtml(c.detail)}</div>` : ""}
+      ${c.detail ? `<div class="campaign-detail">${escapeHtml(c.detail)}</div>` : ""}
     </div>
   `;
 }

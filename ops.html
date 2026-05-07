@@ -333,8 +333,8 @@
   }
   .runrate-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 14px;
   }
   .runrate-card {
     background: rgba(255,255,255,.08);
@@ -352,15 +352,21 @@
     margin-bottom: 8px;
   }
   .runrate-card .value {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 800;
     color: #fff;
     font-variant-numeric: tabular-nums;
     line-height: 1.1;
   }
+  .runrate-card .value-suffix {
+    font-size: 14px;
+    font-weight: 600;
+    opacity: .7;
+    margin-left: 2px;
+  }
   .runrate-card .value.cleared {
     color: #4ade80;
-    font-size: 18px;
+    font-size: 22px;
   }
   .runrate-card .sub {
     font-size: 11px;
@@ -368,9 +374,27 @@
     margin-top: 6px;
     line-height: 1.4;
   }
-  .runrate-card.tier1-card { border-left: 3px solid #fbbf24; }
-  .runrate-card.tier2-card { border-left: 3px solid #4ade80; }
-  .runrate-card.q-card { border-left: 3px solid var(--accent); }
+  .runrate-card.monthly-card { border-left: 3px solid #fbbf24; }
+  .runrate-card.quarterly-card { border-left: 3px solid var(--accent); }
+  .runrate-card.tier1-active .label { color: rgba(255,255,255,.85); }
+  .runrate-card.tier2-active .label { color: #4ade80; }
+  .runrate-card.tier2-active { background: rgba(74, 222, 128, 0.05); }
+  .runrate-card.cleared-card {
+    background: rgba(74, 222, 128, 0.10);
+    border-left-color: #4ade80;
+  }
+  .t1-badge {
+    display: inline-block;
+    background: #4ade80;
+    color: #1B1464;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .5px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
 
   /* === STAFF LEADERBOARD === */
   .staff-leaderboard {
@@ -1740,9 +1764,13 @@ function fmtNumber(n) {
 }
 
 // =============================================================
-//  DAILY RUN-RATE BANNER (public)
-//  Calculates "RM X/day needed" for monthly T1, T2 + quarterly T1, T2.
-//  All 7 days count as working days (per KNM's call).
+//  DAILY RUN-RATE BANNER (public, motivational)
+//  v2.8: shows ONE card per scope (monthly + quarterly).
+//  Card adapts based on achievement:
+//    - Below T1 → show T1 with STD context
+//    - T1 cleared, below T2 → show T2 with STD context, T1 ✓ badge
+//    - Both cleared → celebration card
+//  Period cell auto-cleaned to text if it came in as a date.
 // =============================================================
 function renderRunRate() {
   const s = state.data.sales;
@@ -1758,53 +1786,106 @@ function renderRunRate() {
   const lastDayOfMonth = new Date(yr, mo + 1, 0).getDate();
   const daysLeftMonth = Math.max(1, lastDayOfMonth - dayOfMonth + 1);
 
-  // Quarter math: figure out current quarter's last month
-  const qStartMo = Math.floor(mo / 3) * 3; // 0,3,6,9
+  // Quarter math
+  const qStartMo = Math.floor(mo / 3) * 3;
   const qEndMo = qStartMo + 2;
   const qLastDay = new Date(yr, qEndMo + 1, 0);
   const msPerDay = 1000 * 60 * 60 * 24;
   const daysLeftQuarter = Math.max(1, Math.ceil((qLastDay - today) / msPerDay) + 1);
   const qNum = Math.floor(mo / 3) + 1;
 
-  meta.textContent = `${daysLeftMonth} day${daysLeftMonth===1?'':'s'} left in month · ${daysLeftQuarter} days left in Q${qNum} · all 7 days count`;
+  // Clean Period if it came in as a date object representation
+  const cleanPeriod = cleanPeriodLabel(s.period);
 
-  function buildCard(label, target, current, daysLeft, tierClass) {
-    const remaining = Math.max(0, target - current);
-    if (target === 0) {
-      return `
-        <div class="runrate-card ${tierClass}">
-          <div class="label">${label}</div>
-          <div class="value cleared">— set target —</div>
-          <div class="sub">No target configured in sheet</div>
-        </div>
-      `;
-    }
-    if (remaining === 0) {
-      const above = current - target;
-      return `
-        <div class="runrate-card ${tierClass}">
-          <div class="label">${label}</div>
-          <div class="value cleared">✓ Cleared</div>
-          <div class="sub">RM ${fmtNumber(above)} above target</div>
-        </div>
-      `;
-    }
-    const ratePerDay = Math.ceil(remaining / daysLeft);
+  meta.textContent = `${daysLeftMonth} day${daysLeftMonth===1?'':'s'} left in ${cleanPeriod || 'month'} · ${daysLeftQuarter} days left in Q${qNum} · all 7 days count`;
+
+  // Build monthly card (T1 below → T2 below → celebrate)
+  const monthlyCard = buildScopeCard({
+    scopeLabel: `Monthly · ${cleanPeriod}`,
+    t1: s.tier1 || 0,
+    t2: s.tier2 || 0,
+    std: s.std || 0,
+    daysLeft: daysLeftMonth,
+    cssClass: "monthly-card"
+  });
+
+  // Build quarterly card (independent of monthly)
+  const quarterlyCard = buildScopeCard({
+    scopeLabel: `Q${qNum} (Apr–Jun)`,
+    t1: s.quarterT1 || 0,
+    t2: s.quarterT2 || 0,
+    std: s.quarterStd || 0,
+    daysLeft: daysLeftQuarter,
+    cssClass: "quarterly-card"
+  });
+
+  grid.innerHTML = monthlyCard + quarterlyCard;
+}
+
+function buildScopeCard({ scopeLabel, t1, t2, std, daysLeft, cssClass }) {
+  // No targets configured
+  if (t1 === 0 && t2 === 0) {
     return `
-      <div class="runrate-card ${tierClass}">
-        <div class="label">${label}</div>
-        <div class="value">RM ${fmtNumber(ratePerDay)}<span style="font-size:13px;font-weight:600;opacity:.7">/day</span></div>
-        <div class="sub">RM ${fmtNumber(remaining)} to go · ${daysLeft} day${daysLeft===1?'':'s'}</div>
+      <div class="runrate-card ${cssClass}">
+        <div class="label">${scopeLabel}</div>
+        <div class="value cleared">— set target —</div>
+        <div class="sub">Tier targets not configured in sheet</div>
       </div>
     `;
   }
 
-  grid.innerHTML = [
-    buildCard(`Monthly T1 (${s.period || ''})`, s.tier1, s.std, daysLeftMonth, "tier1-card"),
-    buildCard(`Monthly T2 (${s.period || ''})`, s.tier2, s.std, daysLeftMonth, "tier2-card"),
-    buildCard(`Q${qNum} T1`, s.quarterT1 || 0, s.quarterStd || 0, daysLeftQuarter, "q-card"),
-    buildCard(`Q${qNum} T2`, s.quarterT2 || 0, s.quarterStd || 0, daysLeftQuarter, "q-card")
-  ].join("");
+  // Both T1 and T2 cleared → celebration
+  if (std >= t1 && std >= t2) {
+    const above = std - Math.max(t1, t2);
+    return `
+      <div class="runrate-card ${cssClass} cleared-card">
+        <div class="label">${scopeLabel} · BOTH TIERS ✓</div>
+        <div class="value cleared">🎉 RM ${fmtNumber(std)}</div>
+        <div class="sub">RM ${fmtNumber(above)} above T2 · keep going</div>
+      </div>
+    `;
+  }
+
+  // T1 cleared, push to T2
+  if (std >= t1 && t2 > 0) {
+    const remaining = t2 - std;
+    const ratePerDay = Math.ceil(remaining / daysLeft);
+    return `
+      <div class="runrate-card ${cssClass} tier2-active">
+        <div class="label">${scopeLabel} · T2 <span class="t1-badge">T1 ✓</span></div>
+        <div class="value">RM ${fmtNumber(ratePerDay)}<span class="value-suffix">/day</span></div>
+        <div class="sub">RM ${fmtNumber(std)} of RM ${fmtNumber(t2)}</div>
+        <div class="sub">RM ${fmtNumber(remaining)} to go · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+      </div>
+    `;
+  }
+
+  // Below T1 — focus state
+  const remaining = t1 - std;
+  const ratePerDay = Math.ceil(remaining / daysLeft);
+  return `
+    <div class="runrate-card ${cssClass} tier1-active">
+      <div class="label">${scopeLabel} · T1</div>
+      <div class="value">RM ${fmtNumber(ratePerDay)}<span class="value-suffix">/day</span></div>
+      <div class="sub">RM ${fmtNumber(std)} of RM ${fmtNumber(t1)}</div>
+      <div class="sub">RM ${fmtNumber(remaining)} to go · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+    </div>
+  `;
+}
+
+// Period cell from sheet may come as Date string like "Fri May 01 2026 ..."
+// Try to extract a clean "Mon Year" label.
+function cleanPeriodLabel(periodRaw) {
+  if (!periodRaw) return "";
+  const s = String(periodRaw).trim();
+  // If it already looks like "May 2026" — return as-is
+  if (/^[A-Za-z]{3,9}\s+\d{4}$/.test(s)) return s;
+  // Try parsing as date
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) {
+    return MONTH_NAMES[d.getMonth()].slice(0,3) + " " + d.getFullYear();
+  }
+  return s; // fall back to raw
 }
 
 // =============================================================

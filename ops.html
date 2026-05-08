@@ -204,6 +204,157 @@
   .hero-card .item .text span { color: var(--muted); font-size: 11px; }
   .hero-card .empty { color: var(--muted); font-style: italic; font-size: 12px; padding: 6px 0; }
 
+  /* === HERO RUN-RATE (right column of hero) === */
+  .hero-runrate {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, var(--primary) 0%, #2d246b 100%);
+    border-color: var(--primary);
+    color: #fff;
+  }
+  .hero-runrate h3 {
+    color: rgba(255,255,255,.85);
+    font-size: 11px;
+  }
+  .hero-rr-rate {
+    font-size: 56px;
+    line-height: 1;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1.5px;
+    margin-top: 6px;
+  }
+  .hero-rr-rate .suffix {
+    font-size: 18px;
+    font-weight: 600;
+    opacity: .7;
+    margin-left: 4px;
+  }
+  .hero-rr-period {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: rgba(255,255,255,.7);
+    margin-bottom: 2px;
+  }
+  .hero-rr-context {
+    font-size: 12px;
+    color: rgba(255,255,255,.75);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  .hero-rr-context strong { color: #fff; font-weight: 700; }
+  .hero-rr-tier-badge {
+    display: inline-block;
+    background: #4ade80;
+    color: var(--primary);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .5px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .hero-rr-cleared {
+    font-size: 28px;
+    font-weight: 800;
+    color: #4ade80;
+    margin-top: 8px;
+  }
+  @media (max-width: 600px) {
+    .hero-rr-rate { font-size: 42px; }
+  }
+
+  /* === STRIP ROW (next event + quarterly) === */
+  .strip-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 900px) {
+    .strip-row { grid-template-columns: 1fr; }
+  }
+  .strip-card {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+  }
+  .strip-card .strip-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .strip-card .empty {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 12px;
+  }
+
+  /* Next event countdown */
+  .next-event-card { border-left: 4px solid var(--accent); }
+  .next-event-countdown {
+    font-size: 44px;
+    line-height: 1;
+    font-weight: 800;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1px;
+  }
+  .next-event-countdown .suffix {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .next-event-card.today .next-event-countdown { color: var(--accent); }
+  .next-event-card.tomorrow .next-event-countdown { color: var(--warn); }
+  .next-event-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-top: 8px;
+    line-height: 1.3;
+  }
+  .next-event-date {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Quarterly mini run-rate */
+  .quarterly-card { border-left: 4px solid var(--warn); }
+  .q-rr-rate {
+    font-size: 32px;
+    line-height: 1;
+    font-weight: 800;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.5px;
+    margin-top: 4px;
+  }
+  .q-rr-rate .suffix {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .q-rr-context {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .q-rr-context strong { color: var(--text); font-weight: 700; }
+  .q-rr-cleared { color: var(--success); font-size: 22px; font-weight: 800; margin-top: 6px; }
+
   /* === SALES PANEL === */
   .sales-panel {
     background: var(--bg-2);
@@ -308,92 +459,6 @@
     color: var(--muted);
     text-align: right;
     font-style: italic;
-  }
-
-  /* === DAILY RUN-RATE BANNER (public) === */
-  .runrate-banner {
-    background: linear-gradient(135deg, var(--primary) 0%, #2d246b 100%);
-    color: #fff;
-    border-radius: 14px;
-    padding: 18px 22px;
-    margin-bottom: 18px;
-    box-shadow: var(--shadow);
-  }
-  .runrate-head { margin-bottom: 14px; }
-  .runrate-head h3 {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: .5px;
-    margin-bottom: 4px;
-    color: #fff;
-  }
-  .runrate-head p {
-    font-size: 11px;
-    color: rgba(255,255,255,.7);
-  }
-  .runrate-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 14px;
-  }
-  .runrate-card {
-    background: rgba(255,255,255,.08);
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 10px;
-    padding: 14px 16px;
-    backdrop-filter: blur(4px);
-  }
-  .runrate-card .label {
-    font-size: 10px;
-    color: rgba(255,255,255,.7);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-  .runrate-card .value {
-    font-size: 28px;
-    font-weight: 800;
-    color: #fff;
-    font-variant-numeric: tabular-nums;
-    line-height: 1.1;
-  }
-  .runrate-card .value-suffix {
-    font-size: 14px;
-    font-weight: 600;
-    opacity: .7;
-    margin-left: 2px;
-  }
-  .runrate-card .value.cleared {
-    color: #4ade80;
-    font-size: 22px;
-  }
-  .runrate-card .sub {
-    font-size: 11px;
-    color: rgba(255,255,255,.65);
-    margin-top: 6px;
-    line-height: 1.4;
-  }
-  .runrate-card.monthly-card { border-left: 3px solid #fbbf24; }
-  .runrate-card.quarterly-card { border-left: 3px solid var(--accent); }
-  .runrate-card.tier1-active .label { color: rgba(255,255,255,.85); }
-  .runrate-card.tier2-active .label { color: #4ade80; }
-  .runrate-card.tier2-active { background: rgba(74, 222, 128, 0.05); }
-  .runrate-card.cleared-card {
-    background: rgba(74, 222, 128, 0.10);
-    border-left-color: #4ade80;
-  }
-  .t1-badge {
-    display: inline-block;
-    background: #4ade80;
-    color: #1B1464;
-    padding: 1px 6px;
-    border-radius: 3px;
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: .5px;
-    margin-left: 6px;
-    vertical-align: middle;
   }
 
   /* === STAFF LEADERBOARD === */
@@ -1052,20 +1117,25 @@
         <div class="promo-list" id="promoList"></div>
       </div>
     </div>
-    <div class="hero-card">
-      <h3>📅 This Week</h3>
-      <div id="thisWeekEvents"></div>
+    <div class="hero-card hero-runrate" id="heroRunrate">
+      <h3>🎯 What we need daily</h3>
+      <div id="heroRunrateBody">
+        <div class="empty">Loading…</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- DAILY RUN-RATE BANNER (public, motivational) -->
-<div class="runrate-banner" id="runrateBanner">
-  <div class="runrate-head">
-    <h3>🎯 What we need daily</h3>
-    <p id="runrateMeta">— · auto-calculated · resets at month-end</p>
+<!-- NEXT EVENT + QUARTERLY RUN-RATE STRIP -->
+<div class="strip-row">
+  <div class="strip-card next-event-card" id="nextEventCard">
+    <div class="strip-label">📅 Next Event</div>
+    <div id="nextEventBody"><div class="empty">Loading…</div></div>
   </div>
-  <div class="runrate-grid" id="runrateGrid"></div>
+  <div class="strip-card quarterly-card" id="quarterlyCard">
+    <div class="strip-label" id="quarterlyLabel">🎯 Quarterly Pace</div>
+    <div id="quarterlyBody"><div class="empty">Loading…</div></div>
+  </div>
 </div>
 
 <!-- SALES PANEL (PIN-gated) -->
@@ -1211,18 +1281,15 @@
 //  CONFIG
 // =============================================================
 const CONFIG = {
-  // Apps Script web app URL (paste yours after deploying — see APPS_SCRIPT_GUIDE.md)
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzfKpsRKscvPerFFYs5HASskPhp4t8CBWKN05AxsTtWECKuHQ1mFggEfscWChjcqFH87w/exec",  // e.g. "https://script.google.com/macros/s/AKfyc.../exec"
-  CACHE_TTL_MS: 5 * 60 * 1000,         // 5 minutes
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzfKpsRKscvPerFFYs5HASskPhp4t8CBWKN05AxsTtWECKuHQ1mFggEfscWChjcqFH87w/exec",
+  CACHE_TTL_MS: 5 * 60 * 1000,
   CACHE_KEY: "mdv_dashboard_cache_v2",
-  PIN: "1234",                         // <-- CHANGE THIS PIN before deploying
+  PIN: "1234",
   PIN_SESSION_KEY: "mdv_sales_unlocked"
 };
 
 // =============================================================
 //  FALLBACK DATA — used if Apps Script is unreachable
-//  Verified KL public holidays + KL Kumpulan B school holidays
-//  for 2026, sourced from KPM and the gazetted federal holiday list.
 // =============================================================
 const FALLBACK = {
   weekdayThemes: {
@@ -1250,10 +1317,6 @@ const FALLBACK = {
     12: { myopia: "Holiday Balance & Outdoor Play", digital: "Pensioners · Students", activation: "Back-to-school 2027 — Start Year with Healthy Eyes" }
   },
 
-  // Verified 2026 KL/Federal events. Sources:
-  //   - https://cutisekolah.com.my/2026-tarikh/ (KPM Kumpulan B + gazetted PH)
-  //   - https://www.kabinet.gov.my/storage/2025/08/HKA-2026.pdf (federal gazette)
-  //   - https://www.e2consulting.com.my (Hari Raya extra holiday + Wesak/Agong overlap)
   events: [
     // ── January
     { date: "2026-01-01", title: "Tahun Baru / New Year", type: "holiday", scope: "KL" },
@@ -1405,6 +1468,9 @@ function fmtMoneyShort(n) {
   if (n >= 1000) return "RM" + (n/1000).toFixed(0) + "k";
   return "RM" + n;
 }
+function fmtNumber(n) {
+  return Math.round(n).toLocaleString("en-MY");
+}
 function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
 
 function eventsOn(date) {
@@ -1428,11 +1494,14 @@ function isPublicHoliday(date) {
   return eventsOn(date).some(e => e.type === "holiday");
 }
 
+function escapeHtml(s) {
+  return String(s||"").replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
 // =============================================================
 //  DATA FETCH
 // =============================================================
 async function fetchData() {
-  // Try cache first
   const cached = readCache();
   if (cached) {
     state.data = cached.data;
@@ -1442,7 +1511,6 @@ async function fetchData() {
     document.getElementById("lastRefreshLabel").textContent = new Date(cached.ts).toLocaleString("en-MY");
   }
 
-  // No URL configured → stay on fallback
   if (!CONFIG.APPS_SCRIPT_URL) {
     if (!cached) {
       state.source = "fallback";
@@ -1453,7 +1521,6 @@ async function fetchData() {
     return;
   }
 
-  // Try live fetch
   try {
     const res = await fetch(CONFIG.APPS_SCRIPT_URL, { method: "GET" });
     if (!res.ok) throw new Error("HTTP " + res.status);
@@ -1526,7 +1593,6 @@ function renderHero() {
     document.getElementById("weekdayThemeTitle").textContent = theme.title;
     document.getElementById("weekdayThemeDesc").textContent = theme.desc;
 
-    // Promos handling — array, or pipe-separated string from sheet
     let promos = theme.promos;
     if (typeof promos === "string") {
       promos = promos.split("|").map(s => s.trim()).filter(Boolean);
@@ -1558,29 +1624,8 @@ function renderHero() {
     }
   }
 
-  // This week (next 7 days events)
-  const weekEvents = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(TODAY); d.setDate(TODAY.getDate() + i);
-    const evs = eventsOn(d).filter(e => e.type === "holiday" || e.type === "occasion" || (e.type === "awareness" && !e.range));
-    for (const ev of evs) {
-      weekEvents.push({ date: d, ev });
-    }
-  }
-  const weekEl = document.getElementById("thisWeekEvents");
-  if (weekEvents.length === 0) {
-    weekEl.innerHTML = '<div class="empty">No events in the next 7 days.</div>';
-  } else {
-    weekEl.innerHTML = weekEvents.slice(0, 5).map(({date, ev}) => `
-      <div class="item">
-        <div class="dot ${ev.type === 'holiday' ? '' : 'muted'}"></div>
-        <div class="text">
-          <strong>${ev.title}</strong>
-          <span>${DOW[date.getDay()]} · ${pad(date.getDate())} ${MONTH_NAMES[date.getMonth()].slice(0,3)}</span>
-        </div>
-      </div>
-    `).join("");
-  }
+  // Next Event handled separately in strip card
+  renderNextEvent();
 }
 
 function toggleTodayPromos() {
@@ -1589,10 +1634,56 @@ function toggleTodayPromos() {
   const theme = state.data.weekdayThemes[dowKey];
   let promos = theme && theme.promos;
   if (typeof promos === "string") promos = promos.split("|").map(s=>s.trim()).filter(Boolean);
-  if (!Array.isArray(promos) || promos.length === 0) return; // nothing to toggle
+  if (!Array.isArray(promos) || promos.length === 0) return;
   card.classList.toggle("expanded");
   const hintText = document.getElementById("expandHintText");
   hintText.textContent = card.classList.contains("expanded") ? "Tap to hide" : "Tap to expand";
+}
+
+// =============================================================
+//  NEXT EVENT countdown (strip card, was the purple banner slot)
+// =============================================================
+function renderNextEvent() {
+  const card = document.getElementById("nextEventCard");
+  const body = document.getElementById("nextEventBody");
+  if (!body || !card) return;
+
+  // Look ahead up to 90 days for single-date holiday or occasion
+  const candidates = [];
+  for (let i = 0; i <= 90; i++) {
+    const d = new Date(TODAY); d.setDate(TODAY.getDate() + i);
+    const evs = eventsOn(d).filter(e =>
+      (e.type === "holiday" || e.type === "occasion") && e.date
+    );
+    for (const ev of evs) candidates.push({ date: d, ev, daysAway: i });
+  }
+
+  card.classList.remove("today", "tomorrow");
+
+  if (candidates.length === 0) {
+    body.innerHTML = '<div class="empty">No major events in the next 90 days.</div>';
+    return;
+  }
+
+  const { date, ev, daysAway } = candidates[0];
+  let countdownText, suffix;
+  if (daysAway === 0) {
+    countdownText = "TODAY"; suffix = "";
+    card.classList.add("today");
+  } else if (daysAway === 1) {
+    countdownText = "1"; suffix = "day";
+    card.classList.add("tomorrow");
+  } else {
+    countdownText = String(daysAway); suffix = "days";
+  }
+
+  const fullDate = `${DOW_FULL[date.getDay()]} · ${pad(date.getDate())} ${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
+
+  body.innerHTML = `
+    <div class="next-event-countdown">${countdownText}<span class="suffix">${suffix}</span></div>
+    <div class="next-event-title">${escapeHtml(ev.title)}</div>
+    <div class="next-event-date">${fullDate}</div>
+  `;
 }
 
 // =============================================================
@@ -1662,7 +1753,6 @@ function renderSales() {
   let tier2Bar = tier2Pct >= 100 ? "" : "below";
 
   const grid = document.getElementById("salesGrid");
-  // Customer count progress (TCx target, default 350)
   const custTarget = s.customerTarget || 350;
   const custPct = custTarget > 0 ? Math.round(((s.customerCount || 0) / custTarget) * 100) : 0;
   const custBar = custPct >= 100 ? "" : (custPct >= 75 ? "tier2" : "below");
@@ -1714,8 +1804,6 @@ function renderSales() {
 
 // =============================================================
 //  STAFF LEADERBOARD (PIN-gated, inside Sales section)
-//  Option 4: clean ranking only — no daily run-rate, no alerts.
-//  Lets staff see their position; pace is up to them.
 // =============================================================
 function renderLeaderboard() {
   const staff = (state.data.staffSales || []).filter(p => (p.status || "active") !== "inactive");
@@ -1730,9 +1818,8 @@ function renderLeaderboard() {
   }
   wrap.style.display = "";
 
-  // Sort by MTD descending
   const sorted = [...staff].sort((a,b) => (b.mtdSales||0) - (a.mtdSales||0));
-  const topAmount = sorted[0].mtdSales || 1; // for proportional progress bar
+  const topAmount = sorted[0].mtdSales || 1;
   const lastUpdates = sorted.map(p => p.lastUpdated).filter(d => d).sort();
   const latestUpdate = lastUpdates.length ? lastUpdates[lastUpdates.length-1] : "—";
 
@@ -1743,7 +1830,6 @@ function renderLeaderboard() {
     const mtd = p.mtdSales || 0;
     const rankIcon = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`;
     const rowClass = `leaderboard-row rank-${rank}`;
-    // Progress bar shows position relative to top performer (visual only)
     const progressPct = (mtd / topAmount) * 100;
 
     return `
@@ -1759,25 +1845,14 @@ function renderLeaderboard() {
   }).join("");
 }
 
-function fmtNumber(n) {
-  return Math.round(n).toLocaleString("en-MY");
-}
-
 // =============================================================
-//  DAILY RUN-RATE BANNER (public, motivational)
-//  v2.8: shows ONE card per scope (monthly + quarterly).
-//  Card adapts based on achievement:
-//    - Below T1 → show T1 with STD context
-//    - T1 cleared, below T2 → show T2 with STD context, T1 ✓ badge
-//    - Both cleared → celebration card
-//  Period cell auto-cleaned to text if it came in as a date.
+//  RUN-RATE — split into two renderers
+//  Hero (right column): Monthly only, prominent
+//  Strip card: Quarterly only, compact
 // =============================================================
 function renderRunRate() {
   const s = state.data.sales;
-  const banner = document.getElementById("runrateBanner");
-  const grid = document.getElementById("runrateGrid");
-  const meta = document.getElementById("runrateMeta");
-  if (!s || !banner || !grid) return;
+  if (!s) return;
 
   const today = TODAY;
   const yr = today.getFullYear();
@@ -1786,106 +1861,135 @@ function renderRunRate() {
   const lastDayOfMonth = new Date(yr, mo + 1, 0).getDate();
   const daysLeftMonth = Math.max(1, lastDayOfMonth - dayOfMonth + 1);
 
-  // Quarter math
   const qStartMo = Math.floor(mo / 3) * 3;
   const qEndMo = qStartMo + 2;
   const qLastDay = new Date(yr, qEndMo + 1, 0);
   const msPerDay = 1000 * 60 * 60 * 24;
   const daysLeftQuarter = Math.max(1, Math.ceil((qLastDay - today) / msPerDay) + 1);
   const qNum = Math.floor(mo / 3) + 1;
+  const qLabel = `Q${qNum} (${MONTH_NAMES[qStartMo].slice(0,3)}–${MONTH_NAMES[qEndMo].slice(0,3)})`;
 
-  // Clean Period if it came in as a date object representation
-  const cleanPeriod = cleanPeriodLabel(s.period);
+  const cleanPeriod = cleanPeriodLabel(s.period) || `${MONTH_NAMES[mo]} ${yr}`;
 
-  meta.textContent = `${daysLeftMonth} day${daysLeftMonth===1?'':'s'} left in ${cleanPeriod || 'month'} · ${daysLeftQuarter} days left in Q${qNum} · all 7 days count`;
-
-  // Build monthly card (T1 below → T2 below → celebrate)
-  const monthlyCard = buildScopeCard({
-    scopeLabel: `Monthly · ${cleanPeriod}`,
+  renderHeroRunrate({
+    period: cleanPeriod,
     t1: s.tier1 || 0,
     t2: s.tier2 || 0,
     std: s.std || 0,
-    daysLeft: daysLeftMonth,
-    cssClass: "monthly-card"
+    daysLeft: daysLeftMonth
   });
 
-  // Build quarterly card (independent of monthly)
-  const quarterlyCard = buildScopeCard({
-    scopeLabel: `Q${qNum} (Apr–Jun)`,
+  renderQuarterlyRunrate({
+    qLabel,
     t1: s.quarterT1 || 0,
     t2: s.quarterT2 || 0,
     std: s.quarterStd || 0,
-    daysLeft: daysLeftQuarter,
-    cssClass: "quarterly-card"
+    daysLeft: daysLeftQuarter
   });
-
-  grid.innerHTML = monthlyCard + quarterlyCard;
 }
 
-function buildScopeCard({ scopeLabel, t1, t2, std, daysLeft, cssClass }) {
-  // No targets configured
+function renderHeroRunrate({ period, t1, t2, std, daysLeft }) {
+  const body = document.getElementById("heroRunrateBody");
+  if (!body) return;
+
   if (t1 === 0 && t2 === 0) {
-    return `
-      <div class="runrate-card ${cssClass}">
-        <div class="label">${scopeLabel}</div>
-        <div class="value cleared">— set target —</div>
-        <div class="sub">Tier targets not configured in sheet</div>
-      </div>
+    body.innerHTML = `
+      <div class="hero-rr-period">${period}</div>
+      <div class="hero-rr-cleared">— set target —</div>
+      <div class="hero-rr-context">Tier targets not configured</div>
     `;
+    return;
   }
 
-  // Both T1 and T2 cleared → celebration
-  if (std >= t1 && std >= t2) {
+  // Both cleared
+  if (std >= t1 && std >= t2 && t2 > 0) {
     const above = std - Math.max(t1, t2);
-    return `
-      <div class="runrate-card ${cssClass} cleared-card">
-        <div class="label">${scopeLabel} · BOTH TIERS ✓</div>
-        <div class="value cleared">🎉 RM ${fmtNumber(std)}</div>
-        <div class="sub">RM ${fmtNumber(above)} above T2 · keep going</div>
-      </div>
+    body.innerHTML = `
+      <div class="hero-rr-period">${period} · BOTH TIERS ✓</div>
+      <div class="hero-rr-cleared">🎉 RM ${fmtNumber(std)}</div>
+      <div class="hero-rr-context">RM ${fmtNumber(above)} above T2 · keep going · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
     `;
+    return;
   }
 
   // T1 cleared, push to T2
   if (std >= t1 && t2 > 0) {
     const remaining = t2 - std;
     const ratePerDay = Math.ceil(remaining / daysLeft);
-    return `
-      <div class="runrate-card ${cssClass} tier2-active">
-        <div class="label">${scopeLabel} · T2 <span class="t1-badge">T1 ✓</span></div>
-        <div class="value">RM ${fmtNumber(ratePerDay)}<span class="value-suffix">/day</span></div>
-        <div class="sub">RM ${fmtNumber(std)} of RM ${fmtNumber(t2)}</div>
-        <div class="sub">RM ${fmtNumber(remaining)} to go · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+    body.innerHTML = `
+      <div class="hero-rr-period">${period} · T2 <span class="hero-rr-tier-badge">T1 ✓</span></div>
+      <div class="hero-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day</span></div>
+      <div class="hero-rr-context">
+        <strong>RM ${fmtNumber(std)}</strong> of RM ${fmtNumber(t2)} · 
+        <strong>RM ${fmtNumber(remaining)}</strong> to go · 
+        ${daysLeft} day${daysLeft===1?'':'s'} left
       </div>
     `;
+    return;
   }
 
-  // Below T1 — focus state
+  // Below T1
   const remaining = t1 - std;
   const ratePerDay = Math.ceil(remaining / daysLeft);
-  return `
-    <div class="runrate-card ${cssClass} tier1-active">
-      <div class="label">${scopeLabel} · T1</div>
-      <div class="value">RM ${fmtNumber(ratePerDay)}<span class="value-suffix">/day</span></div>
-      <div class="sub">RM ${fmtNumber(std)} of RM ${fmtNumber(t1)}</div>
-      <div class="sub">RM ${fmtNumber(remaining)} to go · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+  body.innerHTML = `
+    <div class="hero-rr-period">${period} · T1</div>
+    <div class="hero-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day</span></div>
+    <div class="hero-rr-context">
+      <strong>RM ${fmtNumber(std)}</strong> of RM ${fmtNumber(t1)} · 
+      <strong>RM ${fmtNumber(remaining)}</strong> to go · 
+      ${daysLeft} day${daysLeft===1?'':'s'} left
     </div>
   `;
 }
 
-// Period cell from sheet may come as Date string like "Fri May 01 2026 ..."
-// Try to extract a clean "Mon Year" label.
+function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft }) {
+  const body = document.getElementById("quarterlyBody");
+  const labelEl = document.getElementById("quarterlyLabel");
+  if (!body) return;
+
+  labelEl.textContent = `🎯 Quarterly Pace · ${qLabel}`;
+
+  if (t1 === 0 && t2 === 0) {
+    body.innerHTML = `<div class="empty">Quarterly targets not set</div>`;
+    return;
+  }
+
+  if (std >= t1 && std >= t2 && t2 > 0) {
+    const above = std - Math.max(t1, t2);
+    body.innerHTML = `
+      <div class="q-rr-cleared">🎉 BOTH ✓</div>
+      <div class="q-rr-context">RM ${fmtNumber(std)} · RM ${fmtNumber(above)} above T2</div>
+    `;
+    return;
+  }
+
+  if (std >= t1 && t2 > 0) {
+    const remaining = t2 - std;
+    const ratePerDay = Math.ceil(remaining / daysLeft);
+    body.innerHTML = `
+      <div class="q-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day to T2</span></div>
+      <div class="q-rr-context"><strong>T1 ✓</strong> · RM ${fmtNumber(std)} of RM ${fmtNumber(t2)} · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+    `;
+    return;
+  }
+
+  const remaining = t1 - std;
+  const ratePerDay = Math.ceil(remaining / daysLeft);
+  body.innerHTML = `
+    <div class="q-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day to T1</span></div>
+    <div class="q-rr-context">RM ${fmtNumber(std)} of RM ${fmtNumber(t1)} · RM ${fmtNumber(remaining)} to go · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+  `;
+}
+
 function cleanPeriodLabel(periodRaw) {
   if (!periodRaw) return "";
   const s = String(periodRaw).trim();
-  // If it already looks like "May 2026" — return as-is
   if (/^[A-Za-z]{3,9}\s+\d{4}$/.test(s)) return s;
-  // Try parsing as date
   const d = new Date(s);
   if (!isNaN(d.getTime())) {
     return MONTH_NAMES[d.getMonth()].slice(0,3) + " " + d.getFullYear();
   }
-  return s; // fall back to raw
+  return s;
 }
 
 // =============================================================
@@ -1908,7 +2012,6 @@ function renderCampaigns() {
   document.getElementById("campaignSummary").textContent =
     `${active.length} active · ${past.length} past · click any card to see full details`;
 
-  // Group active campaigns by Brand
   const brandOrder = ["HOYA", "ESSILOR", "HQ", "INTERNAL", "OTHER"];
   const groups = {};
   brandOrder.forEach(b => groups[b] = []);
@@ -1918,7 +2021,6 @@ function renderCampaigns() {
     else groups.OTHER.push(c);
   });
 
-  // Render each brand group, hide if empty
   brandOrder.forEach(b => {
     const wrapEl = document.getElementById(`brandGroup_${b}`);
     const listEl = document.getElementById(`activeCampaigns_${b}`);
@@ -1957,7 +2059,6 @@ function renderCampaignCard(c, isPast = false) {
     meta = `Ended ${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
   }
   const source = (c.source || "").toUpperCase();
-  // Past cards don't expand; active cards do
   const onClick = isPast ? "" : "onclick=\"this.classList.toggle('expanded')\"";
   const arrow = isPast ? "" : `<span class="expand-arrow">▾</span>`;
   return `
@@ -1970,10 +2071,6 @@ function renderCampaignCard(c, isPast = false) {
       ${c.detail ? `<div class="campaign-detail">${escapeHtml(c.detail)}</div>` : ""}
     </div>
   `;
-}
-
-function escapeHtml(s) {
-  return String(s||"").replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
 
 function togglePast() {
@@ -2074,11 +2171,7 @@ function renderCalendar() {
   const grid = document.getElementById("yearGrid");
   grid.classList.toggle("full", state.showFullYear);
   const currentMonth = TODAY.getMonth();
-  const monthsToShow = state.showFullYear
-    ? Array.from({length: 12}, (_, i) => i)
-    : [currentMonth, (currentMonth+1) % 12, (currentMonth+2) % 12].slice(0, currentMonth >= 10 ? 12 - currentMonth : 3);
 
-  // For year wraparound when current month is Nov or Dec, just show what fits in 2026
   const months = state.showFullYear
     ? Array.from({length: 12}, (_, i) => ({m: i, y: 2026}))
     : (function() {
@@ -2105,9 +2198,7 @@ function renderMonth(m, y) {
   const daysInMonth = lastDay.getDate();
 
   let cells = '';
-  // empty cells before day 1
   for (let i = 0; i < startDow; i++) cells += '<div class="day muted"></div>';
-  // actual days
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(y, m, d);
     const iso = fmtDate(date);

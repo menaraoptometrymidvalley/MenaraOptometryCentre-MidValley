@@ -1076,6 +1076,66 @@
     .today-special h2 { font-size: 18px; }
     .section-head h2 { font-size: 16px; }
   }
+
+  /* === Jungfraujoch backdrop (subtle, behind everything) === */
+  html { background: var(--bg); }
+  body { position: relative; background: transparent; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background: url('assets/bg-jungfraujoch.webp') center 38% / cover no-repeat;
+    opacity: .22; pointer-events: none; z-index: -2;
+  }
+  body::after {
+    content: ''; position: fixed; inset: 0;
+    background: linear-gradient(180deg,
+      rgba(247,247,245,.55) 0%,
+      rgba(247,247,245,.78) 55%,
+      rgba(247,247,245,.92) 100%);
+    pointer-events: none; z-index: -1;
+  }
+
+  /* === Interactive walking pixel cat === */
+  .opscat-wrap {
+    position: fixed; left: 0;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 5;
+    width: 76px; height: 96px;
+    display: flex; align-items: flex-end; justify-content: center;
+    cursor: pointer; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    filter: drop-shadow(0 8px 16px rgba(27,20,100,.25));
+    transform: translate(50vw, 0);
+    transition: filter .2s;
+  }
+  .opscat-wrap:hover { filter: drop-shadow(0 10px 22px rgba(237,28,36,.35)); }
+  .opscat-wrap.flip .opscat { transform: scaleX(-1); }
+  .opscat { transition: transform 220ms ease; transform-origin: 50% 100%; }
+  .opscat svg { width: 76px; height: 76px; image-rendering: pixelated; display: block; }
+  .opscat-mode-sitting, .opscat-mode-walking { transform: scale(1); }
+  .opscat-mode-watching { transform: scale(1.04); }
+  .opscat-mode-sleeping { transform: rotate(-78deg) translate(-18px, -6px) scale(.9); }
+  .opscat-mode-playing  { animation: opscatHop 850ms ease-in-out infinite; transform-origin: 50% 100%; }
+  @keyframes opscatHop {
+    0%, 100% { transform: scaleY(.95) translateY(2px)  rotate(0deg); }
+    25%      { transform: scaleY(1.10) translateY(-12px) rotate(-4deg); }
+    45%      { transform: scaleY(.84) translateY(3px)  rotate(2deg); }
+    65%      { transform: scaleY(1.06) translateY(-6px) rotate(3deg); }
+    85%      { transform: scaleY(.97) translateY(1px)  rotate(-1deg); }
+  }
+  .opscat-tip {
+    position: absolute; left: 50%; bottom: 100%;
+    transform: translate(-50%, 4px); margin-bottom: 4px;
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: #fff; background: var(--primary);
+    padding: 3px 9px; border-radius: 99px; white-space: nowrap;
+    opacity: 0; transition: opacity 180ms ease, transform 180ms ease;
+    pointer-events: none;
+  }
+  .opscat-wrap:hover .opscat-tip { opacity: 1; transform: translate(-50%, 0); }
+  @media (max-width: 480px) {
+    .opscat-wrap { width: 58px; height: 78px; }
+    .opscat svg { width: 58px; height: 58px; }
+  }
 </style>
 </head>
 <body>
@@ -1276,6 +1336,12 @@
   Source: <span id="dataSourceLabel">—</span> · Last refresh: <span id="lastRefreshLabel">—</span> · <a href="#" onclick="forceRefresh(); return false;">Refresh now</a>
 </div>
 
+<!-- Walking pixel cat — click for a different mood -->
+<div class="opscat-wrap" id="opscatWrap" title="Click for a different mood">
+  <span class="opscat-tip" id="opscatTip">walking</span>
+  <div class="opscat" id="opscatEl"></div>
+</div>
+
 <script>
 // =============================================================
 //  CONFIG
@@ -1318,12 +1384,9 @@ const FALLBACK = {
   },
 
   events: [
-    // ── January
     { date: "2026-01-01", title: "Tahun Baru / New Year", type: "holiday", scope: "KL" },
     { date: "2026-01-12", title: "Sekolah Buka — Sesi 2026 (Kumpulan B)", type: "school" },
     { range: ["2026-01-01","2026-01-31"], title: "Glaucoma Awareness Month", type: "awareness" },
-
-    // ── February
     { date: "2026-02-01", title: "Thaipusam (KL)", type: "holiday", scope: "KL" },
     { date: "2026-02-01", title: "Hari Wilayah Persekutuan", type: "holiday", scope: "KL" },
     { date: "2026-02-02", title: "Cuti Thaipusam (replacement)", type: "holiday", scope: "KL" },
@@ -1333,8 +1396,6 @@ const FALLBACK = {
     { date: "2026-02-18", title: "Chinese New Year — Day 2", type: "holiday", scope: "MY" },
     { date: "2026-02-19", title: "1 Ramadhan 1447H", type: "islamic" },
     { range: ["2026-02-01","2026-02-28"], title: "ARMD / Low Vision Month", type: "awareness" },
-
-    // ── March
     { date: "2026-03-07", title: "Nuzul Al-Quran (KL)", type: "holiday", scope: "KL" },
     { date: "2026-03-08", title: "International Women's Day", type: "occasion" },
     { range: ["2026-03-08","2026-03-14"], title: "World Glaucoma Week", type: "awareness" },
@@ -1345,20 +1406,14 @@ const FALLBACK = {
     { date: "2026-03-23", title: "World Optometry Day", type: "awareness" },
     { range: ["2026-03-21","2026-03-29"], title: "Cuti Penggal 1 (KL Kumpulan B)", type: "school" },
     { range: ["2026-03-01","2026-03-31"], title: "Jualan Hebat Malaysia", type: "campaign" },
-
-    // ── April
     { date: "2026-04-07", title: "World Health Day", type: "awareness" },
     { date: "2026-04-22", title: "Earth Day", type: "occasion" },
-
-    // ── May
     { date: "2026-05-01", title: "Hari Pekerja / Labour Day", type: "holiday", scope: "MY" },
     { date: "2026-05-10", title: "Mother's Day (2nd Sunday)", type: "occasion" },
     { date: "2026-05-16", title: "Teacher's Day (Hari Guru)", type: "occasion" },
     { range: ["2026-05-23","2026-06-07"], title: "Cuti Pertengahan Tahun (KL Kumpulan B)", type: "school" },
     { date: "2026-05-27", title: "Hari Raya Aidiladha (Korban)", type: "holiday", scope: "MY" },
     { date: "2026-05-31", title: "Wesak Day", type: "holiday", scope: "MY" },
-
-    // ── June
     { date: "2026-06-01", title: "Hari Keputeraan YDP Agong", type: "holiday", scope: "MY" },
     { date: "2026-06-02", title: "Wesak replacement (carried forward)", type: "holiday", scope: "MY" },
     { date: "2026-06-05", title: "World Environment Day", type: "awareness" },
@@ -1367,30 +1422,18 @@ const FALLBACK = {
     { date: "2026-06-21", title: "Father's Day (3rd Sunday)", type: "occasion" },
     { range: ["2026-06-15","2026-07-31"], title: "Karnival Jualan Mega", type: "campaign" },
     { range: ["2026-06-01","2026-06-30"], title: "Cataract Awareness Month", type: "awareness" },
-
-    // ── July
     { range: ["2026-07-01","2026-07-31"], title: "Dry Eye Awareness Month", type: "awareness" },
-
-    // ── August
     { date: "2026-08-25", title: "Maulidur Rasul", type: "holiday", scope: "MY" },
     { date: "2026-08-31", title: "Hari Kebangsaan (Merdeka)", type: "holiday", scope: "MY" },
     { range: ["2026-08-15","2026-08-21"], title: "Contact Lens Health Week", type: "awareness" },
-
-    // ── September
     { range: ["2026-08-29","2026-09-06"], title: "Cuti Penggal 2 (KL Kumpulan B)", type: "school" },
     { date: "2026-09-16", title: "Hari Malaysia", type: "holiday", scope: "MY" },
-
-    // ── October
     { date: "2026-10-08", title: "World Sight Day (2nd Thursday)", type: "awareness" },
-
-    // ── November
     { date: "2026-11-08", title: "Deepavali", type: "holiday", scope: "MY" },
     { date: "2026-11-09", title: "Cuti Deepavali (replacement)", type: "holiday", scope: "MY" },
     { date: "2026-11-14", title: "World Diabetes Day", type: "awareness" },
     { date: "2026-11-19", title: "International Men's Day", type: "occasion" },
     { date: "2026-11-20", title: "World Children's Day", type: "occasion" },
-
-    // ── December
     { range: ["2026-12-05","2026-12-31"], title: "Cuti Akhir Tahun (KL Kumpulan B)", type: "school" },
     { date: "2026-12-25", title: "Hari Krismas", type: "holiday", scope: "MY" },
     { range: ["2026-11-15","2027-01-03"], title: "Jualan Akhir Tahun", type: "campaign" }
@@ -1437,9 +1480,6 @@ const FALLBACK = {
   ]
 };
 
-// =============================================================
-//  STATE
-// =============================================================
 let state = {
   data: FALLBACK,
   source: "fallback",
@@ -1449,9 +1489,6 @@ let state = {
   salesUnlocked: false
 };
 
-// =============================================================
-//  HELPERS
-// =============================================================
 const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DOW_FULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -1468,9 +1505,7 @@ function fmtMoneyShort(n) {
   if (n >= 1000) return "RM" + (n/1000).toFixed(0) + "k";
   return "RM" + n;
 }
-function fmtNumber(n) {
-  return Math.round(n).toLocaleString("en-MY");
-}
+function fmtNumber(n) { return Math.round(n).toLocaleString("en-MY"); }
 function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
 
 function eventsOn(date) {
@@ -1486,21 +1521,10 @@ function eventsOn(date) {
   return out;
 }
 
-function isSchoolHoliday(date) {
-  return eventsOn(date).some(e => e.type === "school" && e.range);
-}
+function isSchoolHoliday(date) { return eventsOn(date).some(e => e.type === "school" && e.range); }
+function isPublicHoliday(date) { return eventsOn(date).some(e => e.type === "holiday"); }
+function escapeHtml(s) { return String(s||"").replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
 
-function isPublicHoliday(date) {
-  return eventsOn(date).some(e => e.type === "holiday");
-}
-
-function escapeHtml(s) {
-  return String(s||"").replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-}
-
-// =============================================================
-//  DATA FETCH
-// =============================================================
 async function fetchData() {
   const cached = readCache();
   if (cached) {
@@ -1510,7 +1534,6 @@ async function fetchData() {
     document.getElementById("dataSourceLabel").textContent = "Sheet (cached)";
     document.getElementById("lastRefreshLabel").textContent = new Date(cached.ts).toLocaleString("en-MY");
   }
-
   if (!CONFIG.APPS_SCRIPT_URL) {
     if (!cached) {
       state.source = "fallback";
@@ -1520,7 +1543,6 @@ async function fetchData() {
     }
     return;
   }
-
   try {
     const res = await fetch(CONFIG.APPS_SCRIPT_URL, { method: "GET" });
     if (!res.ok) throw new Error("HTTP " + res.status);
@@ -1550,11 +1572,7 @@ function readCache() {
     return cached;
   } catch { return null; }
 }
-function writeCache(data) {
-  try {
-    sessionStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
-  } catch {}
-}
+function writeCache(data) { try { sessionStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch {} }
 function setStatus(cls, text) {
   const el = document.getElementById("dataStatus");
   el.className = "data-status " + cls;
@@ -1569,42 +1587,28 @@ async function forceRefresh() {
   document.getElementById("loadingOverlay").classList.remove("show");
 }
 
-// =============================================================
-//  CLOCK
-// =============================================================
 function tickClock() {
   const now = new Date();
   document.getElementById("clock").textContent = now.toLocaleTimeString("en-MY", {hour:"2-digit", minute:"2-digit"});
 }
 
-// =============================================================
-//  HERO
-// =============================================================
 function renderHero() {
   const dowKey = DOW[TODAY.getDay()];
-  document.getElementById("todayDateLabel").textContent =
-    `${DOW_FULL[TODAY.getDay()]} · ${MONTH_NAMES[TODAY.getMonth()]} ${TODAY.getDate()}`;
+  document.getElementById("todayDateLabel").textContent = `${DOW_FULL[TODAY.getDay()]} · ${MONTH_NAMES[TODAY.getMonth()]} ${TODAY.getDate()}`;
   document.getElementById("todayDayName").textContent = TODAY.getDate();
-  document.getElementById("todayFullDate").textContent =
-    `${MONTH_NAMES[TODAY.getMonth()]} ${TODAY.getFullYear()}`;
-
+  document.getElementById("todayFullDate").textContent = `${MONTH_NAMES[TODAY.getMonth()]} ${TODAY.getFullYear()}`;
   const theme = state.data.weekdayThemes[dowKey];
   if (theme) {
     document.getElementById("weekdayThemeTitle").textContent = theme.title;
     document.getElementById("weekdayThemeDesc").textContent = theme.desc;
-
     let promos = theme.promos;
-    if (typeof promos === "string") {
-      promos = promos.split("|").map(s => s.trim()).filter(Boolean);
-    }
+    if (typeof promos === "string") promos = promos.split("|").map(s => s.trim()).filter(Boolean);
     promos = Array.isArray(promos) ? promos : [];
-
     const summaryEl = document.getElementById("promoSummary");
     const listEl = document.getElementById("promoList");
     const hintEl = document.getElementById("expandHint");
     const hintText = document.getElementById("expandHintText");
     const card = document.getElementById("todaySpecial");
-
     if (promos.length === 0) {
       summaryEl.textContent = "";
       listEl.innerHTML = '<div class="empty-promos">No specific promos linked to today\'s theme yet.</div>';
@@ -1612,19 +1616,12 @@ function renderHero() {
       card.style.cursor = "default";
     } else {
       summaryEl.innerHTML = `<strong>${promos.length} promo${promos.length===1?"":"s"} active</strong> — tap to view`;
-      listEl.innerHTML = promos.map((p, i) => `
-        <div class="promo-item">
-          <div class="num">${i+1}</div>
-          <div class="promo-text">${escapeHtml(p)}</div>
-        </div>
-      `).join("");
+      listEl.innerHTML = promos.map((p, i) => `<div class="promo-item"><div class="num">${i+1}</div><div class="promo-text">${escapeHtml(p)}</div></div>`).join("");
       hintEl.style.display = "flex";
       hintText.textContent = card.classList.contains("expanded") ? "Tap to hide" : "Tap to expand";
       card.style.cursor = "pointer";
     }
   }
-
-  // Next Event handled separately in strip card
   renderNextEvent();
 }
 
@@ -1640,55 +1637,27 @@ function toggleTodayPromos() {
   hintText.textContent = card.classList.contains("expanded") ? "Tap to hide" : "Tap to expand";
 }
 
-// =============================================================
-//  NEXT EVENT countdown (strip card, was the purple banner slot)
-// =============================================================
 function renderNextEvent() {
   const card = document.getElementById("nextEventCard");
   const body = document.getElementById("nextEventBody");
   if (!body || !card) return;
-
-  // Look ahead up to 90 days for single-date holiday or occasion
   const candidates = [];
   for (let i = 0; i <= 90; i++) {
     const d = new Date(TODAY); d.setDate(TODAY.getDate() + i);
-    const evs = eventsOn(d).filter(e =>
-      (e.type === "holiday" || e.type === "occasion") && e.date
-    );
+    const evs = eventsOn(d).filter(e => (e.type === "holiday" || e.type === "occasion") && e.date);
     for (const ev of evs) candidates.push({ date: d, ev, daysAway: i });
   }
-
   card.classList.remove("today", "tomorrow");
-
-  if (candidates.length === 0) {
-    body.innerHTML = '<div class="empty">No major events in the next 90 days.</div>';
-    return;
-  }
-
+  if (candidates.length === 0) { body.innerHTML = '<div class="empty">No major events in the next 90 days.</div>'; return; }
   const { date, ev, daysAway } = candidates[0];
   let countdownText, suffix;
-  if (daysAway === 0) {
-    countdownText = "TODAY"; suffix = "";
-    card.classList.add("today");
-  } else if (daysAway === 1) {
-    countdownText = "1"; suffix = "day";
-    card.classList.add("tomorrow");
-  } else {
-    countdownText = String(daysAway); suffix = "days";
-  }
-
+  if (daysAway === 0) { countdownText = "TODAY"; suffix = ""; card.classList.add("today"); }
+  else if (daysAway === 1) { countdownText = "1"; suffix = "day"; card.classList.add("tomorrow"); }
+  else { countdownText = String(daysAway); suffix = "days"; }
   const fullDate = `${DOW_FULL[date.getDay()]} · ${pad(date.getDate())} ${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
-
-  body.innerHTML = `
-    <div class="next-event-countdown">${countdownText}<span class="suffix">${suffix}</span></div>
-    <div class="next-event-title">${escapeHtml(ev.title)}</div>
-    <div class="next-event-date">${fullDate}</div>
-  `;
+  body.innerHTML = `<div class="next-event-countdown">${countdownText}<span class="suffix">${suffix}</span></div><div class="next-event-title">${escapeHtml(ev.title)}</div><div class="next-event-date">${fullDate}</div>`;
 }
 
-// =============================================================
-//  MONTHLY THEMES
-// =============================================================
 function renderMonthlyThemes() {
   const m = TODAY.getMonth() + 1;
   const t = state.data.monthlyThemes[m];
@@ -1698,29 +1667,21 @@ function renderMonthlyThemes() {
   document.getElementById("themeActivation").textContent = t.activation;
 }
 
-// =============================================================
-//  SALES
-// =============================================================
 function toggleSales() {
   if (state.salesUnlocked) {
     const body = document.getElementById("salesBody");
     body.classList.toggle("show");
     document.getElementById("salesToggle").textContent = body.classList.contains("show") ? "HIDE" : "SHOW";
     document.getElementById("salesLock").textContent = body.classList.contains("show") ? "🔓" : "🔒";
-  } else {
-    openPin();
-  }
+  } else openPin();
 }
-
 function openPin() {
   document.getElementById("pinModal").classList.add("show");
   document.getElementById("pinError").innerHTML = "&nbsp;";
   document.getElementById("pinInput").value = "";
   setTimeout(() => document.getElementById("pinInput").focus(), 100);
 }
-function closePin() {
-  document.getElementById("pinModal").classList.remove("show");
-}
+function closePin() { document.getElementById("pinModal").classList.remove("show"); }
 function checkPin() {
   const val = document.getElementById("pinInput").value;
   if (val === CONFIG.PIN) {
@@ -1743,124 +1704,58 @@ function renderSales() {
   const s = state.data.sales || FALLBACK.sales;
   const tier1Pct = Math.round((s.std / s.tier1) * 100);
   const tier2Pct = Math.round((s.std / s.tier2) * 100);
-  const qT1 = s.quarterT1 || 0;
-  const qT2 = s.quarterT2 || 0;
-  const qStd = s.quarterStd || 0;
+  const qT1 = s.quarterT1 || 0, qT2 = s.quarterT2 || 0, qStd = s.quarterStd || 0;
   const qT1Pct = qT1 > 0 ? Math.round((qStd / qT1) * 100) : 0;
   const qT2Pct = qT2 > 0 ? Math.round((qStd / qT2) * 100) : 0;
-
   let tier1Bar = tier1Pct >= 100 ? "" : (tier1Pct >= 75 ? "tier2" : "below");
   let tier2Bar = tier2Pct >= 100 ? "" : "below";
-
   const grid = document.getElementById("salesGrid");
   const custTarget = s.customerTarget || 350;
   const custPct = custTarget > 0 ? Math.round(((s.customerCount || 0) / custTarget) * 100) : 0;
   const custBar = custPct >= 100 ? "" : (custPct >= 75 ? "tier2" : "below");
   grid.innerHTML = `
-    <div class="sales-card">
-      <div class="label">Sales To Date · ${s.period || "This Month"}</div>
-      <div class="value accent">${fmtMoney(s.std)}</div>
-      <div class="sub">RM${(s.std/1000).toFixed(1)}k actual</div>
-    </div>
-    <div class="sales-card">
-      <div class="label">Tier 1 Target (3%)</div>
-      <div class="value">${fmtMoney(s.tier1)}</div>
-      <div class="sub">${tier1Pct}% achieved · ${tier1Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, s.tier1 - s.std)) + " to go"}</div>
-      <div class="progress"><div class="progress-bar ${tier1Bar}" style="width: ${Math.min(100, tier1Pct)}%"></div></div>
-    </div>
-    <div class="sales-card">
-      <div class="label">Tier 2 Target (4%)</div>
-      <div class="value">${fmtMoney(s.tier2)}</div>
-      <div class="sub">${tier2Pct}% achieved · ${tier2Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, s.tier2 - s.std)) + " to go"}</div>
-      <div class="progress"><div class="progress-bar ${tier2Bar}" style="width: ${Math.min(100, tier2Pct)}%"></div></div>
-    </div>
-    <div class="sales-card">
-      <div class="label">Customers · TCx Target</div>
-      <div class="value">${fmtNumber(s.customerCount || 0)} / ${fmtNumber(custTarget)}</div>
-      <div class="sub">${custPct}% achieved · ${custPct >= 100 ? "✓ cleared" : fmtNumber(Math.max(0, custTarget - (s.customerCount||0))) + " to go"}</div>
-      <div class="progress"><div class="progress-bar ${custBar}" style="width: ${Math.min(100, custPct)}%"></div></div>
-    </div>
-    <div class="sales-card">
-      <div class="label">Patients · Eye Exams</div>
-      <div class="value">${fmtNumber(s.patientCount || 0)}</div>
-      <div class="sub">No target · clinical metric</div>
-    </div>
-    <div class="sales-card">
-      <div class="label">Quarter T1</div>
-      <div class="value">${fmtMoney(qStd)}</div>
-      <div class="sub">${qT1Pct}% of ${fmtMoneyShort(qT1)} · ${qT1Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, qT1 - qStd)) + " to go"}</div>
-      <div class="progress"><div class="progress-bar ${qT1Pct >= 100 ? '' : (qT1Pct >= 75 ? 'tier2' : 'below')}" style="width: ${Math.min(100, qT1Pct)}%"></div></div>
-    </div>
-    <div class="sales-card">
-      <div class="label">Quarter T2</div>
-      <div class="value">${fmtMoney(qStd)}</div>
-      <div class="sub">${qT2Pct}% of ${fmtMoneyShort(qT2)} · ${qT2Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, qT2 - qStd)) + " to go"}</div>
-      <div class="progress"><div class="progress-bar ${qT2Pct >= 100 ? '' : (qT2Pct >= 75 ? 'tier2' : 'below')}" style="width: ${Math.min(100, qT2Pct)}%"></div></div>
-    </div>
+    <div class="sales-card"><div class="label">Sales To Date · ${s.period || "This Month"}</div><div class="value accent">${fmtMoney(s.std)}</div><div class="sub">RM${(s.std/1000).toFixed(1)}k actual</div></div>
+    <div class="sales-card"><div class="label">Tier 1 Target (3%)</div><div class="value">${fmtMoney(s.tier1)}</div><div class="sub">${tier1Pct}% achieved · ${tier1Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, s.tier1 - s.std)) + " to go"}</div><div class="progress"><div class="progress-bar ${tier1Bar}" style="width: ${Math.min(100, tier1Pct)}%"></div></div></div>
+    <div class="sales-card"><div class="label">Tier 2 Target (4%)</div><div class="value">${fmtMoney(s.tier2)}</div><div class="sub">${tier2Pct}% achieved · ${tier2Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, s.tier2 - s.std)) + " to go"}</div><div class="progress"><div class="progress-bar ${tier2Bar}" style="width: ${Math.min(100, tier2Pct)}%"></div></div></div>
+    <div class="sales-card"><div class="label">Customers · TCx Target</div><div class="value">${fmtNumber(s.customerCount || 0)} / ${fmtNumber(custTarget)}</div><div class="sub">${custPct}% achieved · ${custPct >= 100 ? "✓ cleared" : fmtNumber(Math.max(0, custTarget - (s.customerCount||0))) + " to go"}</div><div class="progress"><div class="progress-bar ${custBar}" style="width: ${Math.min(100, custPct)}%"></div></div></div>
+    <div class="sales-card"><div class="label">Patients · Eye Exams</div><div class="value">${fmtNumber(s.patientCount || 0)}</div><div class="sub">No target · clinical metric</div></div>
+    <div class="sales-card"><div class="label">Quarter T1</div><div class="value">${fmtMoney(qStd)}</div><div class="sub">${qT1Pct}% of ${fmtMoneyShort(qT1)} · ${qT1Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, qT1 - qStd)) + " to go"}</div><div class="progress"><div class="progress-bar ${qT1Pct >= 100 ? '' : (qT1Pct >= 75 ? 'tier2' : 'below')}" style="width: ${Math.min(100, qT1Pct)}%"></div></div></div>
+    <div class="sales-card"><div class="label">Quarter T2</div><div class="value">${fmtMoney(qStd)}</div><div class="sub">${qT2Pct}% of ${fmtMoneyShort(qT2)} · ${qT2Pct >= 100 ? "✓ cleared" : fmtMoneyShort(Math.max(0, qT2 - qStd)) + " to go"}</div><div class="progress"><div class="progress-bar ${qT2Pct >= 100 ? '' : (qT2Pct >= 75 ? 'tier2' : 'below')}" style="width: ${Math.min(100, qT2Pct)}%"></div></div></div>
   `;
   document.getElementById("salesMeta").textContent = `Last updated: ${s.lastUpdated || "—"}`;
   renderLeaderboard();
 }
 
-// =============================================================
-//  STAFF LEADERBOARD (PIN-gated, inside Sales section)
-// =============================================================
 function renderLeaderboard() {
   const staff = (state.data.staffSales || []).filter(p => (p.status || "active") !== "inactive");
   const wrap = document.getElementById("staffLeaderboard");
   const list = document.getElementById("leaderboardList");
   const summary = document.getElementById("leaderboardSummary");
-
   if (!wrap || !list) return;
-  if (staff.length === 0) {
-    wrap.style.display = "none";
-    return;
-  }
+  if (staff.length === 0) { wrap.style.display = "none"; return; }
   wrap.style.display = "";
-
   const sorted = [...staff].sort((a,b) => (b.mtdSales||0) - (a.mtdSales||0));
   const topAmount = sorted[0].mtdSales || 1;
   const lastUpdates = sorted.map(p => p.lastUpdated).filter(d => d).sort();
   const latestUpdate = lastUpdates.length ? lastUpdates[lastUpdates.length-1] : "—";
-
   summary.textContent = `${sorted.length} staff · sorted by MTD · last update ${latestUpdate}`;
-
   list.innerHTML = sorted.map((p, idx) => {
     const rank = idx + 1;
     const mtd = p.mtdSales || 0;
     const rankIcon = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`;
     const rowClass = `leaderboard-row rank-${rank}`;
     const progressPct = (mtd / topAmount) * 100;
-
-    return `
-      <div class="${rowClass}">
-        <div class="lb-rank">${rankIcon}</div>
-        <div class="lb-info">
-          <div class="lb-name">${escapeHtml(p.name)}</div>
-        </div>
-        <div class="lb-amount">RM ${fmtNumber(mtd)}</div>
-        <div class="lb-progress"><div class="lb-progress-bar" style="width: ${Math.min(100, progressPct)}%"></div></div>
-      </div>
-    `;
+    return `<div class="${rowClass}"><div class="lb-rank">${rankIcon}</div><div class="lb-info"><div class="lb-name">${escapeHtml(p.name)}</div></div><div class="lb-amount">RM ${fmtNumber(mtd)}</div><div class="lb-progress"><div class="lb-progress-bar" style="width: ${Math.min(100, progressPct)}%"></div></div></div>`;
   }).join("");
 }
 
-// =============================================================
-//  RUN-RATE — split into two renderers
-//  Hero (right column): Monthly only, prominent
-//  Strip card: Quarterly only, compact
-// =============================================================
 function renderRunRate() {
   const s = state.data.sales;
   if (!s) return;
-
   const today = TODAY;
-  const yr = today.getFullYear();
-  const mo = today.getMonth();
-  const dayOfMonth = today.getDate();
+  const yr = today.getFullYear(), mo = today.getMonth(), dayOfMonth = today.getDate();
   const lastDayOfMonth = new Date(yr, mo + 1, 0).getDate();
   const daysLeftMonth = Math.max(1, lastDayOfMonth - dayOfMonth + 1);
-
   const qStartMo = Math.floor(mo / 3) * 3;
   const qEndMo = qStartMo + 2;
   const qLastDay = new Date(yr, qEndMo + 1, 0);
@@ -1868,117 +1763,51 @@ function renderRunRate() {
   const daysLeftQuarter = Math.max(1, Math.ceil((qLastDay - today) / msPerDay) + 1);
   const qNum = Math.floor(mo / 3) + 1;
   const qLabel = `Q${qNum} (${MONTH_NAMES[qStartMo].slice(0,3)}–${MONTH_NAMES[qEndMo].slice(0,3)})`;
-
   const cleanPeriod = cleanPeriodLabel(s.period) || `${MONTH_NAMES[mo]} ${yr}`;
-
-  renderHeroRunrate({
-    period: cleanPeriod,
-    t1: s.tier1 || 0,
-    t2: s.tier2 || 0,
-    std: s.std || 0,
-    daysLeft: daysLeftMonth
-  });
-
-  renderQuarterlyRunrate({
-    qLabel,
-    t1: s.quarterT1 || 0,
-    t2: s.quarterT2 || 0,
-    std: s.quarterStd || 0,
-    daysLeft: daysLeftQuarter
-  });
+  renderHeroRunrate({ period: cleanPeriod, t1: s.tier1 || 0, t2: s.tier2 || 0, std: s.std || 0, daysLeft: daysLeftMonth });
+  renderQuarterlyRunrate({ qLabel, t1: s.quarterT1 || 0, t2: s.quarterT2 || 0, std: s.quarterStd || 0, daysLeft: daysLeftQuarter });
 }
 
 function renderHeroRunrate({ period, t1, t2, std, daysLeft }) {
   const body = document.getElementById("heroRunrateBody");
   if (!body) return;
-
-  if (t1 === 0 && t2 === 0) {
-    body.innerHTML = `
-      <div class="hero-rr-period">${period}</div>
-      <div class="hero-rr-cleared">— set target —</div>
-      <div class="hero-rr-context">Tier targets not configured</div>
-    `;
-    return;
-  }
-
-  // Both cleared
+  if (t1 === 0 && t2 === 0) { body.innerHTML = `<div class="hero-rr-period">${period}</div><div class="hero-rr-cleared">— set target —</div><div class="hero-rr-context">Tier targets not configured</div>`; return; }
   if (std >= t1 && std >= t2 && t2 > 0) {
     const above = std - Math.max(t1, t2);
-    body.innerHTML = `
-      <div class="hero-rr-period">${period} · BOTH TIERS ✓</div>
-      <div class="hero-rr-cleared">🎉 RM ${fmtNumber(std)}</div>
-      <div class="hero-rr-context">RM ${fmtNumber(above)} above T2 · keep going · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
-    `;
+    body.innerHTML = `<div class="hero-rr-period">${period} · BOTH TIERS ✓</div><div class="hero-rr-cleared">🎉 RM ${fmtNumber(std)}</div><div class="hero-rr-context">RM ${fmtNumber(above)} above T2 · keep going · ${daysLeft} day${daysLeft===1?'':'s'} left</div>`;
     return;
   }
-
-  // T1 cleared, push to T2
   if (std >= t1 && t2 > 0) {
     const remaining = t2 - std;
     const ratePerDay = Math.ceil(remaining / daysLeft);
-    body.innerHTML = `
-      <div class="hero-rr-period">${period} · T2 <span class="hero-rr-tier-badge">T1 ✓</span></div>
-      <div class="hero-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day</span></div>
-      <div class="hero-rr-context">
-        <strong>RM ${fmtNumber(std)}</strong> of RM ${fmtNumber(t2)} · 
-        <strong>RM ${fmtNumber(remaining)}</strong> to go · 
-        ${daysLeft} day${daysLeft===1?'':'s'} left
-      </div>
-    `;
+    body.innerHTML = `<div class="hero-rr-period">${period} · T2 <span class="hero-rr-tier-badge">T1 ✓</span></div><div class="hero-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day</span></div><div class="hero-rr-context"><strong>RM ${fmtNumber(std)}</strong> of RM ${fmtNumber(t2)} · <strong>RM ${fmtNumber(remaining)}</strong> to go · ${daysLeft} day${daysLeft===1?'':'s'} left</div>`;
     return;
   }
-
-  // Below T1
   const remaining = t1 - std;
   const ratePerDay = Math.ceil(remaining / daysLeft);
-  body.innerHTML = `
-    <div class="hero-rr-period">${period} · T1</div>
-    <div class="hero-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day</span></div>
-    <div class="hero-rr-context">
-      <strong>RM ${fmtNumber(std)}</strong> of RM ${fmtNumber(t1)} · 
-      <strong>RM ${fmtNumber(remaining)}</strong> to go · 
-      ${daysLeft} day${daysLeft===1?'':'s'} left
-    </div>
-  `;
+  body.innerHTML = `<div class="hero-rr-period">${period} · T1</div><div class="hero-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day</span></div><div class="hero-rr-context"><strong>RM ${fmtNumber(std)}</strong> of RM ${fmtNumber(t1)} · <strong>RM ${fmtNumber(remaining)}</strong> to go · ${daysLeft} day${daysLeft===1?'':'s'} left</div>`;
 }
 
 function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft }) {
   const body = document.getElementById("quarterlyBody");
   const labelEl = document.getElementById("quarterlyLabel");
   if (!body) return;
-
   labelEl.textContent = `🎯 Quarterly Pace · ${qLabel}`;
-
-  if (t1 === 0 && t2 === 0) {
-    body.innerHTML = `<div class="empty">Quarterly targets not set</div>`;
-    return;
-  }
-
+  if (t1 === 0 && t2 === 0) { body.innerHTML = `<div class="empty">Quarterly targets not set</div>`; return; }
   if (std >= t1 && std >= t2 && t2 > 0) {
     const above = std - Math.max(t1, t2);
-    body.innerHTML = `
-      <div class="q-rr-cleared">🎉 BOTH ✓</div>
-      <div class="q-rr-context">RM ${fmtNumber(std)} · RM ${fmtNumber(above)} above T2</div>
-    `;
+    body.innerHTML = `<div class="q-rr-cleared">🎉 BOTH ✓</div><div class="q-rr-context">RM ${fmtNumber(std)} · RM ${fmtNumber(above)} above T2</div>`;
     return;
   }
-
   if (std >= t1 && t2 > 0) {
     const remaining = t2 - std;
     const ratePerDay = Math.ceil(remaining / daysLeft);
-    body.innerHTML = `
-      <div class="q-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day to T2</span></div>
-      <div class="q-rr-context"><strong>T1 ✓</strong> · RM ${fmtNumber(std)} of RM ${fmtNumber(t2)} · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
-    `;
+    body.innerHTML = `<div class="q-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day to T2</span></div><div class="q-rr-context"><strong>T1 ✓</strong> · RM ${fmtNumber(std)} of RM ${fmtNumber(t2)} · ${daysLeft} day${daysLeft===1?'':'s'} left</div>`;
     return;
   }
-
   const remaining = t1 - std;
   const ratePerDay = Math.ceil(remaining / daysLeft);
-  body.innerHTML = `
-    <div class="q-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day to T1</span></div>
-    <div class="q-rr-context">RM ${fmtNumber(std)} of RM ${fmtNumber(t1)} · RM ${fmtNumber(remaining)} to go · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
-  `;
+  body.innerHTML = `<div class="q-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day to T1</span></div><div class="q-rr-context">RM ${fmtNumber(std)} of RM ${fmtNumber(t1)} · RM ${fmtNumber(remaining)} to go · ${daysLeft} day${daysLeft===1?'':'s'} left</div>`;
 }
 
 function cleanPeriodLabel(periodRaw) {
@@ -1986,15 +1815,10 @@ function cleanPeriodLabel(periodRaw) {
   const s = String(periodRaw).trim();
   if (/^[A-Za-z]{3,9}\s+\d{4}$/.test(s)) return s;
   const d = new Date(s);
-  if (!isNaN(d.getTime())) {
-    return MONTH_NAMES[d.getMonth()].slice(0,3) + " " + d.getFullYear();
-  }
+  if (!isNaN(d.getTime())) return MONTH_NAMES[d.getMonth()].slice(0,3) + " " + d.getFullYear();
   return s;
 }
 
-// =============================================================
-//  CAMPAIGNS
-// =============================================================
 function classifyCampaign(c) {
   const today = TODAY_ISO;
   if (c.status === "done" || c.end < today) return "expired";
@@ -2004,14 +1828,9 @@ function classifyCampaign(c) {
 
 function renderCampaigns() {
   const all = (state.data.campaigns || []).map(c => ({ ...c, _class: classifyCampaign(c) }));
-  const active = all.filter(c => c._class === "live" || c._class === "upcoming")
-                    .sort((a,b) => (a.priority||99) - (b.priority||99));
-  const past = all.filter(c => c._class === "expired")
-                  .sort((a,b) => b.end.localeCompare(a.end));
-
-  document.getElementById("campaignSummary").textContent =
-    `${active.length} active · ${past.length} past · click any card to see full details`;
-
+  const active = all.filter(c => c._class === "live" || c._class === "upcoming").sort((a,b) => (a.priority||99) - (b.priority||99));
+  const past = all.filter(c => c._class === "expired").sort((a,b) => b.end.localeCompare(a.end));
+  document.getElementById("campaignSummary").textContent = `${active.length} active · ${past.length} past · click any card to see full details`;
   const brandOrder = ["HOYA", "ESSILOR", "HQ", "INTERNAL", "OTHER"];
   const groups = {};
   brandOrder.forEach(b => groups[b] = []);
@@ -2020,71 +1839,38 @@ function renderCampaigns() {
     if (groups[b]) groups[b].push(c);
     else groups.OTHER.push(c);
   });
-
   brandOrder.forEach(b => {
     const wrapEl = document.getElementById(`brandGroup_${b}`);
     const listEl = document.getElementById(`activeCampaigns_${b}`);
     if (!wrapEl || !listEl) return;
-    if (groups[b].length === 0) {
-      wrapEl.style.display = "none";
-      listEl.innerHTML = "";
-    } else {
-      wrapEl.style.display = "";
-      listEl.innerHTML = groups[b].map(c => renderCampaignCard(c)).join("");
-    }
+    if (groups[b].length === 0) { wrapEl.style.display = "none"; listEl.innerHTML = ""; }
+    else { wrapEl.style.display = ""; listEl.innerHTML = groups[b].map(c => renderCampaignCard(c)).join(""); }
   });
-
   document.getElementById("pastCount").textContent = past.length;
   document.getElementById("pastCampaigns").innerHTML = past.map(c => renderCampaignCard(c, true)).join("");
-
-  if (past.length === 0) {
-    document.getElementById("pastToggle").style.display = "none";
-  } else {
-    document.getElementById("pastToggle").style.display = "";
-  }
+  document.getElementById("pastToggle").style.display = past.length === 0 ? "none" : "";
 }
 
 function renderCampaignCard(c, isPast = false) {
-  const start = parseDate(c.start);
-  const end = parseDate(c.end);
-  const today = TODAY;
+  const start = parseDate(c.start), end = parseDate(c.end), today = TODAY;
   let meta = "";
-  if (c._class === "live") {
-    const daysLeft = daysBetween(today, end);
-    meta = `Live · ends in ${daysLeft} day${daysLeft===1?"":"s"} (${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)})`;
-  } else if (c._class === "upcoming") {
-    const daysUntil = daysBetween(today, start);
-    meta = `Starts in ${daysUntil} day${daysUntil===1?"":"s"} · ${pad(start.getDate())} ${MONTH_NAMES[start.getMonth()].slice(0,3)}`;
-  } else {
-    meta = `Ended ${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
-  }
+  if (c._class === "live") { const daysLeft = daysBetween(today, end); meta = `Live · ends in ${daysLeft} day${daysLeft===1?"":"s"} (${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)})`; }
+  else if (c._class === "upcoming") { const daysUntil = daysBetween(today, start); meta = `Starts in ${daysUntil} day${daysUntil===1?"":"s"} · ${pad(start.getDate())} ${MONTH_NAMES[start.getMonth()].slice(0,3)}`; }
+  else meta = `Ended ${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
   const source = (c.source || "").toUpperCase();
   const onClick = isPast ? "" : "onclick=\"this.classList.toggle('expanded')\"";
   const arrow = isPast ? "" : `<span class="expand-arrow">▾</span>`;
-  return `
-    <div class="campaign ${c._class}" ${onClick}>
-      <div class="campaign-head">
-        <h4>${escapeHtml(c.title)} ${arrow}</h4>
-        ${source ? `<span class="campaign-source ${source}">${source}</span>` : ""}
-      </div>
-      <div class="campaign-meta">${meta}</div>
-      ${c.detail ? `<div class="campaign-detail">${escapeHtml(c.detail)}</div>` : ""}
-    </div>
-  `;
+  return `<div class="campaign ${c._class}" ${onClick}><div class="campaign-head"><h4>${escapeHtml(c.title)} ${arrow}</h4>${source ? `<span class="campaign-source ${source}">${source}</span>` : ""}</div><div class="campaign-meta">${meta}</div>${c.detail ? `<div class="campaign-detail">${escapeHtml(c.detail)}</div>` : ""}</div>`;
 }
 
 function togglePast() {
   state.showPast = !state.showPast;
   const el = document.getElementById("pastCampaigns");
   el.classList.toggle("show", state.showPast);
-  document.getElementById("pastToggle").innerHTML = state.showPast
-    ? `▴ Hide past campaigns (<span id="pastCount">${(state.data.campaigns||[]).filter(c=>classifyCampaign(c)==="expired").length}</span>)`
-    : `▾ Show past campaigns (<span id="pastCount">${(state.data.campaigns||[]).filter(c=>classifyCampaign(c)==="expired").length}</span>)`;
+  const count = (state.data.campaigns||[]).filter(c=>classifyCampaign(c)==="expired").length;
+  document.getElementById("pastToggle").innerHTML = state.showPast ? `▴ Hide past campaigns (<span id="pastCount">${count}</span>)` : `▾ Show past campaigns (<span id="pastCount">${count}</span>)`;
 }
 
-// =============================================================
-//  STAFF INCENTIVES
-// =============================================================
 function classifyIncentive(c) {
   const today = TODAY_ISO;
   if (c.status === "done" || c.end < today) return "expired";
@@ -2094,57 +1880,25 @@ function classifyIncentive(c) {
 
 function renderIncentives() {
   const all = (state.data.staffIncentives || []).map(c => ({ ...c, _class: classifyIncentive(c) }));
-  const active = all.filter(c => c._class === "live" || c._class === "upcoming")
-                    .sort((a,b) => (a.priority||99) - (b.priority||99));
-  const past = all.filter(c => c._class === "expired")
-                  .sort((a,b) => b.end.localeCompare(a.end));
-
-  document.getElementById("incentiveSummary").textContent =
-    `${active.length} active · ${past.length} past · supplier-driven · click any card for full mechanic`;
-
+  const active = all.filter(c => c._class === "live" || c._class === "upcoming").sort((a,b) => (a.priority||99) - (b.priority||99));
+  const past = all.filter(c => c._class === "expired").sort((a,b) => b.end.localeCompare(a.end));
+  document.getElementById("incentiveSummary").textContent = `${active.length} active · ${past.length} past · supplier-driven · click any card for full mechanic`;
   const activeEl = document.getElementById("activeIncentives");
-  if (active.length === 0) {
-    activeEl.innerHTML = '<div style="color: var(--muted); font-style: italic; padding: 12px;">No active staff incentives.</div>';
-  } else {
-    activeEl.innerHTML = active.map(renderIncentiveCard).join("");
-  }
-
+  if (active.length === 0) activeEl.innerHTML = '<div style="color: var(--muted); font-style: italic; padding: 12px;">No active staff incentives.</div>';
+  else activeEl.innerHTML = active.map(renderIncentiveCard).join("");
   document.getElementById("pastIncentiveCount").textContent = past.length;
   document.getElementById("pastIncentives").innerHTML = past.map(c => renderIncentiveCard(c)).join("");
-
-  if (past.length === 0) {
-    document.getElementById("pastIncentiveToggle").style.display = "none";
-  } else {
-    document.getElementById("pastIncentiveToggle").style.display = "block";
-  }
+  document.getElementById("pastIncentiveToggle").style.display = past.length === 0 ? "none" : "block";
 }
 
 function renderIncentiveCard(c) {
-  const start = parseDate(c.start);
-  const end = parseDate(c.end);
-  const today = TODAY;
+  const start = parseDate(c.start), end = parseDate(c.end), today = TODAY;
   let meta = "";
-  if (c._class === "live") {
-    const daysLeft = daysBetween(today, end);
-    meta = `Live · ends in ${daysLeft} day${daysLeft===1?"":"s"} (${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)})`;
-  } else if (c._class === "upcoming") {
-    const daysUntil = daysBetween(today, start);
-    meta = `Starts in ${daysUntil} day${daysUntil===1?"":"s"} · ${pad(start.getDate())} ${MONTH_NAMES[start.getMonth()].slice(0,3)}`;
-  } else {
-    meta = `Ended ${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
-  }
+  if (c._class === "live") { const daysLeft = daysBetween(today, end); meta = `Live · ends in ${daysLeft} day${daysLeft===1?"":"s"} (${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)})`; }
+  else if (c._class === "upcoming") { const daysUntil = daysBetween(today, start); meta = `Starts in ${daysUntil} day${daysUntil===1?"":"s"} · ${pad(start.getDate())} ${MONTH_NAMES[start.getMonth()].slice(0,3)}`; }
+  else meta = `Ended ${pad(end.getDate())} ${MONTH_NAMES[end.getMonth()].slice(0,3)} ${end.getFullYear()}`;
   const supplier = (c.supplier || "").toUpperCase();
-  return `
-    <div class="incentive ${c._class}" onclick="this.classList.toggle('expanded')">
-      <div class="incentive-head">
-        <h4>${escapeHtml(c.title)} <span class="expand-arrow">▾</span></h4>
-        ${supplier ? `<span class="incentive-supplier ${supplier}">${supplier}</span>` : ""}
-      </div>
-      <div class="incentive-meta">${meta}</div>
-      ${c.reward ? `<div class="incentive-reward">${escapeHtml(c.reward)}</div>` : ""}
-      ${c.mechanic ? `<div class="incentive-mechanic">${escapeHtml(c.mechanic)}</div>` : ""}
-    </div>
-  `;
+  return `<div class="incentive ${c._class}" onclick="this.classList.toggle('expanded')"><div class="incentive-head"><h4>${escapeHtml(c.title)} <span class="expand-arrow">▾</span></h4>${supplier ? `<span class="incentive-supplier ${supplier}">${supplier}</span>` : ""}</div><div class="incentive-meta">${meta}</div>${c.reward ? `<div class="incentive-reward">${escapeHtml(c.reward)}</div>` : ""}${c.mechanic ? `<div class="incentive-mechanic">${escapeHtml(c.mechanic)}</div>` : ""}</div>`;
 }
 
 function togglePastIncentives() {
@@ -2152,14 +1906,9 @@ function togglePastIncentives() {
   const el = document.getElementById("pastIncentives");
   el.classList.toggle("show", state.showPastIncentives);
   const count = (state.data.staffIncentives||[]).filter(c=>classifyIncentive(c)==="expired").length;
-  document.getElementById("pastIncentiveToggle").innerHTML = state.showPastIncentives
-    ? `▴ Hide past incentives (<span id="pastIncentiveCount">${count}</span>)`
-    : `▾ Show past incentives (<span id="pastIncentiveCount">${count}</span>)`;
+  document.getElementById("pastIncentiveToggle").innerHTML = state.showPastIncentives ? `▴ Hide past incentives (<span id="pastIncentiveCount">${count}</span>)` : `▾ Show past incentives (<span id="pastIncentiveCount">${count}</span>)`;
 }
 
-// =============================================================
-//  CALENDAR
-// =============================================================
 function toggleCalendarView() {
   state.showFullYear = !state.showFullYear;
   document.getElementById("viewToggle").textContent = state.showFullYear ? "Show Current + Next 2" : "Show Full Year";
@@ -2171,18 +1920,9 @@ function renderCalendar() {
   const grid = document.getElementById("yearGrid");
   grid.classList.toggle("full", state.showFullYear);
   const currentMonth = TODAY.getMonth();
-
   const months = state.showFullYear
     ? Array.from({length: 12}, (_, i) => ({m: i, y: 2026}))
-    : (function() {
-        const out = [];
-        for (let i = 0; i < 3; i++) {
-          const target = currentMonth + i;
-          if (target < 12) out.push({m: target, y: 2026});
-        }
-        return out;
-      })();
-
+    : (function() { const out = []; for (let i = 0; i < 3; i++) { const target = currentMonth + i; if (target < 12) out.push({m: target, y: 2026}); } return out; })();
   grid.innerHTML = months.map(({m, y}) => renderMonth(m, y)).join("");
 }
 
@@ -2191,12 +1931,10 @@ function renderMonth(m, y) {
   const isCurrent = m === TODAY.getMonth() && y === TODAY.getFullYear();
   const theme = state.data.monthlyThemes[m+1];
   const themeShort = theme ? theme.myopia : "";
-
   const firstDay = new Date(y, m, 1);
   const lastDay = new Date(y, m+1, 0);
   const startDow = firstDay.getDay();
   const daysInMonth = lastDay.getDate();
-
   let cells = '';
   for (let i = 0; i < startDow; i++) cells += '<div class="day muted"></div>';
   for (let d = 1; d <= daysInMonth; d++) {
@@ -2210,46 +1948,24 @@ function renderMonth(m, y) {
     if (evs.some(e => e.type === "awareness" || e.type === "occasion")) cls.push("has-event");
     cells += `<div class="day ${cls.join(' ')}" onclick="showDay('${iso}')">${d}</div>`;
   }
-
-  return `
-    <div class="month ${isCurrent ? 'current' : ''}">
-      <div class="month-head">
-        <span class="name">${monthName} ${y}</span>
-        <span class="theme">${escapeHtml(themeShort)}</span>
-      </div>
-      <div class="month-grid">
-        ${["S","M","T","W","T","F","S"].map(d => `<div class="dow">${d}</div>`).join("")}
-        ${cells}
-      </div>
-    </div>
-  `;
+  return `<div class="month ${isCurrent ? 'current' : ''}"><div class="month-head"><span class="name">${monthName} ${y}</span><span class="theme">${escapeHtml(themeShort)}</span></div><div class="month-grid">${["S","M","T","W","T","F","S"].map(d => `<div class="dow">${d}</div>`).join("")}${cells}</div></div>`;
 }
 
 function showDay(iso) {
   const date = parseDate(iso);
   const evs = eventsOn(date);
-  document.getElementById("dayDetailTitle").textContent =
-    `${DOW_FULL[date.getDay()]} · ${pad(date.getDate())} ${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
+  document.getElementById("dayDetailTitle").textContent = `${DOW_FULL[date.getDay()]} · ${pad(date.getDate())} ${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
   const list = document.getElementById("dayDetailEvents");
-  if (evs.length === 0) {
-    list.innerHTML = '<div class="event"><span class="meta">No special events.</span></div>';
-  } else {
+  if (evs.length === 0) list.innerHTML = '<div class="event"><span class="meta">No special events.</span></div>';
+  else {
     list.innerHTML = evs.map(e => {
-      const meta = e.type === "holiday" ? `Public Holiday${e.scope ? " ("+e.scope+")" : ""}`
-        : e.type === "school" ? "School"
-        : e.type === "islamic" ? "Islamic"
-        : e.type === "occasion" ? "Occasion"
-        : e.type === "campaign" ? "Campaign"
-        : "Awareness";
+      const meta = e.type === "holiday" ? `Public Holiday${e.scope ? " ("+e.scope+")" : ""}` : e.type === "school" ? "School" : e.type === "islamic" ? "Islamic" : e.type === "occasion" ? "Occasion" : e.type === "campaign" ? "Campaign" : "Awareness";
       return `<div class="event"><strong>${escapeHtml(e.title)}</strong><span class="meta">${meta}</span></div>`;
     }).join("");
   }
   document.getElementById("dayDetail").classList.add("show");
 }
 
-// =============================================================
-//  RENDER ALL
-// =============================================================
 function renderAll() {
   renderHero();
   renderRunRate();
@@ -2260,13 +1976,8 @@ function renderAll() {
   if (state.salesUnlocked) renderSales();
 }
 
-// =============================================================
-//  INIT
-// =============================================================
 async function init() {
-  if (sessionStorage.getItem(CONFIG.PIN_SESSION_KEY) === "1") {
-    state.salesUnlocked = true;
-  }
+  if (sessionStorage.getItem(CONFIG.PIN_SESSION_KEY) === "1") state.salesUnlocked = true;
   document.getElementById("pinInput").addEventListener("keyup", e => {
     if (e.key === "Enter") checkPin();
     if (e.key === "Escape") closePin();
@@ -2278,6 +1989,96 @@ async function init() {
 }
 
 init();
+
+// =============================================================
+//  WALKING PIXEL CAT — pure SVG, Menara palette
+//  Click to cycle moods. Auto-sleeps 22:00–06:00.
+// =============================================================
+(function () {
+  const G='#5b4636', GD='#3b2a1e', GH='#a07e5c', EYE='#1B1464', NOSE='#ED1C24';
+  const px = (x,y,w,h,c) => `<rect x="${x*4}" y="${y*4}" width="${w*4}" height="${h*4}" fill="${c}"/>`;
+  const svg = p => `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">${p}</svg>`;
+
+  const POSES = {
+    sitting: () => svg([px(3,4,2,2,G),px(11,4,2,2,G),px(3,5,1,1,GD),px(12,5,1,1,GD),px(3,6,10,4,G),px(3,9,10,1,GD),px(5,7,1,1,EYE),px(10,7,1,1,EYE),px(7,8,2,1,NOSE),px(4,10,8,4,G),px(4,13,8,1,GD),px(12,11,2,1,G),px(13,10,1,1,G),px(5,14,2,1,GH),px(9,14,2,1,GH)].join('')),
+    walkingA: () => svg([px(3,4,2,2,G),px(11,4,2,2,G),px(3,5,1,1,GD),px(12,5,1,1,GD),px(3,6,10,4,G),px(3,9,10,1,GD),px(5,7,1,1,EYE),px(10,7,1,1,EYE),px(7,8,2,1,NOSE),px(4,10,8,4,G),px(4,13,8,1,GD),px(12,9,1,1,G),px(13,8,1,1,G),px(13,7,1,1,G),px(4,14,2,1,GH),px(10,14,2,1,GH)].join('')),
+    walkingB: () => svg([px(3,4,2,2,G),px(11,4,2,2,G),px(3,5,1,1,GD),px(12,5,1,1,GD),px(3,6,10,4,G),px(3,9,10,1,GD),px(5,7,1,1,EYE),px(10,7,1,1,EYE),px(7,8,2,1,NOSE),px(4,10,8,4,G),px(4,13,8,1,GD),px(12,10,1,1,G),px(13,9,1,1,G),px(13,10,1,1,G),px(6,14,2,1,GH),px(8,14,2,1,GH)].join('')),
+    watching: () => svg([px(3,4,2,2,G),px(11,4,2,2,G),px(3,5,1,1,GD),px(12,5,1,1,GD),px(3,6,10,4,G),px(3,9,10,1,GD),px(5,7,2,2,EYE),px(9,7,2,2,EYE),px(6,7,1,1,GH),px(10,7,1,1,GH),px(7,9,2,1,NOSE),px(5,10,6,3,G),px(5,12,6,1,GD),px(11,11,2,1,G),px(13,10,1,1,G)].join('')),
+    playing: () => svg([px(3,5,2,2,G),px(11,5,2,2,G),px(3,6,1,1,GD),px(12,6,1,1,GD),px(3,7,10,4,G),px(3,10,10,1,GD),px(5,8,1,1,EYE),px(10,8,1,1,EYE),px(7,9,2,1,NOSE),px(4,11,8,2,G),px(4,12,8,1,GH),px(3,11,1,1,GH),px(12,11,1,1,GH),px(13,8,1,1,G),px(14,9,1,1,G)].join('')),
+    sleeping: () => svg([px(3,7,2,2,G),px(11,7,2,2,G),px(3,8,1,1,GD),px(12,8,1,1,GD),px(3,9,10,4,G),px(3,12,10,1,GD),px(5,10,2,1,EYE),px(9,10,2,1,EYE),px(7,11,2,1,NOSE),px(2,11,1,2,G),px(13,5,1,1,GH),px(14,4,1,1,GH),px(13,6,1,1,GH)].join('')),
+  };
+
+  const S = { el:null, wrap:null, tip:null, x:0, dir:1, speed:30, mode:'walking', modeUntil:0, legFrame:'A', legSwitchAt:0, nextActionAt:0, lastT:0, lastEvalT:0, manualMood:null, manualUntil:0 };
+  const margin = () => (S.wrap.offsetWidth || 76)/2 + 8;
+
+  function setMode(m){ if (S.mode===m) return; S.mode=m; S.tip.textContent=m; render(); }
+  function render(){
+    let body;
+    if (S.mode==='walking') body = S.legFrame==='A' ? POSES.walkingA() : POSES.walkingB();
+    else body = (POSES[S.mode]||POSES.sitting)();
+    S.el.innerHTML = body;
+    S.el.className = 'opscat opscat-mode-' + S.mode;
+  }
+  function evaluate(force){
+    if (S.manualMood && performance.now() < S.manualUntil) return;
+    S.manualMood = null;
+    if (S.modeUntil && performance.now() < S.modeUntil) return;
+    const h = new Date().getHours();
+    let next;
+    if (h>=22 || h<6) next = 'sleeping';
+    else if (h>=7 && h<21 && Math.random()<.15) { next = 'playing'; S.modeUntil = performance.now() + 4500 + Math.random()*2500; }
+    else next = S.mode==='sitting' ? 'sitting' : 'walking';
+    if (force || next !== S.mode) setMode(next);
+  }
+  function cycle(){
+    const order = ['walking','sitting','watching','playing','sleeping'];
+    const cur = order.indexOf(S.manualMood || S.mode);
+    const next = order[(cur+1) % order.length];
+    S.manualMood = next;
+    S.manualUntil = performance.now() + 25000;
+    setMode(next);
+  }
+  function tick(now){
+    const dt = Math.min(.05, (now - S.lastT)/1000);
+    S.lastT = now;
+    if (now - S.lastEvalT > 2000) { S.lastEvalT = now; evaluate(); }
+    let bob = 0;
+    if (S.mode==='walking') {
+      S.x += S.dir * S.speed * dt;
+      const m = margin();
+      if (S.x < m)              { S.x = m; S.dir = 1; }
+      if (S.x > innerWidth - m) { S.x = innerWidth - m; S.dir = -1; }
+      bob = Math.sin(now/220) * 2;
+      if (now > S.legSwitchAt) { S.legFrame = S.legFrame==='A'?'B':'A'; S.legSwitchAt = now+260; render(); }
+      if (now > S.nextActionAt) { setMode('sitting'); S.nextActionAt = now + 1800 + Math.random()*2400; }
+    } else if (S.mode==='sitting') {
+      if (now > S.nextActionAt) { setMode('walking'); S.nextActionAt = now + 6000 + Math.random()*8000; }
+    } else if (S.mode==='sleeping') {
+      bob = Math.sin(now/900) * 1.5;
+    } else if (S.mode==='playing') {
+      S.x += S.dir * (S.speed*.25) * dt;
+      const m = margin();
+      if (S.x < m)              { S.x = m; S.dir = 1; }
+      if (S.x > innerWidth - m) { S.x = innerWidth - m; S.dir = -1; }
+    }
+    const wrapW = S.wrap.offsetWidth || 76;
+    S.wrap.classList.toggle('flip', S.dir===-1 && S.mode==='walking');
+    S.wrap.style.transform = `translate(${Math.round(S.x - wrapW/2)}px, ${Math.round(-bob)}px)`;
+    requestAnimationFrame(tick);
+  }
+  S.el = document.getElementById('opscatEl');
+  S.wrap = document.getElementById('opscatWrap');
+  S.tip = document.getElementById('opscatTip');
+  if (S.el && S.wrap && S.tip) {
+    S.x = innerWidth * 0.5;
+    S.lastT = performance.now();
+    S.nextActionAt = S.lastT + 5000 + Math.random()*5000;
+    S.legSwitchAt = S.lastT + 260;
+    evaluate(true);
+    S.wrap.addEventListener('click', cycle);
+    requestAnimationFrame(tick);
+  }
+})();
 </script>
 </body>
 </html>

@@ -1176,35 +1176,98 @@
     .bg-showcase-caption { font-size: 12px; padding: 12px 14px; }
   }
 
-  /* === Interactive walking pixel cat === */
+  /* === Realistic cat image — free roaming, cat-like movement === */
   .opscat-wrap {
     position: fixed; left: 0;
     bottom: max(8px, env(safe-area-inset-bottom));
     z-index: 5;
-    width: 150px; height: 180px;
+    width: 180px; height: 180px;
     display: flex; align-items: flex-end; justify-content: center;
     cursor: pointer; user-select: none;
     -webkit-tap-highlight-color: transparent;
-    filter: drop-shadow(0 10px 22px rgba(27,20,100,.30));
-    transform: translate(50vw, 0);
-    transition: filter .2s;
+    filter: drop-shadow(0 12px 18px rgba(27,20,100,.30));
+    transition: filter .3s ease, transform 4s cubic-bezier(.45,.05,.55,.95);
+    will-change: transform;
   }
-  .opscat-wrap:hover { filter: drop-shadow(0 10px 22px rgba(237,28,36,.35)); }
-  .opscat-wrap.flip .opscat { transform: scaleX(-1); }
-  .opscat { transition: transform 220ms ease; transform-origin: 50% 100%; }
-  .opscat svg { width: 150px; height: 150px; display: block; }
-  /* Cat mode transforms now applied via inner .cat-whole — see realistic cat block below */
-  .opscat { transition: transform 220ms ease; }
-  @keyframes opscatHop {
-    0%, 100% { transform: scaleY(.95) translateY(2px)  rotate(0deg); }
-    25%      { transform: scaleY(1.10) translateY(-12px) rotate(-4deg); }
-    45%      { transform: scaleY(.84) translateY(3px)  rotate(2deg); }
-    65%      { transform: scaleY(1.06) translateY(-6px) rotate(3deg); }
-    85%      { transform: scaleY(.97) translateY(1px)  rotate(-1deg); }
+  .opscat-wrap:hover { filter: drop-shadow(0 14px 22px rgba(237,28,36,.35)); }
+  .opscat-wrap.flip .opscat-img { transform: scaleX(-1); }
+
+  .opscat { width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; pointer-events: none; }
+  .opscat-img {
+    width: 180px; height: 180px;
+    object-fit: contain;
+    display: block;
+    -webkit-user-drag: none;
+    user-drag: none;
+    transition: transform .35s ease;
+    animation: catBreathe 4.5s cubic-bezier(.45,.05,.55,.95) infinite;
+    transform-origin: 50% 100%;
   }
+  @keyframes catBreathe {
+    0%, 100% { transform: scaleY(1) scaleX(1); }
+    50%      { transform: scaleY(1.018) scaleX(0.992); }
+  }
+
+  .opscat-wrap.walking .opscat-img {
+    animation: catBreathe 4.5s cubic-bezier(.45,.05,.55,.95) infinite, catWalkBob 0.55s ease-in-out infinite;
+  }
+  @keyframes catWalkBob {
+    0%, 100% { translate: 0 0; }
+    50%      { translate: 0 -3px; }
+  }
+
+  .opscat-wrap.sitting .opscat-img {
+    animation: catBreathe 4.5s cubic-bezier(.45,.05,.55,.95) infinite, catLookAround 7s ease-in-out infinite;
+  }
+  @keyframes catLookAround {
+    0%, 100% { rotate: 0deg; }
+    25%      { rotate: -2.5deg; }
+    50%      { rotate: 0deg; }
+    75%      { rotate: 2.5deg; }
+  }
+
+  .opscat-wrap.sleeping .opscat-img {
+    animation: catBreathe 6s cubic-bezier(.45,.05,.55,.95) infinite;
+    transform: scale(0.88) rotate(-4deg);
+    filter: brightness(0.85);
+    transform-origin: 50% 100%;
+  }
+  /* Resting on a card looks similar to sleeping but a touch warmer */
+  .opscat-wrap.resting-on-card .opscat-img {
+    transform: scale(0.85) rotate(2deg);
+    filter: brightness(0.9) saturate(1.1);
+  }
+  .opscat-wrap.resting-on-card { filter: drop-shadow(0 6px 10px rgba(27,20,100,.35)); }
+
+  .opscat-zzz {
+    position: absolute; top: -8px; right: -2px;
+    font-family: Georgia, serif; font-weight: 700; font-size: 18px;
+    color: var(--primary); opacity: 0;
+    pointer-events: none;
+  }
+  .opscat-wrap.sleeping .opscat-zzz {
+    opacity: 1;
+    animation: opscatZzz 2.6s ease-in-out infinite;
+  }
+  @keyframes opscatZzz {
+    0%, 100% { opacity: .5; transform: translateY(0) scale(.9); }
+    50%      { opacity: 1;  transform: translateY(-6px) scale(1.1); }
+  }
+
+  .opscat-wrap.playing .opscat-img {
+    animation: catBreathe 4.5s cubic-bezier(.45,.05,.55,.95) infinite, catPlayBounce 0.9s ease-in-out infinite;
+  }
+  @keyframes catPlayBounce {
+    0%, 100% { translate: 0 0; }
+    50%      { translate: 0 -10px; }
+  }
+
+  .opscat-wrap:hover .opscat-img { filter: brightness(1.05); }
+  .opscat-wrap:active .opscat-img { transform: scale(.95); }
+
   .opscat-tip {
     position: absolute; left: 50%; bottom: 100%;
-    transform: translate(-50%, 4px); margin-bottom: 4px;
+    transform: translate(-50%, 4px); margin-bottom: 8px;
     font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
     color: #fff; background: var(--primary);
     padding: 3px 9px; border-radius: 99px; white-space: nowrap;
@@ -1212,142 +1275,21 @@
     pointer-events: none;
   }
   .opscat-wrap:hover .opscat-tip { opacity: 1; transform: translate(-50%, 0); }
-  @media (max-width: 480px) {
-    .opscat-wrap { width: 110px; height: 140px; }
-    .opscat svg { width: 110px; height: 110px; }
-  }
 
-  /* === Realistic vector cat ============================================ */
-  .opscat { width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
-  .cat-svg {
-    width: 100%; height: 100%; overflow: visible;
-    filter: drop-shadow(0 4px 6px rgba(58,42,30,0.35));
-    transition: transform .25s ease;
-  }
-  .opscat-wrap { cursor: pointer; }
-  .opscat-wrap:hover .cat-svg { transform: translateY(-1px); }
-  .opscat-wrap:active .cat-svg { transform: scale(.97); }
-
-  /* Breathing — always on, very gentle */
-  .cat-body {
-    transform-origin: 50% 92%;
-    animation: catBreathe 4.5s cubic-bezier(.45,.05,.55,.95) infinite;
-  }
-  @keyframes catBreathe {
-    0%, 100% { transform: scaleY(1) translateY(0); }
-    50%      { transform: scaleY(1.025) translateY(-0.4px); }
-  }
-
-  /* Tail sway — always on */
-  .cat-tail {
-    transform-origin: 25% 73%;
-    animation: catTailSway 5s ease-in-out infinite;
-    transform-box: fill-box;
-  }
-  @keyframes catTailSway {
-    0%, 100% { transform: rotate(-7deg); }
-    50%      { transform: rotate(7deg); }
-  }
-  .opscat-wrap:hover .cat-tail { animation-duration: 1.6s; }
-
-  /* Blinking — closed for a moment every 5.5s */
-  .cat-eyelids {
-    opacity: 0;
-    transform-origin: 50% 40%;
-    animation: catBlink 5.5s steps(1, end) infinite;
-  }
-  @keyframes catBlink {
-    0%, 93%, 100% { opacity: 0; transform: scaleY(0); }
-    94%, 96%      { opacity: 1; transform: scaleY(1); }
-  }
-
-  /* Pupil smooth transition for cursor tracking */
-  .cat-pupil { transition: transform .2s ease-out; transform-box: fill-box; transform-origin: center; }
-
-  /* Iris animation when hovering */
-  .opscat-wrap:hover .cat-iris { transform: translateY(-0.4px); }
-
-  /* === Mode-specific animations ======================================= */
-  .opscat-mode-walking .cat-whole { animation: catWalkBob 0.7s cubic-bezier(.45,.05,.55,.95) infinite; }
-  .opscat-mode-walking .cat-leg-fl, .opscat-mode-walking .cat-leg-br {
-    animation: catLegA 0.7s cubic-bezier(.45,.05,.55,.95) infinite;
-    transform-origin: 50% 5%; transform-box: fill-box;
-  }
-  .opscat-mode-walking .cat-leg-fr, .opscat-mode-walking .cat-leg-bl {
-    animation: catLegB 0.7s cubic-bezier(.45,.05,.55,.95) infinite;
-    transform-origin: 50% 5%; transform-box: fill-box;
-  }
-  @keyframes catWalkBob {
-    0%, 100% { transform: translateY(0) rotate(0); }
-    50%      { transform: translateY(-1.4px) rotate(.6deg); }
-  }
-  @keyframes catLegA {
-    0%, 100% { transform: rotate(-7deg); }
-    50%      { transform: rotate(7deg); }
-  }
-  @keyframes catLegB {
-    0%, 100% { transform: rotate(7deg); }
-    50%      { transform: rotate(-7deg); }
-  }
-
-  .opscat-mode-sitting .cat-whole { transform: translateY(2px); }
-
-  .opscat-mode-watching .cat-head {
-    animation: catWatch 1.4s ease-in-out infinite;
-    transform-origin: 50% 60%; transform-box: fill-box;
-  }
-  @keyframes catWatch {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50%      { transform: translateY(-0.6px) scale(1.015); }
-  }
-
-  .opscat-mode-sleeping .cat-whole { transform: translateY(4px); }
-  .opscat-mode-sleeping .cat-head { transform: translate(-1px, 3px) rotate(-8deg); transform-origin: 50% 65%; transform-box: fill-box; }
-  .opscat-mode-sleeping .cat-body {
-    transform: scaleX(1.12) scaleY(0.88);
-    transform-origin: 50% 100%; transform-box: fill-box;
-    animation: catSleepBreath 4.2s ease-in-out infinite;
-  }
-  .opscat-mode-sleeping .cat-eyelids { opacity: 1 !important; animation: none; transform: scaleY(1); }
-  .opscat-mode-sleeping .cat-zzz { opacity: 1 !important; animation: catZzz 2.5s ease-in-out infinite; transform-origin: center; }
-  .opscat-mode-sleeping .cat-tail { animation-duration: 8s; }
-  @keyframes catZzz {
-    0%, 100% { opacity: 0.5; transform: translateY(0); }
-    50%      { opacity: 1; transform: translateY(-3px); }
-  }
-  @keyframes catSleepBreath {
-    0%, 100% { transform: scaleY(1); }
-    50%      { transform: scaleY(1.06); }
-  }
-
-  .opscat-mode-playing .cat-whole {
-    animation: catPlayBounce 0.9s cubic-bezier(.5,.05,.5,1) infinite;
-    transform-origin: 50% 92%;
-  }
-  @keyframes catPlayBounce {
-    0%, 100% { transform: scaleY(1) translateY(0) rotate(0); }
-    25%      { transform: scaleY(1.08) translateY(-10px) rotate(-3deg); }
-    50%      { transform: scaleY(0.94) translateY(2px); }
-    75%      { transform: scaleY(1.05) translateY(-6px) rotate(3deg); }
-  }
-
-  /* Flip whole cat horizontally when walking left */
-  .opscat-wrap.flip .cat-svg { transform: scaleX(-1); }
-
-  /* Pet (click) reaction: gentle wiggle + heart hearts float up */
-  .cat-purr .cat-body { animation: catPurr 0.35s ease-in-out 4, catBreathe 3.4s cubic-bezier(.45,.05,.55,.95) infinite; }
-  @keyframes catPurr {
-    0%, 100% { transform: scaleY(1); }
-    50%      { transform: scaleY(1.05); }
-  }
   .cat-pet-heart {
-    position: absolute; bottom: 70%; font-size: 16px; pointer-events: none;
+    position: absolute; bottom: 70%; left: 50%;
+    font-size: 18px; pointer-events: none;
     animation: catHeartFloat 1.4s ease-out forwards;
   }
   @keyframes catHeartFloat {
-    0%   { transform: translateY(0) scale(.5); opacity: 0; }
-    20%  { transform: translateY(-6px) scale(1.2); opacity: 1; }
-    100% { transform: translateY(-50px) scale(1) rotate(15deg); opacity: 0; }
+    0%   { transform: translate(-50%, 0) scale(.5); opacity: 0; }
+    20%  { transform: translate(-50%, -10px) scale(1.2); opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--dx, 0px)), -70px) scale(1); opacity: 0; }
+  }
+
+  @media (max-width: 480px) {
+    .opscat-wrap { width: 130px; height: 130px; }
+    .opscat-img { width: 130px; height: 130px; }
   }
 
   /* === Realistic plant SVG ============================================ */
@@ -2761,243 +2703,261 @@ init();
 })();
 
 // =============================================================
-//  REALISTIC VECTOR CAT — single SVG, CSS-driven animations
-//  Click to pet (Shift+click to cycle mood). Auto-sleeps 22:00-06:00.
+//  REALISTIC PHOTO CAT — free-roaming 2D wandering
+//  Click to pet. Auto-sleeps 01:00-05:00.
 // =============================================================
 (function () {
-  // === Realistic kawaii kitten — single SVG, CSS-driven animations ===
-  function buildCatSvg() {
-    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="cat-svg" preserveAspectRatio="xMidYMax meet">'
-      + '<defs>'
-        + '<linearGradient id="furG" x1="0" y1="0" x2="0" y2="1">'
-          + '<stop offset="0%" stop-color="#c89878"/>'
-          + '<stop offset="55%" stop-color="#8b6240"/>'
-          + '<stop offset="100%" stop-color="#5a3a22"/>'
-        + '</linearGradient>'
-        + '<radialGradient id="bellyG" cx="0.5" cy="0.5" r="0.6">'
-          + '<stop offset="0%" stop-color="#f0d4a8" stop-opacity="0.9"/>'
-          + '<stop offset="100%" stop-color="#c89878" stop-opacity="0"/>'
-        + '</radialGradient>'
-        + '<radialGradient id="cheekG" cx="0.5" cy="0.5" r="0.5">'
-          + '<stop offset="0%" stop-color="#f5b8c0" stop-opacity="0.6"/>'
-          + '<stop offset="100%" stop-color="#f5b8c0" stop-opacity="0"/>'
-        + '</radialGradient>'
-        + '<radialGradient id="eyeG" cx="0.3" cy="0.3" r="0.75">'
-          + '<stop offset="0%" stop-color="#5a4ee0"/>'
-          + '<stop offset="50%" stop-color="#2d2399"/>'
-          + '<stop offset="100%" stop-color="#0d0840"/>'
-        + '</radialGradient>'
-        + '<radialGradient id="noseG" cx="0.5" cy="0.5" r="0.5">'
-          + '<stop offset="0%" stop-color="#ff6b75"/>'
-          + '<stop offset="100%" stop-color="#c01018"/>'
-        + '</radialGradient>'
-      + '</defs>'
-      + '<g class="cat-whole">'
-        // Tail — curved S-shape behind body
-        + '<g class="cat-tail">'
-          + '<path d="M 70 78 C 82 72, 88 58, 82 42 C 78 34, 84 28, 90 32" stroke="url(#furG)" stroke-width="8" fill="none" stroke-linecap="round"/>'
-          + '<path d="M 70 78 C 82 72, 88 58, 82 42" stroke="#3d2818" stroke-width="0.5" fill="none" stroke-linecap="round" opacity="0.3"/>'
-          // Tail tip lighter
-          + '<circle cx="90" cy="32" r="3.5" fill="#e8c597" opacity="0.4"/>'
-        + '</g>'
-        // Back legs
-        + '<ellipse class="cat-leg cat-leg-bl" cx="38" cy="84" rx="5.5" ry="8" fill="url(#furG)"/>'
-        + '<ellipse class="cat-leg cat-leg-br" cx="62" cy="84" rx="5.5" ry="8" fill="url(#furG)"/>'
-        // Body (smaller relative to head, kawaii)
-        + '<g class="cat-body">'
-          + '<ellipse cx="50" cy="76" rx="22" ry="16" fill="url(#furG)"/>'
-          + '<ellipse cx="50" cy="82" rx="15" ry="10" fill="url(#bellyG)"/>'
-        + '</g>'
-        // Front legs
-        + '<ellipse class="cat-leg cat-leg-fl" cx="42" cy="90" rx="5" ry="6.5" fill="url(#furG)"/>'
-        + '<ellipse class="cat-leg cat-leg-fr" cx="58" cy="90" rx="5" ry="6.5" fill="url(#furG)"/>'
-        // Tiny paw toe-beans
-        + '<ellipse cx="42" cy="95" rx="3.5" ry="1.5" fill="#3b2a1e" opacity="0.45"/>'
-        + '<ellipse cx="58" cy="95" rx="3.5" ry="1.5" fill="#3b2a1e" opacity="0.45"/>'
-        // === HEAD (big, kawaii) ===
-        + '<g class="cat-head">'
-          // Ears outer
-          + '<path d="M 24 30 L 18 8 L 42 22 Z" fill="url(#furG)" stroke="#5a3a22" stroke-width="0.4" stroke-linejoin="round"/>'
-          + '<path d="M 76 30 L 82 8 L 58 22 Z" fill="url(#furG)" stroke="#5a3a22" stroke-width="0.4" stroke-linejoin="round"/>'
-          // Ears inner pink
-          + '<path d="M 28 26 L 25 14 L 39 22 Z" fill="#f5a8b8" opacity="0.95"/>'
-          + '<path d="M 72 26 L 75 14 L 61 22 Z" fill="#f5a8b8" opacity="0.95"/>'
-          // Face (BIG, round)
-          + '<ellipse cx="50" cy="43" rx="26" ry="24" fill="url(#furG)"/>'
-          // Lighter belly/chin
-          + '<ellipse cx="50" cy="50" rx="18" ry="14" fill="#f0d4a8" opacity="0.45"/>'
-          // Subtle tabby stripes on forehead
-          + '<path d="M 38 25 Q 42 28 38 32" stroke="#5a3a22" stroke-width="0.8" fill="none" opacity="0.45"/>'
-          + '<path d="M 50 22 Q 50 26 50 30" stroke="#5a3a22" stroke-width="0.8" fill="none" opacity="0.45"/>'
-          + '<path d="M 62 25 Q 58 28 62 32" stroke="#5a3a22" stroke-width="0.8" fill="none" opacity="0.45"/>'
-          // Cheek blush
-          + '<ellipse cx="28" cy="50" rx="9" ry="6" fill="url(#cheekG)"/>'
-          + '<ellipse cx="72" cy="50" rx="9" ry="6" fill="url(#cheekG)"/>'
-          // === BIG kawaii eyes ===
-          + '<g class="cat-eyes">'
-            // Eye whites
-            + '<ellipse cx="38" cy="44" rx="6" ry="7.5" fill="#fff"/>'
-            + '<ellipse cx="62" cy="44" rx="6" ry="7.5" fill="#fff"/>'
-            // Iris (big)
-            + '<ellipse class="cat-iris" cx="38" cy="45" rx="5" ry="6.5" fill="url(#eyeG)"/>'
-            + '<ellipse class="cat-iris" cx="62" cy="45" rx="5" ry="6.5" fill="url(#eyeG)"/>'
-            // Pupils (vertical slits like real cats)
-            + '<ellipse class="cat-pupil" cx="38" cy="45" rx="1.8" ry="5.5" fill="#000"/>'
-            + '<ellipse class="cat-pupil" cx="62" cy="45" rx="1.8" ry="5.5" fill="#000"/>'
-            // Sparkle highlights (two each — kawaii effect)
-            + '<circle cx="40" cy="41" r="1.8" fill="#fff"/>'
-            + '<circle cx="64" cy="41" r="1.8" fill="#fff"/>'
-            + '<circle cx="36" cy="47" r="0.9" fill="#fff" opacity="0.8"/>'
-            + '<circle cx="60" cy="47" r="0.9" fill="#fff" opacity="0.8"/>'
-          + '</g>'
-          // Eyelids (for blink)
-          + '<g class="cat-eyelids">'
-            + '<path d="M 31 44 Q 38 50 45 44 L 45 41 L 31 41 Z" fill="url(#furG)" stroke="#3b2a1e" stroke-width="0.5" stroke-linejoin="round"/>'
-            + '<path d="M 55 44 Q 62 50 69 44 L 69 41 L 55 41 Z" fill="url(#furG)" stroke="#3b2a1e" stroke-width="0.5" stroke-linejoin="round"/>'
-          + '</g>'
-          // Nose (heart-shaped)
-          + '<path d="M 45 55 Q 50 53 50 55 Q 50 53 55 55 Q 55 58 50 60 Q 45 58 45 55 Z" fill="url(#noseG)"/>'
-          // Mouth — smile
-          + '<path d="M 50 60 L 50 62" stroke="#3b2a1e" stroke-width="0.8" stroke-linecap="round"/>'
-          + '<path d="M 50 62 Q 46 65 43 64" stroke="#3b2a1e" stroke-width="0.8" fill="none" stroke-linecap="round"/>'
-          + '<path d="M 50 62 Q 54 65 57 64" stroke="#3b2a1e" stroke-width="0.8" fill="none" stroke-linecap="round"/>'
-          // Tiny pink tongue (peeks out)
-          + '<path class="cat-tongue" d="M 49 63 Q 50 65 51 63 Q 51 64.5 50 64.5 Q 49 64.5 49 63 Z" fill="#f08a9a" opacity="0"/>'
-          // Whiskers
-          + '<g class="cat-whiskers" opacity="0.85">'
-            + '<line x1="22" y1="55" x2="6" y2="50" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
-            + '<line x1="22" y1="58" x2="6" y2="58" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
-            + '<line x1="22" y1="61" x2="6" y2="65" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
-            + '<line x1="78" y1="55" x2="94" y2="50" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
-            + '<line x1="78" y1="58" x2="94" y2="58" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
-            + '<line x1="78" y1="61" x2="94" y2="65" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
-          + '</g>'
-        + '</g>'
-        // Z indicator for sleeping mode
-        + '<g class="cat-zzz" opacity="0">'
-          + '<text x="78" y="20" font-family="Georgia, serif" font-size="12" font-weight="bold" fill="#1B1464" opacity="0.7">Z</text>'
-          + '<text x="84" y="14" font-family="Georgia, serif" font-size="9" font-weight="bold" fill="#1B1464" opacity="0.5">z</text>'
-        + '</g>'
-      + '</g>'
-    + '</svg>';
-  }
+  const IMG_URL = 'https://raw.githubusercontent.com/haz1-90/trading/claude/mdv-dashboard-backend-VkjqT/dashboard/assets/cat-realistic.webp';
 
   const S = {
-    el:null, wrap:null, tip:null,
-    x:0, dir:1, speed:30,
-    mode:'walking', modeUntil:0,
-    nextActionAt:0,
-    lastT:0, lastEvalT:0,
-    manualMood:null, manualUntil:0
+    el: null, wrap: null, tip: null,
+    x: 0, y: 0,
+    facingLeft: false,
+    mode: 'sitting',
+    moveTimer: null,
+    arrivalTimer: null,
+    isMoving: false,
+    manualMood: null,
+    manualUntil: 0,
+    lastModeEval: 0
   };
-  const margin = () => (S.wrap.offsetWidth || 76)/2 + 8;
-  function setMode(m){
-    if (S.mode===m) return;
-    S.mode=m;
-    if (S.tip) S.tip.textContent=m;
-    if (S.el) S.el.className = 'opscat opscat-mode-' + m;
+
+  function setupDom() {
+    S.el = document.getElementById('opscatEl');
+    S.wrap = document.getElementById('opscatWrap');
+    S.tip = document.getElementById('opscatTip');
+    if (!S.el || !S.wrap) return false;
+    S.el.innerHTML = '<img class="opscat-img" src="' + IMG_URL + '" alt="cat" draggable="false">' +
+                     '<span class="opscat-zzz">Z<span style="font-size:13px;margin-left:2px">z</span></span>';
+    return true;
   }
-  function evaluate(force){
+
+  function setMode(m) {
+    if (S.mode === m) return;
+    S.wrap.classList.remove('walking','sitting','sleeping','playing','eating','drinking','playing-ball','hungry');
+    S.mode = m;
+    const visualClass = { walking:'walking', sitting:'sitting', sleeping:'sleeping',
+      playing:'playing', eat:'sitting', drink:'sitting', ball:'playing', hungry:'sitting' }[m] || 'sitting';
+    S.wrap.classList.add(visualClass);
+    if (S.tip) S.tip.textContent = m;
+  }
+
+  function pickTarget() {
+    const margin = 100;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const newX = margin + Math.random() * (vw - 2 * margin);
+    const maxLift = Math.min(280, vh * 0.35);
+    const newY = Math.random() * maxLift;
+    return { x: newX, y: newY };
+  }
+
+  function moveTo(targetX, targetY) {
+    if (!S.wrap) return;
+    const dx = targetX - S.x;
+    const dy = targetY - S.y;
+    const distance = Math.sqrt(dx*dx + dy*dy);
+    const baseSpeed = 50 + Math.random() * 60;
+    let duration = Math.min(10, Math.max(1.2, distance / baseSpeed));
+    if (Math.random() < 0.12) duration = Math.max(0.6, duration * 0.4);
+
+    S.facingLeft = (dx < -3);
+    S.wrap.classList.toggle('flip', S.facingLeft);
+    S.isMoving = true;
+    setMode('walking');
+
+    S.wrap.style.transitionDuration = duration + 's';
+    S.wrap.style.transform = 'translate3d(' + targetX + 'px, ' + (-targetY) + 'px, 0)';
+
+    S.x = targetX;
+    S.y = targetY;
+
+    clearTimeout(S.arrivalTimer);
+    S.arrivalTimer = setTimeout(function () {
+      S.isMoving = false;
+      setMode('sitting');
+      scheduleNextMove();
+    }, duration * 1000 + 50);
+  }
+
+  function scheduleNextMove() {
+    clearTimeout(S.moveTimer);
+    const pause = 2000 + Math.random() * 7000;
+    S.moveTimer = setTimeout(function () {
+      if (S.manualMood && performance.now() < S.manualUntil) {
+        scheduleNextMove();
+        return;
+      }
+      if (S.mode === 'sleeping' || S.boundCard) {
+        scheduleNextMove();
+        return;
+      }
+      // If user idle 60+ sec, 55% chance to climb a card and rest
+      if (isUserIdle(60000) && Math.random() < 0.55) {
+        if (tryClimbCard()) return;
+      }
+      const t = pickTarget();
+      moveTo(t.x, t.y);
+    }, pause);
+  }
+
+  // === Card climbing & resting (idle behaviour) ===
+  const CARD_SEL = '.hero, .strip-card, .sales-panel, .campaigns-section, .incentives-section, .calendar-section, .theme-card, .widget, .bg-showcase';
+  S.lastUserActivity = Date.now();
+  S.boundCard = null;
+  S.restTimer = null;
+  S.boundCardScrollOffset = 0;
+
+  function trackActivity() { S.lastUserActivity = Date.now(); }
+  function isUserIdle(thresholdMs) { return (Date.now() - S.lastUserActivity) > thresholdMs; }
+
+  function findClimbableCards() {
+    return Array.from(document.querySelectorAll(CARD_SEL))
+      .map(function (el) { return { el: el, rect: el.getBoundingClientRect() }; })
+      .filter(function (c) {
+        return c.rect.width > 250 && c.rect.height > 60 &&
+               c.rect.top > 80 && c.rect.top < window.innerHeight - 80;
+      });
+  }
+
+  function tryClimbCard() {
+    const cards = findClimbableCards();
+    if (cards.length === 0) return false;
+    const card = cards[Math.floor(Math.random() * cards.length)];
+    climbOntoCard(card.el, card.rect);
+    return true;
+  }
+
+  function computeCardSpot(cardEl) {
+    const rect = cardEl.getBoundingClientRect();
+    const wrapW = parseFloat(getComputedStyle(S.wrap).width) || 180;
+    // Pick random x along the card (within margins)
+    const sideMargin = 20;
+    const targetScreenX = rect.left + sideMargin + Math.random() * Math.max(0, rect.width - wrapW - sideMargin * 2);
+    const vh = window.innerHeight;
+    // Cat's bottom edge should sit slightly below card top (paws on card)
+    const catFeetBelowTop = 40; // image has ~40px of shadow/leg area below the body
+    const targetCatBottomY = rect.top + catFeetBelowTop;
+    const targetY = vh - 8 - targetCatBottomY;
+    return { x: targetScreenX, y: targetY };
+  }
+
+  function climbOntoCard(cardEl, rect) {
+    const spot = computeCardSpot(cardEl);
+    S.facingLeft = spot.x < S.x;
+    S.wrap.classList.toggle('flip', S.facingLeft);
+    S.boundCard = cardEl;
+    setMode('walking');
+    // Climbing takes a bit longer than normal walk for "jumping up" feel
+    const duration = 2.8;
+    S.wrap.style.transitionDuration = duration + 's';
+    S.wrap.style.transitionTimingFunction = 'cubic-bezier(.4, -.05, .3, 1.1)'; // arc-like easing
+    S.wrap.style.transform = 'translate3d(' + spot.x + 'px, ' + (-spot.y) + 'px, 0)';
+    S.x = spot.x;
+    S.y = spot.y;
+    clearTimeout(S.arrivalTimer);
+    S.arrivalTimer = setTimeout(function () {
+      // Reset easing for next move
+      S.wrap.style.transitionTimingFunction = 'cubic-bezier(.45,.05,.55,.95)';
+      // Settle: resting pose (use sleeping visual)
+      setMode('sleeping');
+      S.wrap.classList.add('resting-on-card');
+      // Stay on card during scroll
+      window.addEventListener('scroll', stickToCard, { passive: true });
+      window.addEventListener('resize', stickToCard, { passive: true });
+      // Rest for 60-180 seconds, then climb down
+      const restDur = 60000 + Math.random() * 120000;
+      clearTimeout(S.restTimer);
+      S.restTimer = setTimeout(climbDownFromCard, restDur);
+    }, duration * 1000 + 50);
+  }
+
+  function stickToCard() {
+    if (!S.boundCard) return;
+    const rect = S.boundCard.getBoundingClientRect();
+    const vh = window.innerHeight;
+    // If card scrolled out of viewport entirely, climb down
+    if (rect.bottom < 0 || rect.top > vh) {
+      climbDownFromCard();
+      return;
+    }
+    const catFeetBelowTop = 40;
+    const targetY = vh - 8 - (rect.top + catFeetBelowTop);
+    S.wrap.style.transitionDuration = '0s';
+    S.wrap.style.transform = 'translate3d(' + S.x + 'px, ' + (-targetY) + 'px, 0)';
+    S.y = targetY;
+  }
+
+  function climbDownFromCard() {
+    window.removeEventListener('scroll', stickToCard);
+    window.removeEventListener('resize', stickToCard);
+    clearTimeout(S.restTimer);
+    S.restTimer = null;
+    S.boundCard = null;
+    S.wrap.classList.remove('resting-on-card');
+    setMode('walking');
+    const duration = 2.2;
+    S.wrap.style.transitionDuration = duration + 's';
+    S.wrap.style.transitionTimingFunction = 'cubic-bezier(.5, .05, .4, 1)';
+    S.wrap.style.transform = 'translate3d(' + S.x + 'px, 0, 0)';
+    S.y = 0;
+    clearTimeout(S.arrivalTimer);
+    S.arrivalTimer = setTimeout(function () {
+      S.wrap.style.transitionTimingFunction = 'cubic-bezier(.45,.05,.55,.95)';
+      setMode('sitting');
+      scheduleNextMove();
+    }, duration * 1000 + 50);
+  }
+
+  // Wake up on click anywhere (gentle - mouse movement alone doesn't wake)
+  function maybeWake() {
+    trackActivity();
+    if (S.boundCard) {
+      climbDownFromCard();
+    }
+  }
+
+  // Bind activity trackers
+  document.addEventListener('mousemove', trackActivity, { passive: true });
+  document.addEventListener('touchstart', trackActivity, { passive: true });
+  document.addEventListener('keydown', trackActivity, { passive: true });
+  document.addEventListener('wheel', trackActivity, { passive: true });
+  document.addEventListener('click', maybeWake, { passive: true });
+
+  function evaluateMood() {
     if (S.manualMood && performance.now() < S.manualUntil) return;
     S.manualMood = null;
-    if (S.modeUntil && performance.now() < S.modeUntil) return;
     const h = new Date().getHours();
-    let next;
-    if (h>=1 && h<5) next = 'sleeping';
-    else if (h>=7 && h<21 && Math.random()<.15) {
-      next = 'playing';
-      S.modeUntil = performance.now() + 4500 + Math.random()*2500;
+    if (h >= 1 && h < 5) {
+      if (S.mode !== 'sleeping') {
+        S.wrap.style.transitionDuration = '0.8s';
+        S.wrap.style.transform = 'translate3d(' + S.x + 'px, ' + (-S.y) + 'px, 0)';
+        clearTimeout(S.moveTimer);
+        clearTimeout(S.arrivalTimer);
+        setMode('sleeping');
+      }
+    } else if (S.mode === 'sleeping') {
+      setMode('sitting');
+      scheduleNextMove();
     }
-    else next = S.mode==='sitting' ? 'sitting' : 'walking';
-    if (force || next !== S.mode) setMode(next);
-  }
-  function cycle(){
-    const order = ['walking','sitting','watching','playing','sleeping'];
-    const cur = order.indexOf(S.manualMood || S.mode);
-    const next = order[(cur+1) % order.length];
-    S.manualMood = next;
-    S.manualUntil = performance.now() + 25000;
-    setMode(next);
   }
 
-  // === Interactivity: pet on click, eye tracking on hover ===
-  const PURR_MSGS = ["Purr~ 💛", "Lebih sayang please 😸", "Mmm best...", "Mwah! 💕", "Selesa sangat 🤍", "Aku suka awak", "Hehe geli 😊"];
-  function petCat() {
-    if (!S.el) return;
-    S.el.classList.add('cat-purr');
-    setTimeout(() => S.el.classList.remove('cat-purr'), 1500);
-    const bubble = document.getElementById('opscatBubble');
-    if (bubble) {
-      bubble.textContent = PURR_MSGS[Math.floor(Math.random()*PURR_MSGS.length)];
-      bubble.classList.add('show');
-      clearTimeout(bubble._t);
-      bubble._t = setTimeout(() => bubble.classList.remove('show'), 3000);
+  function tick(now) {
+    if (now - (S.lastModeEval || 0) > 5000) {
+      S.lastModeEval = now;
+      evaluateMood();
     }
-    // Spawn floating hearts
-    for (let i = 0; i < 3; i++) {
-      const h = document.createElement('span');
-      h.className = 'cat-pet-heart';
-      h.textContent = '💛';
-      h.style.left = (40 + Math.random()*20) + '%';
-      h.style.animationDelay = (i * 0.18) + 's';
-      S.wrap.appendChild(h);
-      setTimeout(() => h.remove(), 1500);
-    }
-  }
-  function trackPupils(e) {
-    if (!S.wrap) return;
-    const rect = S.wrap.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    let dx = (e.clientX - cx) / Math.max(40, rect.width);
-    let dy = (e.clientY - cy) / Math.max(40, rect.height);
-    dx = Math.max(-1, Math.min(1, dx)) * 1.6;
-    dy = Math.max(-0.5, Math.min(1, dy)) * 1.2;
-    const pupils = S.el && S.el.querySelectorAll('.cat-pupil');
-    if (pupils) pupils.forEach(p => { p.style.transform = `translate(${dx}px, ${dy}px)`; });
-  }
-  function resetPupils() {
-    const pupils = S.el && S.el.querySelectorAll('.cat-pupil');
-    if (pupils) pupils.forEach(p => { p.style.transform = ''; });
-  }
-
-  function tick(now){
-    const dt = Math.min(.05, (now - S.lastT)/1000);
-    S.lastT = now;
-    if (now - S.lastEvalT > 2000) { S.lastEvalT = now; evaluate(); }
-    let bob = 0;
-    if (S.mode==='walking') {
-      S.x += S.dir * S.speed * dt;
-      const m = margin();
-      if (S.x < m)              { S.x = m; S.dir = 1; }
-      if (S.x > innerWidth - m) { S.x = innerWidth - m; S.dir = -1; }
-      bob = Math.sin(now/220) * 1.5;
-      if (now > S.nextActionAt) { setMode('sitting'); S.nextActionAt = now + 1800 + Math.random()*2400; }
-    } else if (S.mode==='sitting') {
-      if (now > S.nextActionAt) { setMode('walking'); S.nextActionAt = now + 6000 + Math.random()*8000; }
-    } else if (S.mode==='sleeping') {
-      bob = Math.sin(now/900) * 1.2;
-    } else if (S.mode==='playing') {
-      S.x += S.dir * (S.speed*.25) * dt;
-      const m = margin();
-      if (S.x < m)              { S.x = m; S.dir = 1; }
-      if (S.x > innerWidth - m) { S.x = innerWidth - m; S.dir = -1; }
-    }
-    const wrapW = S.wrap.offsetWidth || 76;
-    S.wrap.classList.toggle('flip', S.dir===-1 && S.mode==='walking');
-    S.wrap.style.transform = `translate(${Math.round(S.x - wrapW/2)}px, ${Math.round(-bob)}px)`;
     requestAnimationFrame(tick);
   }
 
-  // External mood API for cat care widget (unchanged interface)
   function showCatOverlay(kind, durationMs) {
     if (!S.wrap) return;
     const existing = S.wrap.querySelector('.opscat-overlay');
     if (existing) existing.remove();
     const map = {
-      eat:    { emoji: '\u{1F371}', side: 'right',  offset: '-32px', anim: 'opscatBob 0.7s ease-in-out infinite' },
-      drink:  { emoji: '\u{1F4A7}', side: 'right',  offset: '-28px', anim: 'opscatBob 0.9s ease-in-out infinite' },
-      ball:   { emoji: '\u{1F3BE}', side: 'right',  offset: '-30px', anim: 'opscatBall 0.55s ease-in-out infinite' },
+      eat:    { emoji: '\u{1F371}', side: 'right',  offset: '-30px', anim: 'opscatBob 0.7s ease-in-out infinite' },
+      drink:  { emoji: '\u{1F4A7}', side: 'right',  offset: '-26px', anim: 'opscatBob 0.9s ease-in-out infinite' },
+      ball:   { emoji: '\u{1F3BE}', side: 'right',  offset: '-32px', anim: 'opscatBall 0.55s ease-in-out infinite' },
       hungry: { emoji: '\u{1F37D}', side: 'left',   offset: '-30px', anim: 'opscatBob 1.2s ease-in-out infinite' }
     };
     const cfg = map[kind];
@@ -3005,41 +2965,71 @@ init();
     const ov = document.createElement('span');
     ov.className = 'opscat-overlay';
     ov.textContent = cfg.emoji;
-    ov.style.cssText = 'position:absolute;font-size:22px;bottom:6px;' + cfg.side + ':' + cfg.offset + ';pointer-events:none;z-index:5;animation:' + cfg.anim + ';';
+    ov.style.cssText = 'position:absolute;font-size:28px;bottom:10px;' + cfg.side + ':' + cfg.offset + ';pointer-events:none;z-index:6;animation:' + cfg.anim + ';';
     S.wrap.appendChild(ov);
-    setTimeout(function() { if (ov.parentNode) ov.remove(); }, durationMs || 5000);
+    setTimeout(function () { if (ov.parentNode) ov.remove(); }, durationMs || 5000);
   }
 
   function performAction(kind, durationMs) {
     const dur = durationMs || 5000;
-    const moodMap = { eat: 'sitting', drink: 'sitting', ball: 'playing', hungry: 'sitting' };
-    const internalMood = moodMap[kind] || 'sitting';
-    S.manualMood = internalMood;
+    S.manualMood = kind;
     S.manualUntil = performance.now() + dur;
-    setMode(internalMood);
+    S.wrap.style.transitionDuration = '0.5s';
+    S.wrap.style.transform = 'translate3d(' + S.x + 'px, ' + (-S.y) + 'px, 0)';
+    clearTimeout(S.moveTimer);
+    clearTimeout(S.arrivalTimer);
+    S.isMoving = false;
+    setMode(kind);
     showCatOverlay(kind, dur);
+    setTimeout(function () {
+      S.manualMood = null;
+      setMode('sitting');
+      scheduleNextMove();
+    }, dur);
   }
 
-  S.el = document.getElementById('opscatEl');
-  S.wrap = document.getElementById('opscatWrap');
-  S.tip = document.getElementById('opscatTip');
-  if (S.el && S.wrap && S.tip) {
-    S.el.innerHTML = buildCatSvg();
-    S.el.className = 'opscat opscat-mode-walking';
-    S.x = innerWidth * 0.5;
-    S.lastT = performance.now();
-    S.nextActionAt = S.lastT + 5000 + Math.random()*5000;
-    evaluate(true);
-    // Interaction wiring
-    S.wrap.addEventListener('click', function(e) {
-      // Shift-click = mood cycle (existing behaviour for those who knew it)
-      if (e.shiftKey) { cycle(); }
-      else { petCat(); }
-    });
-    S.wrap.addEventListener('mousemove', trackPupils);
-    S.wrap.addEventListener('mouseleave', resetPupils);
-    requestAnimationFrame(tick);
+  function petCat() {
+    if (!S.wrap) return;
+    const heart = document.createElement('span');
+    heart.className = 'cat-pet-heart';
+    heart.textContent = '\u{2665}';
+    heart.style.setProperty('--dx', (Math.random() * 40 - 20) + 'px');
+    S.wrap.appendChild(heart);
+    setTimeout(function () { if (heart.parentNode) heart.remove(); }, 1500);
+    const bubble = document.getElementById('opscatBubble');
+    if (bubble) {
+      const purrs = ['Purr purr~', 'Meow! \u{1F49B}', 'Suka pet \u{1F4AB}', '\u{1F60A}', 'Garu lagi please'];
+      bubble.textContent = purrs[Math.floor(Math.random() * purrs.length)];
+      bubble.classList.add('show');
+      clearTimeout(bubble._t);
+      bubble._t = setTimeout(function () { bubble.classList.remove('show'); }, 2500);
+    }
   }
+
+  function boot() {
+    if (!setupDom()) return;
+    S.x = Math.max(80, window.innerWidth / 2 - 90);
+    S.y = 0;
+    S.wrap.style.transform = 'translate3d(' + S.x + 'px, 0, 0)';
+    setMode('sitting');
+    evaluateMood();
+    S.wrap.addEventListener('click', petCat);
+    setTimeout(scheduleNextMove, 1500);
+    requestAnimationFrame(tick);
+    window.addEventListener('resize', function () {
+      const m = 80;
+      S.x = Math.max(m, Math.min(window.innerWidth - m, S.x));
+      S.y = Math.max(0, Math.min(280, S.y));
+      S.wrap.style.transitionDuration = '0s';
+      S.wrap.style.transform = 'translate3d(' + S.x + 'px, ' + (-S.y) + 'px, 0)';
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
   window.OpsCatAPI = { performAction: performAction };
 })();
 </script>

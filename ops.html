@@ -1262,6 +1262,89 @@
     50%      { translate: 0 -10px; }
   }
 
+  /* === Idle behaviour animations: yawn, groom, stretch === */
+  .opscat-wrap.yawning .opscat-img {
+    animation: catYawn 2.6s ease-in-out forwards;
+  }
+  @keyframes catYawn {
+    0%   { transform: scaleY(1) scaleX(1) translateY(0); }
+    25%  { transform: scaleY(1.06) scaleX(0.96) translateY(-2px); }
+    50%  { transform: scaleY(1.13) scaleX(0.93) translateY(-5px); }
+    75%  { transform: scaleY(1.04) scaleX(0.98) translateY(-1px); }
+    100% { transform: scaleY(1) scaleX(1) translateY(0); }
+  }
+
+  .opscat-wrap.grooming .opscat-img {
+    animation: catGroom 4.5s ease-in-out forwards;
+    transform-origin: 50% 90%;
+  }
+  @keyframes catGroom {
+    0%   { transform: rotate(0deg) translateX(0); }
+    15%  { transform: rotate(-7deg) translateX(-3px); }
+    30%  { transform: rotate(8deg) translateX(3px); }
+    45%  { transform: rotate(-5deg) translateX(-2px); }
+    60%  { transform: rotate(6deg) translateX(2px); }
+    75%  { transform: rotate(-3deg) translateX(-1px); }
+    100% { transform: rotate(0deg) translateX(0); }
+  }
+
+  .opscat-wrap.stretching .opscat-img {
+    animation: catStretch 2.4s ease-in-out forwards;
+  }
+  @keyframes catStretch {
+    0%   { transform: scaleX(1) scaleY(1) translateY(0); }
+    35%  { transform: scaleX(1.18) scaleY(0.88) translateY(3px); }
+    65%  { transform: scaleX(1.18) scaleY(0.88) translateY(3px); }
+    100% { transform: scaleX(1) scaleY(1) translateY(0); }
+  }
+
+  /* Behaviour emoji overlay (yawn 🥱 / groom ✨ / stretch 🐈) */
+  .cat-behavior-emoji {
+    position: absolute; top: -22px; left: 50%;
+    transform: translateX(-50%) scale(.6);
+    font-size: 26px; opacity: 0;
+    pointer-events: none; z-index: 7;
+    animation: behaviorEmoji 2.2s ease-out forwards;
+  }
+  @keyframes behaviorEmoji {
+    0%   { transform: translateX(-50%) translateY(0) scale(.5); opacity: 0; }
+    20%  { transform: translateX(-50%) translateY(-4px) scale(1.2); opacity: 1; }
+    80%  { transform: translateX(-50%) translateY(-14px) scale(1); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-22px) scale(.85); opacity: 0; }
+  }
+  .cat-sparkle {
+    position: absolute; pointer-events: none; z-index: 7;
+    font-size: 14px; opacity: 0;
+    animation: sparklePoof 1.6s ease-out forwards;
+  }
+  @keyframes sparklePoof {
+    0%   { transform: translateY(0) scale(.4); opacity: 0; }
+    30%  { transform: translateY(-12px) scale(1.2); opacity: 1; }
+    100% { transform: translate(var(--dx, 0px), -34px) scale(.8); opacity: 0; }
+  }
+
+  /* Walking now includes subtle body lean toward direction */
+  .opscat-wrap.walking .opscat-img {
+    animation: catWalkAll 0.6s ease-in-out infinite;
+  }
+  @keyframes catWalkAll {
+    0%, 100% { transform: scaleY(1) translateY(0) rotate(-1deg); }
+    25%      { transform: scaleY(1.01) translateY(-2px) rotate(.5deg); }
+    50%      { transform: scaleY(1.015) translateY(-3.5px) rotate(1.2deg); }
+    75%      { transform: scaleY(1.005) translateY(-1.5px) rotate(-.3deg); }
+  }
+  /* Flipped cat leans the other direction */
+  .opscat-wrap.walking.flip .opscat-img {
+    animation: catWalkAllFlip 0.6s ease-in-out infinite;
+  }
+  @keyframes catWalkAllFlip {
+    0%, 100% { transform: scaleX(-1) scaleY(1) translateY(0) rotate(1deg); }
+    25%      { transform: scaleX(-1) scaleY(1.01) translateY(-2px) rotate(-.5deg); }
+    50%      { transform: scaleX(-1) scaleY(1.015) translateY(-3.5px) rotate(-1.2deg); }
+    75%      { transform: scaleX(-1) scaleY(1.005) translateY(-1.5px) rotate(.3deg); }
+  }
+
+
   .opscat-wrap:hover .opscat-img { filter: brightness(1.05); }
   .opscat-wrap:active .opscat-img { transform: scale(.95); }
 
@@ -2734,10 +2817,11 @@ init();
 
   function setMode(m) {
     if (S.mode === m) return;
-    S.wrap.classList.remove('walking','sitting','sleeping','playing','eating','drinking','playing-ball','hungry');
+    S.wrap.classList.remove('walking','sitting','sleeping','playing','eating','drinking','playing-ball','hungry','yawning','grooming','stretching');
     S.mode = m;
     const visualClass = { walking:'walking', sitting:'sitting', sleeping:'sleeping',
-      playing:'playing', eat:'sitting', drink:'sitting', ball:'playing', hungry:'sitting' }[m] || 'sitting';
+      playing:'playing', eat:'sitting', drink:'sitting', ball:'playing', hungry:'sitting',
+      yawning:'yawning', grooming:'grooming', stretching:'stretching' }[m] || 'sitting';
     S.wrap.classList.add(visualClass);
     if (S.tip) S.tip.textContent = m;
   }
@@ -2792,6 +2876,11 @@ init();
         scheduleNextMove();
         return;
       }
+      // 35% chance: do an idle behaviour (yawn / groom / stretch) instead of moving
+      if (Math.random() < 0.35) {
+        doIdleBehavior();
+        return;
+      }
       // If user idle 60+ sec, 55% chance to climb a card and rest
       if (isUserIdle(60000) && Math.random() < 0.55) {
         if (tryClimbCard()) return;
@@ -2799,6 +2888,52 @@ init();
       const t = pickTarget();
       moveTo(t.x, t.y);
     }, pause);
+  }
+
+  // === Idle behaviours: yawn, groom, stretch ===
+  function doIdleBehavior() {
+    const behaviors = [
+      { name: 'yawning',    duration: 2600, emoji: '\u{1F971}', bubble: ['*yawn*', 'Mmh~ ngantuk', 'Aaah~'] },
+      { name: 'grooming',   duration: 4500, emoji: '\u{2728}',  bubble: ['*lick lick*', 'Brush brush~', 'Bersih bulu dulu'] },
+      { name: 'stretching', duration: 2400, emoji: '\u{1F408}', bubble: ['Stretch!', '*regang*', 'Aaah lega'] }
+    ];
+    const b = behaviors[Math.floor(Math.random() * behaviors.length)];
+    setMode(b.name);
+    // Show emoji above cat
+    if (b.name === 'grooming') {
+      // Multiple sparkles for grooming
+      for (let i = 0; i < 5; i++) {
+        setTimeout(function () {
+          const sp = document.createElement('span');
+          sp.className = 'cat-sparkle';
+          sp.textContent = '\u{2728}';
+          sp.style.left = (30 + Math.random() * 40) + '%';
+          sp.style.top = (15 + Math.random() * 35) + '%';
+          sp.style.setProperty('--dx', (Math.random() * 30 - 15) + 'px');
+          S.wrap.appendChild(sp);
+          setTimeout(function () { if (sp.parentNode) sp.remove(); }, 1700);
+        }, i * 600);
+      }
+    } else {
+      const ov = document.createElement('span');
+      ov.className = 'cat-behavior-emoji';
+      ov.textContent = b.emoji;
+      S.wrap.appendChild(ov);
+      setTimeout(function () { if (ov.parentNode) ov.remove(); }, 2300);
+    }
+    // Show bubble text
+    const bubble = document.getElementById('opscatBubble');
+    if (bubble) {
+      bubble.textContent = b.bubble[Math.floor(Math.random() * b.bubble.length)];
+      bubble.classList.add('show');
+      clearTimeout(bubble._t);
+      bubble._t = setTimeout(function () { bubble.classList.remove('show'); }, Math.min(b.duration, 2800));
+    }
+    // After behaviour, return to sitting + schedule next
+    setTimeout(function () {
+      setMode('sitting');
+      scheduleNextMove();
+    }, b.duration + 100);
   }
 
   // === Card climbing & resting (idle behaviour) ===

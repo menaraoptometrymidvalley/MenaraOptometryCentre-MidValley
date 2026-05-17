@@ -1262,40 +1262,16 @@
     50%      { translate: 0 -10px; }
   }
 
-  /* === Idle behaviour animations: yawn, groom, stretch === */
-  .opscat-wrap.yawning .opscat-img {
-    animation: catYawn 2.6s ease-in-out forwards;
-  }
-  @keyframes catYawn {
-    0%   { transform: scaleY(1) scaleX(1) translateY(0); }
-    25%  { transform: scaleY(1.06) scaleX(0.96) translateY(-2px); }
-    50%  { transform: scaleY(1.13) scaleX(0.93) translateY(-5px); }
-    75%  { transform: scaleY(1.04) scaleX(0.98) translateY(-1px); }
-    100% { transform: scaleY(1) scaleX(1) translateY(0); }
-  }
-
-  .opscat-wrap.grooming .opscat-img {
-    animation: catGroom 4.5s ease-in-out forwards;
-    transform-origin: 50% 90%;
-  }
-  @keyframes catGroom {
-    0%   { transform: rotate(0deg) translateX(0); }
-    15%  { transform: rotate(-7deg) translateX(-3px); }
-    30%  { transform: rotate(8deg) translateX(3px); }
-    45%  { transform: rotate(-5deg) translateX(-2px); }
-    60%  { transform: rotate(6deg) translateX(2px); }
-    75%  { transform: rotate(-3deg) translateX(-1px); }
-    100% { transform: rotate(0deg) translateX(0); }
-  }
-
+  /* === Idle behaviour: sprite IS the pose, just add subtle settling ===*/
+  .opscat-wrap.yawning .opscat-img,
+  .opscat-wrap.grooming .opscat-img,
   .opscat-wrap.stretching .opscat-img {
-    animation: catStretch 2.4s ease-in-out forwards;
+    animation: catPosePop 0.45s ease-out forwards, catBreathe 4.5s cubic-bezier(.45,.05,.55,.95) 0.45s infinite;
   }
-  @keyframes catStretch {
-    0%   { transform: scaleX(1) scaleY(1) translateY(0); }
-    35%  { transform: scaleX(1.18) scaleY(0.88) translateY(3px); }
-    65%  { transform: scaleX(1.18) scaleY(0.88) translateY(3px); }
-    100% { transform: scaleX(1) scaleY(1) translateY(0); }
+  @keyframes catPosePop {
+    0%   { transform: scale(0.92); opacity: .7; }
+    60%  { transform: scale(1.04); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
   }
 
   /* Behaviour emoji overlay (yawn 🥱 / groom ✨ / stretch 🐈) */
@@ -2790,7 +2766,28 @@ init();
 //  Click to pet. Auto-sleeps 01:00-05:00.
 // =============================================================
 (function () {
-  const IMG_URL = 'https://raw.githubusercontent.com/haz1-90/trading/claude/mdv-dashboard-backend-VkjqT/dashboard/assets/cat-realistic.webp';
+  const BASE = 'https://raw.githubusercontent.com/haz1-90/trading/claude/mdv-dashboard-backend-VkjqT/dashboard/assets/';
+  const POSES = {
+    sitting:    BASE + 'cat-sitting.webp',
+    walking:    BASE + 'cat-walking.webp',
+    walking2:   BASE + 'cat-walking2.webp',
+    yawning:    BASE + 'cat-yawning.webp',
+    grooming:   BASE + 'cat-grooming.webp',
+    sleeping:   BASE + 'cat-sleeping.webp',
+    stretching: BASE + 'cat-stretching.webp',
+    playing:    BASE + 'cat-playing.webp'
+  };
+  // Mode -> sprite key mapping
+  const MODE_SPRITE = {
+    sitting: 'sitting', walking: 'walking',
+    sleeping: 'sleeping', playing: 'playing',
+    yawning: 'yawning', grooming: 'grooming',
+    stretching: 'stretching',
+    eat: 'sitting', drink: 'sitting', ball: 'playing',
+    hungry: 'sitting'
+  };
+  // Preload all sprites so swapping is instant
+  Object.values(POSES).forEach(function(u) { const i = new Image(); i.src = u; });
 
   const S = {
     el: null, wrap: null, tip: null,
@@ -2810,7 +2807,7 @@ init();
     S.wrap = document.getElementById('opscatWrap');
     S.tip = document.getElementById('opscatTip');
     if (!S.el || !S.wrap) return false;
-    S.el.innerHTML = '<img class="opscat-img" src="' + IMG_URL + '" alt="cat" draggable="false">' +
+    S.el.innerHTML = '<img class="opscat-img" id="opscatSprite" src="' + POSES.sitting + '" alt="cat" draggable="false">' +
                      '<span class="opscat-zzz">Z<span style="font-size:13px;margin-left:2px">z</span></span>';
     return true;
   }
@@ -2824,6 +2821,21 @@ init();
       yawning:'yawning', grooming:'grooming', stretching:'stretching' }[m] || 'sitting';
     S.wrap.classList.add(visualClass);
     if (S.tip) S.tip.textContent = m;
+    // Swap sprite to match mode
+    const spriteKey = MODE_SPRITE[m] || 'sitting';
+    const img = document.getElementById('opscatSprite');
+    if (img && POSES[spriteKey]) img.src = POSES[spriteKey];
+    // If walking, start the leg-cycle (alternating two walking poses)
+    clearInterval(S.walkCycle);
+    S.walkCycle = null;
+    if (m === 'walking') {
+      let flipFrame = false;
+      S.walkCycle = setInterval(function() {
+        flipFrame = !flipFrame;
+        const i = document.getElementById('opscatSprite');
+        if (i) i.src = POSES[flipFrame ? 'walking2' : 'walking'];
+      }, 320); // alternate every 320ms = ~3 steps/sec
+    }
   }
 
   function pickTarget() {

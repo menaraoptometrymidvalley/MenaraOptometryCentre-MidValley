@@ -2080,5 +2080,181 @@ init();
   }
 })();
 </script>
-</body>
+<!-- Backdrop fix + Prayer times + Cat phrases -->
+<script>
+(function() {
+  // ===== Styles for prayer line + cat bubble =====
+  const styles = document.createElement('style');
+  styles.textContent = `
+    .prayer-line {
+      display: flex; align-items: baseline; gap: 14px;
+      line-height: 1; margin-top: 4px; flex-wrap: wrap;
+    }
+    .prayer-name {
+      font-size: clamp(40px, 6.5vw, 64px);
+      font-weight: 800; color: var(--text);
+      letter-spacing: -1px; line-height: 1;
+    }
+    .prayer-time {
+      font-size: clamp(24px, 4.2vw, 36px);
+      font-weight: 700; color: var(--accent);
+      font-variant-numeric: tabular-nums; line-height: 1;
+    }
+    .hijri-line {
+      font-size: 13px; color: var(--muted);
+      font-weight: 600; letter-spacing: .5px; margin-top: 8px;
+    }
+    @media (max-width: 600px) {
+      .prayer-name { font-size: 36px; }
+      .prayer-time { font-size: 22px; }
+    }
+    .opscat-bubble {
+      position: absolute; bottom: calc(100% + 8px); left: 50%;
+      transform: translateX(-50%) translateY(6px);
+      background: #fff; color: var(--text);
+      border: 1.5px solid var(--primary);
+      padding: 6px 12px; border-radius: 14px;
+      font-size: 11px; font-weight: 700;
+      white-space: nowrap; letter-spacing: .2px;
+      box-shadow: 0 6px 14px rgba(27,20,100,.18);
+      opacity: 0; pointer-events: none; z-index: 6;
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    .opscat-bubble.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .opscat-bubble::after {
+      content: ''; position: absolute; top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent; border-top-color: var(--primary);
+    }
+    .opscat-bubble::before {
+      content: ''; position: absolute; top: calc(100% - 1.5px); left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent; border-top-color: #fff; z-index: 1;
+    }
+  `;
+  document.head.appendChild(styles);
+
+  // ===== Make backdrop more visible + mobile-friendly =====
+  function fixBackdrop() {
+    let bgImg = '';
+    try { bgImg = getComputedStyle(document.body, '::before').backgroundImage || ''; } catch(e){}
+    if (!bgImg || !bgImg.includes('data:image')) return;
+    document.documentElement.style.background =
+      `linear-gradient(180deg, rgba(247,247,245,.30) 0%, rgba(247,247,245,.55) 55%, rgba(247,247,245,.75) 100%), ` +
+      `${bgImg} center 38% / cover no-repeat fixed, #f7f7f5`;
+    const hide = document.createElement('style');
+    hide.textContent = `body::before, body::after { display: none !important; }`;
+    document.head.appendChild(hide);
+  }
+
+  // ===== Insert prayer line + hijri line into hero =====
+  function setupHero() {
+    const day = document.getElementById('todayDayName');
+    const rest = document.getElementById('todayFullDate');
+    if (!day || document.getElementById('nextPrayerName')) return;
+    day.style.display = 'none';
+    if (rest) rest.style.display = 'none';
+    const prayer = document.createElement('div');
+    prayer.className = 'prayer-line';
+    prayer.innerHTML = '<span class="prayer-name" id="nextPrayerName">Memuat…</span><span class="prayer-time" id="nextPrayerTime">—</span>';
+    day.parentNode.insertBefore(prayer, day);
+    const hijri = document.createElement('div');
+    hijri.className = 'hijri-line';
+    hijri.id = 'hijriLine';
+    hijri.textContent = '—';
+    day.parentNode.insertBefore(hijri, day);
+  }
+
+  // ===== Aladhan API (JAKIM method 17 for KL) =====
+  const PRAYERS = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+  const NAMES_MY = { Fajr:'Subuh', Dhuhr:'Zohor', Asr:'Asar', Maghrib:'Maghrib', Isha:'Isyak' };
+  const HIJRI_MY = ['Muharram','Safar','Rabiulawal','Rabiulakhir','Jamadilawal','Jamadilakhir','Rejab','Syaaban','Ramadan','Syawal','Zulkaedah','Zulhijjah'];
+  let prayerCache = null;
+
+  async function fetchPrayers() {
+    try {
+      const d = new Date();
+      const dd = String(d.getDate()).padStart(2,'0');
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const url = `https://api.aladhan.com/v1/timingsByCity/${dd}-${mm}-${d.getFullYear()}?city=Kuala+Lumpur&country=Malaysia&method=17`;
+      const res = await fetch(url);
+      const json = await res.json();
+      if (json.code !== 200 || !json.data) throw new Error('bad');
+      prayerCache = json.data;
+    } catch (e) { console.warn('Prayer fetch failed:', e); }
+  }
+
+  function fmt12(t24) {
+    const [h,m] = t24.split(':').map(Number);
+    const ap = h >= 12 ? 'PM' : 'AM';
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${h12}:${String(m).padStart(2,'0')} ${ap}`;
+  }
+
+  function renderPrayer() {
+    if (!prayerCache) return;
+    const nameEl = document.getElementById('nextPrayerName');
+    const timeEl = document.getElementById('nextPrayerTime');
+    const hijriEl = document.getElementById('hijriLine');
+    if (!nameEl) return;
+    const t = prayerCache.timings;
+    const now = new Date();
+    const cur = now.getHours()*60 + now.getMinutes();
+    let nxt = null;
+    for (const p of PRAYERS) {
+      const [hh,mm] = t[p].split(':').map(Number);
+      if (hh*60 + mm > cur) { nxt = {key:p, time:t[p]}; break; }
+    }
+    if (!nxt) nxt = {key:'Fajr', time:t.Fajr, tom:true};
+    nameEl.textContent = NAMES_MY[nxt.key] + (nxt.tom ? ' (esok)' : '');
+    timeEl.textContent = fmt12(nxt.time);
+    const h = prayerCache.date && prayerCache.date.hijri;
+    if (h && hijriEl) {
+      const mIdx = parseInt(h.month.number,10) - 1;
+      hijriEl.textContent = `${parseInt(h.day,10)} ${HIJRI_MY[mIdx] || h.month.en} ${h.year}H`;
+    }
+  }
+
+  // ===== Cat speech bubble =====
+  const PHRASES = [
+    "Hi, how are you?", "Ganbatte! 💪", "Hari yang ceria!", "Semangat ya!",
+    "Senyum dulu 😊", "Awak hebat!", "Coffee break?", "Meow~ 🐾",
+    "You got this!", "Take a breath", "Selamat datang!", "Stay focused!",
+    "Patient first 💙", "Almost there!", "Bismillah 🤲", "Rest sikit",
+    "Keep going!", "Jangan stress", "Be kind 💛", "Eyes on prize 👀"
+  ];
+  function injectBubble() {
+    const wrap = document.getElementById('opscatWrap');
+    if (!wrap || document.getElementById('opscatBubble')) return;
+    const b = document.createElement('span');
+    b.className = 'opscat-bubble'; b.id = 'opscatBubble';
+    wrap.appendChild(b);
+  }
+  function showBubble() {
+    const b = document.getElementById('opscatBubble');
+    if (!b) return;
+    b.textContent = PHRASES[Math.floor(Math.random()*PHRASES.length)];
+    b.classList.add('show');
+    clearTimeout(b._t);
+    b._t = setTimeout(() => b.classList.remove('show'), 4500);
+  }
+  function scheduleBubble() {
+    setTimeout(() => { showBubble(); scheduleBubble(); }, 10000 + Math.random()*12000);
+  }
+
+  // ===== Boot =====
+  async function boot() {
+    fixBackdrop();
+    setupHero();
+    injectBubble();
+    await fetchPrayers();
+    renderPrayer();
+    setInterval(renderPrayer, 60*1000);
+    setInterval(fetchPrayers, 30*60*1000);
+    setTimeout(() => { showBubble(); scheduleBubble(); }, 4000);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script></body>
 </html>

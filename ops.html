@@ -1262,6 +1262,21 @@
     50%      { translate: 0 -10px; }
   }
 
+  /* Food/water/ball item dropped on the floor */
+  .cat-food-item {
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.3));
+    transform-origin: 50% 100%;
+  }
+  @keyframes catItemDrop {
+    0%   { transform: translateY(-80px) scale(.5); opacity: 0; }
+    60%  { transform: translateY(8px) scale(1.15); opacity: 1; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  @keyframes catBallBounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-18px) rotate(180deg); }
+  }
+
   /* === Idle behaviour: sprite IS the pose, just gentle continuous breathing === */
   .opscat-wrap.yawning .opscat-img,
   .opscat-wrap.grooming .opscat-img,
@@ -3125,38 +3140,108 @@ init();
   }
 
   function performAction(kind, durationMs) {
-    const dur = durationMs || 5000;
-    S.manualMood = kind;
-    S.manualUntil = performance.now() + dur;
-    S.wrap.style.transitionDuration = '0.5s';
-    S.wrap.style.transform = 'translate3d(' + S.x + 'px, ' + (-S.y) + 'px, 0)';
+    const dur = durationMs || 6000;
+    S.manualMood = 'walking-to-action';
+    S.manualUntil = performance.now() + dur + 3000;
     clearTimeout(S.moveTimer);
     clearTimeout(S.arrivalTimer);
-    S.isMoving = false;
-    setMode(kind);
-    showCatOverlay(kind, dur);
-    setTimeout(function () {
-      S.manualMood = null;
-      setMode('sitting');
-      scheduleNextMove();
-    }, dur);
+
+    // Climb down from card if needed
+    if (S.boundCard && typeof climbDownFromCard === 'function') {
+      climbDownFromCard();
+    }
+
+    // Place a bowl/ball at a fixed spot in viewport
+    const emojiMap = { eat: '\u{1F371}', drink: '\u{1F4A7}', ball: '\u{1F3BE}', hungry: '\u{1F37D}' };
+    const itemEmoji = emojiMap[kind] || '\u{2728}';
+    const item = document.createElement('div');
+    item.className = 'cat-food-item';
+    item.textContent = itemEmoji;
+    // Place item somewhere on screen - prefer center-bottom but offset from cat
+    const vw = window.innerWidth;
+    const itemX = Math.max(120, Math.min(vw - 120, vw * (0.3 + Math.random() * 0.4)));
+    const itemY = 30 + Math.random() * 60;
+    item.style.cssText = 'position:fixed;left:' + itemX + 'px;bottom:' + itemY + 'px;font-size:42px;z-index:4;pointer-events:none;animation:catItemDrop .5s cubic-bezier(.4,1.5,.5,1) forwards;';
+    document.body.appendChild(item);
+
+    // Cat walks to the item
+    const targetX = itemX - 70; // stand slightly left of item
+    S.facingLeft = targetX < S.x;
+    S.wrap.classList.toggle('flip', S.facingLeft);
+    setMode('walking');
+    const walkDur = 2.2;
+    S.wrap.style.transitionDuration = walkDur + 's';
+    S.wrap.style.transitionTimingFunction = 'cubic-bezier(.45,.05,.55,.95)';
+    S.wrap.style.transform = 'translate3d(' + targetX + 'px, ' + (-itemY) + 'px, 0)';
+    S.x = targetX;
+    S.y = itemY;
+
+    // On arrival, switch to action pose
+    clearTimeout(S.arrivalTimer);
+    S.arrivalTimer = setTimeout(function () {
+      setMode(kind); // 'eat' = sitting sprite, 'drink' = sitting, 'ball' = playing
+      // For ball, make it bounce around between cat and item
+      if (kind === 'ball') {
+        item.style.animation = 'catBallBounce 0.8s ease-in-out infinite';
+      } else {
+        // Item shrinks as cat 'eats/drinks' it
+        item.style.transition = 'transform ' + (dur / 1000) + 's ease-out, opacity .5s ease-out ' + ((dur - 500) / 1000) + 's';
+        item.style.transform = 'scale(0.3)';
+        setTimeout(function() { item.style.opacity = '0'; }, dur - 500);
+      }
+      // After action ends, remove item and resume
+      setTimeout(function () {
+        if (item.parentNode) item.remove();
+        S.manualMood = null;
+        setMode('sitting');
+        scheduleNextMove();
+      }, dur);
+    }, walkDur * 1000 + 50);
   }
 
   function petCat() {
     if (!S.wrap) return;
-    const heart = document.createElement('span');
-    heart.className = 'cat-pet-heart';
-    heart.textContent = '\u{2665}';
-    heart.style.setProperty('--dx', (Math.random() * 40 - 20) + 'px');
-    S.wrap.appendChild(heart);
-    setTimeout(function () { if (heart.parentNode) heart.remove(); }, 1500);
+    const wasSleeping = (S.mode === 'sleeping');
+    // Wake the cat if sleeping (auto-sleep at night, or resting on card)
+    if (wasSleeping) {
+      // If resting on card, climb down
+      if (S.boundCard && typeof climbDownFromCard === 'function') {
+        climbDownFromCard();
+      } else {
+        // Time-based sleep: stay awake for 45 seconds, then check time again
+        S.manualMood = 'sitting';
+        S.manualUntil = performance.now() + 45000;
+        setMode('sitting');
+      }
+    } else if (S.mode !== 'walking' && S.mode !== 'playing') {
+      // Brief happy reaction
+      setMode('playing');
+      setTimeout(function () {
+        S.manualMood = null;
+        setMode('sitting');
+      }, 1500);
+    }
+    // Multiple hearts float up
+    const heartCount = wasSleeping ? 2 : 4;
+    for (let i = 0; i < heartCount; i++) {
+      const heart = document.createElement('span');
+      heart.className = 'cat-pet-heart';
+      heart.textContent = '\u{2665}';
+      heart.style.setProperty('--dx', (Math.random() * 50 - 25) + 'px');
+      heart.style.animationDelay = (i * 0.12) + 's';
+      S.wrap.appendChild(heart);
+      setTimeout(function () { if (heart.parentNode) heart.remove(); }, 1600 + i * 120);
+    }
+    // Bubble — different message if waking from sleep
     const bubble = document.getElementById('opscatBubble');
     if (bubble) {
-      const purrs = ['Purr purr~', 'Meow! \u{1F49B}', 'Suka pet \u{1F4AB}', '\u{1F60A}', 'Garu lagi please'];
-      bubble.textContent = purrs[Math.floor(Math.random() * purrs.length)];
+      const wakeMsgs = ['Hmm? *yawn* \u{1F971}', 'Aaa~ awake', 'Oh hello there \u{1F60A}', 'Apa kena pet-pet ni \u{1F60C}'];
+      const purrs   = ['Purr purr~ \u{1F49B}', 'Meow! Suka!', 'Best gila pet macam ni', 'Lagi! Lagi! \u{1F4AB}', 'Geli geli sayang \u{1F60A}', 'Aaa best~'];
+      const msgs = wasSleeping ? wakeMsgs : purrs;
+      bubble.textContent = msgs[Math.floor(Math.random() * msgs.length)];
       bubble.classList.add('show');
       clearTimeout(bubble._t);
-      bubble._t = setTimeout(function () { bubble.classList.remove('show'); }, 2500);
+      bubble._t = setTimeout(function () { bubble.classList.remove('show'); }, 2800);
     }
   }
 

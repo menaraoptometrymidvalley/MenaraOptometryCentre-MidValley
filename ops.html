@@ -1193,10 +1193,8 @@
   .opscat-wrap.flip .opscat { transform: scaleX(-1); }
   .opscat { transition: transform 220ms ease; transform-origin: 50% 100%; }
   .opscat svg { width: 76px; height: 76px; image-rendering: pixelated; display: block; }
-  .opscat-mode-sitting, .opscat-mode-walking { transform: scale(1); }
-  .opscat-mode-watching { transform: scale(1.04); }
-  .opscat-mode-sleeping { transform: rotate(-78deg) translate(-18px, -6px) scale(.9); }
-  .opscat-mode-playing  { animation: opscatHop 850ms ease-in-out infinite; transform-origin: 50% 100%; }
+  /* Cat mode transforms now applied via inner .cat-whole — see realistic cat block below */
+  .opscat { transition: transform 220ms ease; }
   @keyframes opscatHop {
     0%, 100% { transform: scaleY(.95) translateY(2px)  rotate(0deg); }
     25%      { transform: scaleY(1.10) translateY(-12px) rotate(-4deg); }
@@ -1217,6 +1215,189 @@
   @media (max-width: 480px) {
     .opscat-wrap { width: 58px; height: 78px; }
     .opscat svg { width: 58px; height: 58px; }
+  }
+
+  /* === Realistic vector cat ============================================ */
+  .opscat { width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; }
+  .cat-svg {
+    width: 100%; height: 100%; overflow: visible;
+    filter: drop-shadow(0 4px 6px rgba(58,42,30,0.35));
+    transition: transform .25s ease;
+  }
+  .opscat-wrap { cursor: pointer; }
+  .opscat-wrap:hover .cat-svg { transform: translateY(-1px); }
+  .opscat-wrap:active .cat-svg { transform: scale(.97); }
+
+  /* Breathing — always on, very gentle */
+  .cat-body {
+    transform-origin: 50% 92%;
+    animation: catBreathe 3.4s cubic-bezier(.45,.05,.55,.95) infinite;
+  }
+  @keyframes catBreathe {
+    0%, 100% { transform: scaleY(1) translateY(0); }
+    50%      { transform: scaleY(1.025) translateY(-0.4px); }
+  }
+
+  /* Tail sway — always on */
+  .cat-tail {
+    transform-origin: 25% 73%;
+    animation: catTailSway 3.8s ease-in-out infinite;
+    transform-box: fill-box;
+  }
+  @keyframes catTailSway {
+    0%, 100% { transform: rotate(-7deg); }
+    50%      { transform: rotate(7deg); }
+  }
+  .opscat-wrap:hover .cat-tail { animation-duration: 1.6s; }
+
+  /* Blinking — closed for a moment every 5.5s */
+  .cat-eyelids {
+    opacity: 0;
+    transform-origin: 50% 40%;
+    animation: catBlink 5.5s steps(1, end) infinite;
+  }
+  @keyframes catBlink {
+    0%, 93%, 100% { opacity: 0; transform: scaleY(0); }
+    94%, 96%      { opacity: 1; transform: scaleY(1); }
+  }
+
+  /* Pupil smooth transition for cursor tracking */
+  .cat-pupil { transition: transform .2s ease-out; transform-box: fill-box; transform-origin: center; }
+
+  /* Iris animation when hovering */
+  .opscat-wrap:hover .cat-iris { transform: translateY(-0.4px); }
+
+  /* === Mode-specific animations ======================================= */
+  .opscat-mode-walking .cat-whole { animation: catWalkBob 0.7s cubic-bezier(.45,.05,.55,.95) infinite; }
+  .opscat-mode-walking .cat-leg-fl, .opscat-mode-walking .cat-leg-br {
+    animation: catLegA 0.7s cubic-bezier(.45,.05,.55,.95) infinite;
+    transform-origin: 50% 5%; transform-box: fill-box;
+  }
+  .opscat-mode-walking .cat-leg-fr, .opscat-mode-walking .cat-leg-bl {
+    animation: catLegB 0.7s cubic-bezier(.45,.05,.55,.95) infinite;
+    transform-origin: 50% 5%; transform-box: fill-box;
+  }
+  @keyframes catWalkBob {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50%      { transform: translateY(-1.4px) rotate(.6deg); }
+  }
+  @keyframes catLegA {
+    0%, 100% { transform: rotate(-10deg); }
+    50%      { transform: rotate(10deg); }
+  }
+  @keyframes catLegB {
+    0%, 100% { transform: rotate(10deg); }
+    50%      { transform: rotate(-10deg); }
+  }
+
+  .opscat-mode-sitting .cat-whole { transform: translateY(2px); }
+
+  .opscat-mode-watching .cat-head {
+    animation: catWatch 1.4s ease-in-out infinite;
+    transform-origin: 50% 60%; transform-box: fill-box;
+  }
+  @keyframes catWatch {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-0.6px) scale(1.015); }
+  }
+
+  .opscat-mode-sleeping .cat-whole {
+    transform: rotate(-72deg) translate(-12px, 2px) scale(0.92);
+    transform-origin: 50% 80%;
+  }
+  .opscat-mode-sleeping .cat-eyelids { opacity: 1 !important; animation: none; transform: scaleY(1); }
+  .opscat-mode-sleeping .cat-body { animation: catSleepBreath 4s ease-in-out infinite; }
+  @keyframes catSleepBreath {
+    0%, 100% { transform: scaleY(1); }
+    50%      { transform: scaleY(1.06); }
+  }
+
+  .opscat-mode-playing .cat-whole {
+    animation: catPlayBounce 0.9s cubic-bezier(.5,.05,.5,1) infinite;
+    transform-origin: 50% 92%;
+  }
+  @keyframes catPlayBounce {
+    0%, 100% { transform: scaleY(1) translateY(0) rotate(0); }
+    25%      { transform: scaleY(1.08) translateY(-10px) rotate(-3deg); }
+    50%      { transform: scaleY(0.94) translateY(2px); }
+    75%      { transform: scaleY(1.05) translateY(-6px) rotate(3deg); }
+  }
+
+  /* Flip whole cat horizontally when walking left */
+  .opscat-wrap.flip .cat-svg { transform: scaleX(-1); }
+
+  /* Pet (click) reaction: gentle wiggle + heart hearts float up */
+  .cat-purr .cat-body { animation: catPurr 0.35s ease-in-out 4, catBreathe 3.4s cubic-bezier(.45,.05,.55,.95) infinite; }
+  @keyframes catPurr {
+    0%, 100% { transform: scaleY(1); }
+    50%      { transform: scaleY(1.05); }
+  }
+  .cat-pet-heart {
+    position: absolute; bottom: 70%; font-size: 16px; pointer-events: none;
+    animation: catHeartFloat 1.4s ease-out forwards;
+  }
+  @keyframes catHeartFloat {
+    0%   { transform: translateY(0) scale(.5); opacity: 0; }
+    20%  { transform: translateY(-6px) scale(1.2); opacity: 1; }
+    100% { transform: translateY(-50px) scale(1) rotate(15deg); opacity: 0; }
+  }
+
+  /* === Realistic plant SVG ============================================ */
+  .sakura-svg {
+    width: 100%; height: 100%;
+    filter: drop-shadow(0 6px 10px rgba(75,50,35,0.25));
+    transition: transform .4s ease;
+    cursor: pointer;
+  }
+  .sakura-display:hover .sakura-svg { transform: scale(1.05) translateY(-2px); }
+  .sakura-display:active .sakura-svg { transform: scale(0.98); }
+
+  /* Tree sway (always on) */
+  .sakura-tree {
+    transform-origin: 50% 100%;
+    animation: treeSway 7s ease-in-out infinite;
+    transform-box: fill-box;
+  }
+  @keyframes treeSway {
+    0%, 100% { transform: rotate(-0.7deg); }
+    50%      { transform: rotate(0.7deg); }
+  }
+
+  /* Shake on click */
+  .sakura-svg.tree-shake { animation: treeShake 0.7s cubic-bezier(.36,.07,.19,.97); }
+  @keyframes treeShake {
+    0%, 100%        { transform: scale(1.05) rotate(0); }
+    10%, 30%, 50%, 70%, 90% { transform: scale(1.05) rotate(-2deg); }
+    20%, 40%, 60%, 80%      { transform: scale(1.05) rotate(2deg); }
+  }
+
+  /* Falling petals */
+  .petal-fall {
+    transform-origin: center; transform-box: fill-box;
+    animation: petalFall var(--dur, 4s) ease-in infinite;
+    animation-delay: var(--dly, 0s);
+  }
+  .petal-1 { --dur: 3.6s; --dly: 0s;   }
+  .petal-2 { --dur: 4.4s; --dly: 1.4s; }
+  .petal-3 { --dur: 3.9s; --dly: 2.6s; }
+  @keyframes petalFall {
+    0%   { transform: translate(0, 0) rotate(0); opacity: 1; }
+    100% { transform: translate(8px, 60px) rotate(280deg); opacity: 0; }
+  }
+
+  /* Blossom hover-grow */
+  .blossom { cursor: pointer; transition: transform .25s cubic-bezier(.5,1.5,.5,1); transform-box: fill-box; transform-origin: center; }
+  .blossom:hover { transform: scale(1.4); }
+
+  /* Burst petals from shake */
+  @keyframes burstPetal {
+    0%   { transform: translate(-50%, 0) scale(.5) rotate(0); opacity: 0; }
+    20%  { opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--bx,0px)), 100px) scale(1) rotate(var(--brot,360deg)); opacity: 0; }
+  }
+  .burst-petal {
+    position: absolute; top: 30%; left: 50%; font-size: 14px; pointer-events: none;
+    animation: burstPetal 2.2s ease-in forwards;
   }
 </style>
 </head>
@@ -2572,72 +2753,119 @@ init();
 })();
 
 // =============================================================
-//  WALKING PIXEL CAT — pure SVG, Menara palette
-//  Click to cycle moods. Auto-sleeps 22:00–06:00.
+//  REALISTIC VECTOR CAT — single SVG, CSS-driven animations
+//  Click to pet (Shift+click to cycle mood). Auto-sleeps 22:00-06:00.
 // =============================================================
 (function () {
-  const G='#5b4636', GD='#3b2a1e', GH='#a07e5c', EYE='#1B1464', NOSE='#ED1C24';
-  const px = (x,y,w,h,c) => `<rect x="${x*4}" y="${y*4}" width="${w*4}" height="${h*4}" fill="${c}"/>`;
-  const svg = p => `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">${p}</svg>`;
-
-  const POSES = {
-    sitting: () => svg([
-      px(3,4,2,2,G),px(11,4,2,2,G),px(3,5,1,1,GD),px(12,5,1,1,GD),
-      px(3,6,10,4,G),px(3,9,10,1,GD),px(5,7,1,1,EYE),px(10,7,1,1,EYE),
-      px(7,8,2,1,NOSE),px(4,10,8,4,G),px(4,13,8,1,GD),
-      px(12,11,2,1,G),px(13,10,1,1,G),px(5,14,2,1,GH),px(9,14,2,1,GH)
-    ].join('')),
-    walkingA: () => svg([
-      px(3,4,2,2,G),px(11,4,2,2,G),px(3,5,1,1,GD),px(12,5,1,1,GD),
-      px(3,6,10,4,G),px(3,9,10,1,GD),px(5,7,1,1,EYE),px(10,7,1,1,EYE),
-      px(7,8,2,1,NOSE),px(4,10,8,4,G),px(4,13,8,1,GD),
-      px(12,9,1,1,G),px(13,8,1,1,G),px(13,7,1,1,G),
-      px(4,14,2,1,GH),px(10,14,2,1,GH)
-    ].join('')),
-    walkingB: () => svg([
-      px(3,4,2,2,G),px(11,4,2,2,G),px(3,5,1,1,GD),px(12,5,1,1,GD),
-      px(3,6,10,4,G),px(3,9,10,1,GD),px(5,7,1,1,EYE),px(10,7,1,1,EYE),
-      px(7,8,2,1,NOSE),px(4,10,8,4,G),px(4,13,8,1,GD),
-      px(12,10,1,1,G),px(13,9,1,1,G),px(13,10,1,1,G),
-      px(6,14,2,1,GH),px(8,14,2,1,GH)
-    ].join('')),
-    watching: () => svg([
-      px(3,4,2,2,G),px(11,4,2,2,G),px(3,5,1,1,GD),px(12,5,1,1,GD),
-      px(3,6,10,4,G),px(3,9,10,1,GD),
-      px(5,7,2,2,EYE),px(9,7,2,2,EYE),px(6,7,1,1,GH),px(10,7,1,1,GH),
-      px(7,9,2,1,NOSE),px(5,10,6,3,G),px(5,12,6,1,GD),
-      px(11,11,2,1,G),px(13,10,1,1,G)
-    ].join('')),
-    playing: () => svg([
-      px(3,5,2,2,G),px(11,5,2,2,G),px(3,6,1,1,GD),px(12,6,1,1,GD),
-      px(3,7,10,4,G),px(3,10,10,1,GD),px(5,8,1,1,EYE),px(10,8,1,1,EYE),
-      px(7,9,2,1,NOSE),px(4,11,8,2,G),px(4,12,8,1,GH),
-      px(3,11,1,1,GH),px(12,11,1,1,GH),px(13,8,1,1,G),px(14,9,1,1,G)
-    ].join('')),
-    sleeping: () => svg([
-      px(3,7,2,2,G),px(11,7,2,2,G),px(3,8,1,1,GD),px(12,8,1,1,GD),
-      px(3,9,10,4,G),px(3,12,10,1,GD),
-      px(5,10,2,1,EYE),px(9,10,2,1,EYE),px(7,11,2,1,NOSE),px(2,11,1,2,G),
-      px(13,5,1,1,GH),px(14,4,1,1,GH),px(13,6,1,1,GH)
-    ].join('')),
-  };
+  // === Realistic vector cat — single static SVG, CSS-driven animations ===
+  function buildCatSvg() {
+    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="cat-svg" preserveAspectRatio="xMidYMax meet">'
+      + '<defs>'
+        + '<linearGradient id="furG" x1="0" y1="0" x2="0" y2="1">'
+          + '<stop offset="0%" stop-color="#b8895f"/>'
+          + '<stop offset="55%" stop-color="#825939"/>'
+          + '<stop offset="100%" stop-color="#523822"/>'
+        + '</linearGradient>'
+        + '<radialGradient id="bellyG" cx="0.5" cy="0.55" r="0.5">'
+          + '<stop offset="0%" stop-color="#e8c597" stop-opacity="0.75"/>'
+          + '<stop offset="100%" stop-color="#b8895f" stop-opacity="0"/>'
+        + '</radialGradient>'
+        + '<radialGradient id="cheekG" cx="0.5" cy="0.5" r="0.5">'
+          + '<stop offset="0%" stop-color="#e8a8a8" stop-opacity="0.4"/>'
+          + '<stop offset="100%" stop-color="#e8a8a8" stop-opacity="0"/>'
+        + '</radialGradient>'
+        + '<radialGradient id="eyeG" cx="0.35" cy="0.35" r="0.65">'
+          + '<stop offset="0%" stop-color="#4338ca"/>'
+          + '<stop offset="55%" stop-color="#2d2399"/>'
+          + '<stop offset="100%" stop-color="#1B1464"/>'
+        + '</radialGradient>'
+      + '</defs>'
+      + '<g class="cat-whole">'
+        // Tail behind everything
+        + '<g class="cat-tail">'
+          + '<path d="M 25 73 Q 12 68 7 53 Q 4 42 13 33 Q 18 30 22 33" stroke="url(#furG)" stroke-width="6.5" fill="none" stroke-linecap="round"/>'
+          + '<path d="M 25 73 Q 13 68 9 55" stroke="#3d2818" stroke-width="0.5" fill="none" stroke-linecap="round" opacity="0.35"/>'
+        + '</g>'
+        // Back legs (slightly behind body)
+        + '<ellipse class="cat-leg cat-leg-bl" cx="36" cy="85" rx="6" ry="9" fill="url(#furG)"/>'
+        + '<ellipse class="cat-leg cat-leg-br" cx="64" cy="85" rx="6" ry="9" fill="url(#furG)"/>'
+        // Body
+        + '<g class="cat-body">'
+          + '<ellipse cx="50" cy="72" rx="24" ry="20" fill="url(#furG)"/>'
+          + '<ellipse cx="50" cy="78" rx="16" ry="12" fill="url(#bellyG)"/>'
+        + '</g>'
+        // Front legs
+        + '<ellipse class="cat-leg cat-leg-fl" cx="42" cy="89" rx="5" ry="7" fill="url(#furG)"/>'
+        + '<ellipse class="cat-leg cat-leg-fr" cx="58" cy="89" rx="5" ry="7" fill="url(#furG)"/>'
+        // Paw pads
+        + '<ellipse cx="42" cy="94" rx="4" ry="2" fill="#3b2a1e" opacity="0.55"/>'
+        + '<ellipse cx="58" cy="94" rx="4" ry="2" fill="#3b2a1e" opacity="0.55"/>'
+        // Head
+        + '<g class="cat-head">'
+          // Ears outer
+          + '<path d="M 28 32 L 22 13 L 43 25 Z" fill="url(#furG)"/>'
+          + '<path d="M 72 32 L 78 13 L 57 25 Z" fill="url(#furG)"/>'
+          // Ears inner (pink)
+          + '<path d="M 30 28 L 26 18 L 39 26 Z" fill="#e8a8a8" opacity="0.85"/>'
+          + '<path d="M 70 28 L 74 18 L 61 26 Z" fill="#e8a8a8" opacity="0.85"/>'
+          // Face shape
+          + '<ellipse cx="50" cy="43" rx="22" ry="20" fill="url(#furG)"/>'
+          // Cheek blush
+          + '<ellipse cx="32" cy="49" rx="9" ry="6" fill="url(#cheekG)"/>'
+          + '<ellipse cx="68" cy="49" rx="9" ry="6" fill="url(#cheekG)"/>'
+          // Eye whites
+          + '<g class="cat-eyes">'
+            + '<ellipse cx="40" cy="40" rx="4.2" ry="5" fill="#fff"/>'
+            + '<ellipse cx="60" cy="40" rx="4.2" ry="5" fill="#fff"/>'
+            // Irises
+            + '<ellipse class="cat-iris" cx="40" cy="40" rx="3.4" ry="4.3" fill="url(#eyeG)"/>'
+            + '<ellipse class="cat-iris" cx="60" cy="40" rx="3.4" ry="4.3" fill="url(#eyeG)"/>'
+            // Pupils
+            + '<ellipse class="cat-pupil" cx="40" cy="40" rx="1.3" ry="3.6" fill="#000"/>'
+            + '<ellipse class="cat-pupil" cx="60" cy="40" rx="1.3" ry="3.6" fill="#000"/>'
+            // Highlights
+            + '<circle cx="41" cy="38" r="1" fill="#fff"/>'
+            + '<circle cx="61" cy="38" r="1" fill="#fff"/>'
+          + '</g>'
+          // Eyelids — closed during blink
+          + '<g class="cat-eyelids">'
+            + '<path d="M 35 40 Q 40 44 45 40 L 45 38 L 35 38 Z" fill="url(#furG)"/>'
+            + '<path d="M 55 40 Q 60 44 65 40 L 65 38 L 55 38 Z" fill="url(#furG)"/>'
+          + '</g>'
+          // Nose
+          + '<path d="M 47 50 L 53 50 L 50 53.5 Z" fill="#ED1C24"/>'
+          + '<path d="M 47.5 50.3 Q 50 51 52.5 50.3" stroke="#a01018" stroke-width="0.3" fill="none"/>'
+          // Mouth
+          + '<path d="M 50 54 Q 47 57.5 44 56.5" stroke="#3b2a1e" stroke-width="0.7" fill="none" stroke-linecap="round"/>'
+          + '<path d="M 50 54 Q 53 57.5 56 56.5" stroke="#3b2a1e" stroke-width="0.7" fill="none" stroke-linecap="round"/>'
+          // Whiskers
+          + '<g class="cat-whiskers" opacity="0.75">'
+            + '<line x1="28" y1="50" x2="14" y2="46" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
+            + '<line x1="28" y1="52" x2="14" y2="52" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
+            + '<line x1="28" y1="54" x2="14" y2="58" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
+            + '<line x1="72" y1="50" x2="86" y2="46" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
+            + '<line x1="72" y1="52" x2="86" y2="52" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
+            + '<line x1="72" y1="54" x2="86" y2="58" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
+          + '</g>'
+        + '</g>'
+      + '</g>'
+    + '</svg>';
+  }
 
   const S = {
     el:null, wrap:null, tip:null,
     x:0, dir:1, speed:30,
     mode:'walking', modeUntil:0,
-    legFrame:'A', legSwitchAt:0, nextActionAt:0,
+    nextActionAt:0,
     lastT:0, lastEvalT:0,
     manualMood:null, manualUntil:0
   };
   const margin = () => (S.wrap.offsetWidth || 76)/2 + 8;
-  function setMode(m){ if (S.mode===m) return; S.mode=m; S.tip.textContent=m; render(); }
-  function render(){
-    let body;
-    if (S.mode==='walking') body = S.legFrame==='A' ? POSES.walkingA() : POSES.walkingB();
-    else body = (POSES[S.mode]||POSES.sitting)();
-    S.el.innerHTML = body;
-    S.el.className = 'opscat opscat-mode-' + S.mode;
+  function setMode(m){
+    if (S.mode===m) return;
+    S.mode=m;
+    if (S.tip) S.tip.textContent=m;
+    if (S.el) S.el.className = 'opscat opscat-mode-' + m;
   }
   function evaluate(force){
     if (S.manualMood && performance.now() < S.manualUntil) return;
@@ -2661,6 +2889,48 @@ init();
     S.manualUntil = performance.now() + 25000;
     setMode(next);
   }
+
+  // === Interactivity: pet on click, eye tracking on hover ===
+  const PURR_MSGS = ["Purr~ 💛", "Lebih sayang please 😸", "Mmm best...", "Mwah! 💕", "Selesa sangat 🤍", "Aku suka awak", "Hehe geli 😊"];
+  function petCat() {
+    if (!S.el) return;
+    S.el.classList.add('cat-purr');
+    setTimeout(() => S.el.classList.remove('cat-purr'), 1500);
+    const bubble = document.getElementById('opscatBubble');
+    if (bubble) {
+      bubble.textContent = PURR_MSGS[Math.floor(Math.random()*PURR_MSGS.length)];
+      bubble.classList.add('show');
+      clearTimeout(bubble._t);
+      bubble._t = setTimeout(() => bubble.classList.remove('show'), 3000);
+    }
+    // Spawn floating hearts
+    for (let i = 0; i < 3; i++) {
+      const h = document.createElement('span');
+      h.className = 'cat-pet-heart';
+      h.textContent = '💛';
+      h.style.left = (40 + Math.random()*20) + '%';
+      h.style.animationDelay = (i * 0.18) + 's';
+      S.wrap.appendChild(h);
+      setTimeout(() => h.remove(), 1500);
+    }
+  }
+  function trackPupils(e) {
+    if (!S.wrap) return;
+    const rect = S.wrap.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    let dx = (e.clientX - cx) / Math.max(40, rect.width);
+    let dy = (e.clientY - cy) / Math.max(40, rect.height);
+    dx = Math.max(-1, Math.min(1, dx)) * 1.6;
+    dy = Math.max(-0.5, Math.min(1, dy)) * 1.2;
+    const pupils = S.el && S.el.querySelectorAll('.cat-pupil');
+    if (pupils) pupils.forEach(p => { p.style.transform = `translate(${dx}px, ${dy}px)`; });
+  }
+  function resetPupils() {
+    const pupils = S.el && S.el.querySelectorAll('.cat-pupil');
+    if (pupils) pupils.forEach(p => { p.style.transform = ''; });
+  }
+
   function tick(now){
     const dt = Math.min(.05, (now - S.lastT)/1000);
     S.lastT = now;
@@ -2671,13 +2941,12 @@ init();
       const m = margin();
       if (S.x < m)              { S.x = m; S.dir = 1; }
       if (S.x > innerWidth - m) { S.x = innerWidth - m; S.dir = -1; }
-      bob = Math.sin(now/220) * 2;
-      if (now > S.legSwitchAt) { S.legFrame = S.legFrame==='A'?'B':'A'; S.legSwitchAt = now+260; render(); }
+      bob = Math.sin(now/220) * 1.5;
       if (now > S.nextActionAt) { setMode('sitting'); S.nextActionAt = now + 1800 + Math.random()*2400; }
     } else if (S.mode==='sitting') {
       if (now > S.nextActionAt) { setMode('walking'); S.nextActionAt = now + 6000 + Math.random()*8000; }
     } else if (S.mode==='sleeping') {
-      bob = Math.sin(now/900) * 1.5;
+      bob = Math.sin(now/900) * 1.2;
     } else if (S.mode==='playing') {
       S.x += S.dir * (S.speed*.25) * dt;
       const m = margin();
@@ -2689,7 +2958,8 @@ init();
     S.wrap.style.transform = `translate(${Math.round(S.x - wrapW/2)}px, ${Math.round(-bob)}px)`;
     requestAnimationFrame(tick);
   }
-  // External mood API for cat care widget
+
+  // External mood API for cat care widget (unchanged interface)
   function showCatOverlay(kind, durationMs) {
     if (!S.wrap) return;
     const existing = S.wrap.querySelector('.opscat-overlay');
@@ -2724,16 +2994,22 @@ init();
   S.wrap = document.getElementById('opscatWrap');
   S.tip = document.getElementById('opscatTip');
   if (S.el && S.wrap && S.tip) {
+    S.el.innerHTML = buildCatSvg();
+    S.el.className = 'opscat opscat-mode-walking';
     S.x = innerWidth * 0.5;
     S.lastT = performance.now();
     S.nextActionAt = S.lastT + 5000 + Math.random()*5000;
-    S.legSwitchAt = S.lastT + 260;
     evaluate(true);
-    S.wrap.addEventListener('click', cycle);
+    // Interaction wiring
+    S.wrap.addEventListener('click', function(e) {
+      // Shift-click = mood cycle (existing behaviour for those who knew it)
+      if (e.shiftKey) { cycle(); }
+      else { petCat(); }
+    });
+    S.wrap.addEventListener('mousemove', trackPupils);
+    S.wrap.addEventListener('mouseleave', resetPupils);
     requestAnimationFrame(tick);
   }
-
-  // Expose API for cat care widget
   window.OpsCatAPI = { performAction: performAction };
 })();
 </script>
@@ -2832,62 +3108,146 @@ init();
       100% { transform: translate(calc(-50% + var(--dx, 0px)), -90px) scale(1); opacity: 0; }
     }
     .float-icon { position: absolute; bottom: 60px; font-size: 26px; pointer-events: none; animation: heartUp 1.5s ease-out forwards; }
+    .sync-bar {
+      display: flex; justify-content: center; align-items: center; gap: 12px;
+      margin: -4px 0 16px;
+      font-size: 11px; color: var(--muted);
+    }
+    .sync-status { font-weight: 700; padding: 3px 10px; background: rgba(255,255,255,.6); border-radius: 99px; transition: all .3s ease; }
+    .sync-status.on { color: var(--success); background: rgba(21,128,61,.08); }
+    .sync-status.flash { color: var(--accent); background: rgba(237,28,36,.1); }
+    .sync-btn {
+      padding: 4px 12px; background: rgba(255,255,255,.75);
+      border: 1px solid var(--line); border-radius: 99px;
+      font-size: 11px; font-weight: 700; color: var(--text);
+      cursor: pointer; transition: all .15s;
+    }
+    .sync-btn:hover { background: var(--bg-3); transform: translateY(-1px); }
   `;
   document.head.appendChild(css);
 
   function sakuraSvg(stage) {
-    const pot = `
-      <ellipse cx="50" cy="122" rx="22" ry="3" fill="rgba(0,0,0,0.15)"/>
-      <path d="M30 105 L70 105 L67 122 L33 122 Z" fill="#8B5A2B"/>
-      <ellipse cx="50" cy="105" rx="20" ry="3" fill="#A67042"/>
-      <ellipse cx="50" cy="104" rx="18" ry="2" fill="#5A3F2D"/>`;
-    let tree = '', blossoms = '';
-    if (stage === 0) {} 
-    else if (stage === 1) {
-      tree = `<path d="M50 102 Q49 92 50 85" stroke="#6B8E23" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <ellipse cx="47" cy="86" rx="3" ry="4" fill="#84CC16"/>
-              <ellipse cx="53" cy="86" rx="3" ry="4" fill="#84CC16"/>`;
-    } else if (stage === 2) {
-      tree = `<path d="M50 102 L50 75" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <ellipse cx="45" cy="76" rx="7" ry="9" fill="#65a30d"/>
-              <ellipse cx="55" cy="76" rx="7" ry="9" fill="#65a30d"/>
-              <ellipse cx="50" cy="70" rx="7" ry="9" fill="#84cc16"/>`;
-    } else if (stage === 3) {
-      tree = `<path d="M50 102 L50 65" stroke="#92400e" stroke-width="4" fill="none" stroke-linecap="round"/>
-              <path d="M50 80 L40 70" stroke="#92400e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <path d="M50 80 L60 70" stroke="#92400e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <circle cx="40" cy="68" r="10" fill="#65a30d"/>
-              <circle cx="60" cy="68" r="10" fill="#65a30d"/>
-              <circle cx="50" cy="58" r="12" fill="#84cc16"/>`;
-    } else if (stage === 4) {
-      tree = `<path d="M50 102 L50 55" stroke="#92400e" stroke-width="5" fill="none" stroke-linecap="round"/>
-              <path d="M50 75 L34 60" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <path d="M50 75 L66 60" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <circle cx="34" cy="58" r="13" fill="#65a30d"/>
-              <circle cx="66" cy="58" r="13" fill="#65a30d"/>
-              <circle cx="50" cy="48" r="15" fill="#84cc16"/>`;
-      blossoms = `
-        <circle cx="30" cy="55" r="3" fill="#f9a8d4"/>
-        <circle cx="68" cy="56" r="3" fill="#f9a8d4"/>
-        <circle cx="50" cy="42" r="3" fill="#fbb6ce"/>
-        <circle cx="40" cy="46" r="2.5" fill="#f9a8d4"/>
-        <circle cx="58" cy="48" r="2.5" fill="#fbb6ce"/>`;
-    } else {
-      tree = `<path d="M50 102 L50 48" stroke="#7c2d12" stroke-width="6" fill="none" stroke-linecap="round"/>
-              <path d="M50 72 L28 55" stroke="#7c2d12" stroke-width="4" fill="none" stroke-linecap="round"/>
-              <path d="M50 72 L72 55" stroke="#7c2d12" stroke-width="4" fill="none" stroke-linecap="round"/>
-              <path d="M50 62 L34 48" stroke="#7c2d12" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <path d="M50 62 L66 48" stroke="#7c2d12" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
-      const positions = [
-        [28,52,14,'#f9a8d4'],[72,52,14,'#f9a8d4'],[50,38,16,'#fbb6ce'],
-        [38,44,11,'#f9a8d4'],[62,44,11,'#fbb6ce'],
-        [22,55,9,'#fbb6ce'],[78,55,9,'#f9a8d4'],
-        [50,54,11,'#fda4af'],[36,34,10,'#f9a8d4'],[64,34,10,'#fbb6ce']
-      ];
-      blossoms = positions.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="${p[2]}" fill="${p[3]}" opacity="0.92"/>`).join('');
-      blossoms += `<circle cx="42" cy="34" r="2" fill="#ffe4e6"/><circle cx="58" cy="34" r="2" fill="#ffe4e6"/><circle cx="50" cy="46" r="2" fill="#ffe4e6"/>`;
+    const safeStage = Math.max(0, Math.min(5, stage));
+    const defs = '<defs>'
+      + '<linearGradient id="potG" x1="0" y1="0" x2="0" y2="1">'
+        + '<stop offset="0%" stop-color="#b58552"/><stop offset="50%" stop-color="#8b5a2b"/><stop offset="100%" stop-color="#4a2e18"/>'
+      + '</linearGradient>'
+      + '<radialGradient id="potRim" cx="0.5" cy="0.3"><stop offset="0%" stop-color="#a67042"/><stop offset="100%" stop-color="#5a3f2d"/></radialGradient>'
+      + '<linearGradient id="trunkG" x1="0" y1="0" x2="1" y2="0">'
+        + '<stop offset="0%" stop-color="#3d1505"/><stop offset="30%" stop-color="#7c2d12"/><stop offset="60%" stop-color="#5e1f0a"/><stop offset="100%" stop-color="#2d0d02"/>'
+      + '</linearGradient>'
+      + '<radialGradient id="leafG" cx="0.35" cy="0.3" r="0.85">'
+        + '<stop offset="0%" stop-color="#b6e84a"/><stop offset="50%" stop-color="#65a30d"/><stop offset="100%" stop-color="#365314"/>'
+      + '</radialGradient>'
+      + '<radialGradient id="blossomA" cx="0.5" cy="0.5" r="0.6">'
+        + '<stop offset="0%" stop-color="#fff5fa"/><stop offset="50%" stop-color="#fbcfde"/><stop offset="100%" stop-color="#f9a8d4"/>'
+      + '</radialGradient>'
+      + '<radialGradient id="blossomB" cx="0.5" cy="0.5" r="0.6">'
+        + '<stop offset="0%" stop-color="#fff8fb"/><stop offset="50%" stop-color="#fed6e0"/><stop offset="100%" stop-color="#fbb6ce"/>'
+      + '</radialGradient>'
+      + '<filter id="treeShadow"><feGaussianBlur stdDeviation="0.5"/></filter>'
+    + '</defs>';
+
+    // Ground shadow + pot (always)
+    const ground = '<ellipse cx="50" cy="124" rx="26" ry="3.5" fill="rgba(0,0,0,0.20)"/>';
+    const pot = '<g class="sakura-pot">'
+      + '<path d="M30 105 L70 105 L67 122 L33 122 Z" fill="url(#potG)"/>'
+      + '<ellipse cx="50" cy="105" rx="20" ry="3" fill="url(#potRim)"/>'
+      + '<ellipse cx="50" cy="105" rx="18" ry="2" fill="#2d1810"/>'
+      + '<path d="M33 108 Q35 115 38 121" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" fill="none" stroke-linecap="round"/>'
+      + '<path d="M62 108 Q64 115 67 121" stroke="rgba(0,0,0,0.18)" stroke-width="1.5" fill="none" stroke-linecap="round"/>'
+      + '<circle cx="43" cy="105" r="0.6" fill="#3d2818"/>'
+      + '<circle cx="56" cy="105" r="0.5" fill="#3d2818"/>'
+    + '</g>';
+
+    // 5-petal blossom helper
+    function blossom(cx, cy, r, type, idx) {
+      const grad = type === 'A' ? 'blossomA' : 'blossomB';
+      return '<g class="blossom blossom-' + idx + '" style="transform-origin:' + cx + 'px ' + cy + 'px;">'
+        + '<circle cx="' + (cx-r*0.55) + '" cy="' + (cy-r*0.4) + '" r="' + (r*0.6) + '" fill="url(#' + grad + ')"/>'
+        + '<circle cx="' + (cx+r*0.55) + '" cy="' + (cy-r*0.4) + '" r="' + (r*0.6) + '" fill="url(#' + grad + ')"/>'
+        + '<circle cx="' + (cx-r*0.65) + '" cy="' + (cy+r*0.35) + '" r="' + (r*0.55) + '" fill="url(#' + grad + ')"/>'
+        + '<circle cx="' + (cx+r*0.65) + '" cy="' + (cy+r*0.35) + '" r="' + (r*0.55) + '" fill="url(#' + grad + ')"/>'
+        + '<circle cx="' + cx + '" cy="' + (cy+r*0.55) + '" r="' + (r*0.55) + '" fill="url(#' + grad + ')"/>'
+        + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r*0.3) + '" fill="#fbd649"/>'
+        + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r*0.16) + '" fill="#dc7a18"/>'
+      + '</g>';
     }
-    return `<svg viewBox="0 0 100 130" width="150" height="195" xmlns="http://www.w3.org/2000/svg">${tree}${blossoms}${pot}</svg>`;
+
+    let tree = '';
+    if (safeStage === 0) {
+      // Just rich soil mound
+      tree = '<ellipse cx="50" cy="103.5" rx="16" ry="1.8" fill="#1a0f08"/>';
+    } else if (safeStage === 1) {
+      tree = '<g class="sakura-tree">'
+        + '<path d="M50 103 Q49 95 50 86" stroke="#5a7a1a" stroke-width="1.5" fill="none" stroke-linecap="round"/>'
+        + '<ellipse cx="46" cy="87" rx="3.5" ry="5" fill="url(#leafG)" transform="rotate(-35 46 87)"/>'
+        + '<ellipse cx="54" cy="87" rx="3.5" ry="5" fill="url(#leafG)" transform="rotate(35 54 87)"/>'
+      + '</g>';
+    } else if (safeStage === 2) {
+      tree = '<g class="sakura-tree">'
+        + '<path d="M50 103 Q49 91 50 79" stroke="url(#trunkG)" stroke-width="2.8" fill="none" stroke-linecap="round"/>'
+        + '<ellipse cx="44" cy="80" rx="6.5" ry="9" fill="url(#leafG)" transform="rotate(-25 44 80)"/>'
+        + '<ellipse cx="56" cy="80" rx="6.5" ry="9" fill="url(#leafG)" transform="rotate(25 56 80)"/>'
+        + '<ellipse cx="50" cy="73" rx="7.5" ry="10" fill="url(#leafG)"/>'
+        + '<circle cx="48" cy="72" r="1.2" fill="#fbb6ce"/>'
+      + '</g>';
+    } else if (safeStage === 3) {
+      tree = '<g class="sakura-tree">'
+        + '<path d="M50 103 L50 68" stroke="url(#trunkG)" stroke-width="4" fill="none" stroke-linecap="round"/>'
+        + '<line x1="48" y1="95" x2="48" y2="85" stroke="#2d0d02" stroke-width="0.4"/>'
+        + '<path d="M50 80 Q44 76 39 72" stroke="url(#trunkG)" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
+        + '<path d="M50 80 Q56 76 61 72" stroke="url(#trunkG)" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
+        + '<ellipse cx="40" cy="72" rx="10" ry="11" fill="url(#leafG)"/>'
+        + '<ellipse cx="60" cy="72" rx="10" ry="11" fill="url(#leafG)"/>'
+        + '<ellipse cx="50" cy="62" rx="12" ry="13" fill="url(#leafG)"/>'
+        + blossom(42, 70, 2.8, 'A', 0)
+        + blossom(58, 73, 2.8, 'B', 1)
+      + '</g>';
+    } else if (safeStage === 4) {
+      const buds = [[28,55,3.5,'A'],[68,55,3.5,'B'],[50,40,4,'A'],[40,46,3,'B'],[60,48,3,'A'],
+                    [25,60,2.5,'A'],[72,60,2.5,'B'],[44,42,2.5,'B'],[56,44,2.5,'A']];
+      tree = '<g class="sakura-tree">'
+        + '<path d="M50 103 L50 56" stroke="url(#trunkG)" stroke-width="5" fill="none" stroke-linecap="round"/>'
+        + '<line x1="48" y1="100" x2="48" y2="90" stroke="#2d0d02" stroke-width="0.5"/>'
+        + '<line x1="52" y1="80" x2="52" y2="70" stroke="#2d0d02" stroke-width="0.5"/>'
+        + '<path d="M50 76 Q40 68 32 60" stroke="url(#trunkG)" stroke-width="3" fill="none" stroke-linecap="round"/>'
+        + '<path d="M50 76 Q60 68 68 60" stroke="url(#trunkG)" stroke-width="3" fill="none" stroke-linecap="round"/>'
+        + '<path d="M50 66 Q44 58 38 54" stroke="url(#trunkG)" stroke-width="2" fill="none" stroke-linecap="round"/>'
+        + '<path d="M50 66 Q56 58 62 54" stroke="url(#trunkG)" stroke-width="2" fill="none" stroke-linecap="round"/>'
+        + '<ellipse cx="32" cy="58" rx="12" ry="13" fill="url(#leafG)"/>'
+        + '<ellipse cx="68" cy="58" rx="12" ry="13" fill="url(#leafG)"/>'
+        + '<ellipse cx="50" cy="48" rx="15" ry="14" fill="url(#leafG)"/>'
+        + buds.map(function(b, i) { return blossom(b[0], b[1], b[2], b[3], i); }).join('')
+      + '</g>';
+    } else {
+      // FULL BLOOM stage 5 — massive flower canopy
+      const clusters = [
+        [22,50,4.5,'A'],[78,50,4.5,'A'],[50,30,5,'B'],
+        [35,38,4,'A'],[65,38,4,'B'],[18,58,3.5,'B'],[82,58,3.5,'A'],
+        [28,30,3.8,'B'],[72,30,3.8,'A'],[50,46,4,'A'],
+        [38,52,3.5,'B'],[62,52,3.5,'A'],[28,42,3,'B'],[72,42,3,'A'],
+        [50,56,3.5,'B'],[42,28,3.2,'A'],[58,28,3.2,'B'],
+        [24,38,3.2,'A'],[76,38,3.2,'B'],[44,38,2.8,'B'],[56,38,2.8,'A']
+      ];
+      tree = '<g class="sakura-tree">'
+        + '<path d="M50 103 L50 48" stroke="url(#trunkG)" stroke-width="6" fill="none" stroke-linecap="round"/>'
+        + '<line x1="48" y1="100" x2="48" y2="92" stroke="#2d0d02" stroke-width="0.6"/>'
+        + '<line x1="52" y1="86" x2="52" y2="76" stroke="#2d0d02" stroke-width="0.6"/>'
+        + '<line x1="48" y1="70" x2="48" y2="60" stroke="#2d0d02" stroke-width="0.5"/>'
+        + '<path d="M50 70 Q35 58 22 52" stroke="url(#trunkG)" stroke-width="4" fill="none" stroke-linecap="round"/>'
+        + '<path d="M50 70 Q65 58 78 52" stroke="url(#trunkG)" stroke-width="4" fill="none" stroke-linecap="round"/>'
+        + '<path d="M50 58 Q40 48 32 44" stroke="url(#trunkG)" stroke-width="2.5" fill="none" stroke-linecap="round"/>'
+        + '<path d="M50 58 Q60 48 68 44" stroke="url(#trunkG)" stroke-width="2.5" fill="none" stroke-linecap="round"/>'
+        + clusters.map(function(c, i) { return blossom(c[0], c[1], c[2], c[3], i); }).join('')
+        // Falling petals (animated via CSS)
+        + '<circle class="petal-fall petal-1" cx="30" cy="65" r="1.4" fill="#fbb6ce"/>'
+        + '<circle class="petal-fall petal-2" cx="70" cy="68" r="1.4" fill="#f9a8d4"/>'
+        + '<circle class="petal-fall petal-3" cx="50" cy="62" r="1.2" fill="#fda4af"/>'
+      + '</g>';
+    }
+
+    return '<svg viewBox="0 0 100 130" width="150" height="195" xmlns="http://www.w3.org/2000/svg" class="sakura-svg" data-stage="' + safeStage + '">' + defs + ground + tree + pot + '</svg>';
   }
 
   const STAGE_NAMES = ['Pasu kosong', 'Cambah', 'Pucuk', 'Pokok muda', 'Berkembang', 'Penuh Bunga! 🌸'];
@@ -2905,20 +3265,22 @@ init();
     try { const s = JSON.parse(localStorage.getItem(SK_KEY) || 'null'); if (s && typeof s === 'object') return s; } catch(e){}
     return { stage: 3, waterToday: 0, lastDay: todayStr(), streak: 0 };
   }
-  function saveSakura(s) { try { localStorage.setItem(SK_KEY, JSON.stringify(s)); } catch(e){} }
+  function saveSakura(s) { try { localStorage.setItem(SK_KEY, JSON.stringify(s)); } catch(e){} cloudSave(); }
   function tickSakuraDay() {
     const s = loadSakura();
     const today = todayStr();
     if (s.lastDay !== today) {
       const days = dayDiff(s.lastDay, today);
       if (days === 1) {
-        if (s.waterToday >= 3) {
-          s.streak = (s.streak || 0) + 1;
-        } else {
+        if (s.waterToday < 3) {
+          // Yesterday was incomplete — wilt
           s.streak = 0;
           if (s.stage > 0) s.stage--;
         }
+        // If yesterday was complete (>=3 waterings), streak was already incremented in waterSakura.
+        // Don't double-count here.
       } else if (days > 1) {
+        // Skipped multiple days — wilt more
         s.streak = 0;
         s.stage = Math.max(0, s.stage - Math.min(2, days - 1));
       }
@@ -2928,6 +3290,32 @@ init();
     }
     return s;
   }
+
+  // === Plant interactivity: click tree to shake + bonus petals ===
+  function wirePlantInteractions() {
+    const display = document.querySelector('.sakura-display');
+    if (!display || display._wired) return;
+    display._wired = true;
+    display.addEventListener('click', function(e) {
+      if (e.target.closest('button')) return;
+      const svg = display.querySelector('.sakura-svg');
+      if (!svg) return;
+      svg.classList.add('tree-shake');
+      setTimeout(function() { svg.classList.remove('tree-shake'); }, 700);
+      // Burst petals
+      for (let i = 0; i < 8; i++) {
+        const p = document.createElement('span');
+        p.className = 'burst-petal';
+        p.textContent = ['\u{1F338}','\u{1F33A}','\u{2728}'][i % 3];
+        p.style.setProperty('--bx', (Math.random()*120 - 60) + 'px');
+        p.style.setProperty('--brot', (180 + Math.random()*360) + 'deg');
+        p.style.animationDelay = (i * 0.06) + 's';
+        display.appendChild(p);
+        setTimeout(function(){ if (p.parentNode) p.remove(); }, 2400);
+      }
+    });
+  }
+
   function renderSakura() {
     const s = tickSakuraDay();
     const svgEl = document.getElementById('sakuraSvg');
@@ -2983,11 +3371,82 @@ init();
   }
 
   const CC_KEY = 'mdv_cat_care_v1';
+
+  // ===== Cloud sync via Pantry (getpantry.cloud — free, no login) =====
+  const PANTRY_KEY = 'mdv_pantry_id_v1';
+  const BASKET = 'mdv-widgets';
+  var cloudTimer = null;
+  var isSyncing = false;
+
+  function getPantryId() {
+    try { return localStorage.getItem(PANTRY_KEY) || null; } catch(e) { return null; }
+  }
+
+  async function cloudLoad() {
+    const id = getPantryId();
+    if (!id) return null;
+    try {
+      const res = await fetch('https://getpantry.cloud/apiv1/pantry/' + id + '/basket/' + BASKET);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch(e) { return null; }
+  }
+
+  function cloudSave() {
+    const id = getPantryId();
+    if (!id || isSyncing) return;
+    clearTimeout(cloudTimer);
+    cloudTimer = setTimeout(async function() {
+      try {
+        const data = {
+          sakura: JSON.parse(localStorage.getItem(SK_KEY) || 'null'),
+          catCare: JSON.parse(localStorage.getItem(CC_KEY) || 'null'),
+          _ts: Date.now()
+        };
+        await fetch('https://getpantry.cloud/apiv1/pantry/' + id + '/basket/' + BASKET, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        flashSync('Synced ✓');
+      } catch(e) { flashSync('Sync failed'); }
+    }, 1500);
+  }
+
+  function setupSync() {
+    const cur = getPantryId();
+    const msg = "Paste your Pantry ID to sync widget state across all devices.\n\n" +
+      "1. Visit getpantry.cloud\n" +
+      "2. Enter your email, they send you a Pantry ID\n" +
+      "3. Paste the same ID on every device\n\n" +
+      "Leave blank to disable sync.";
+    const id = prompt(msg, cur || '');
+    if (id === null) return;
+    const t = id.trim();
+    try {
+      if (t) { localStorage.setItem(PANTRY_KEY, t); alert('Sync ON! Reloading.'); }
+      else { localStorage.removeItem(PANTRY_KEY); alert('Sync OFF (local-only).'); }
+    } catch(e) {}
+    location.reload();
+  }
+
+  function flashSync(msg) {
+    const el = document.getElementById('syncStatus');
+    if (!el) return;
+    const orig = el.textContent;
+    el.textContent = msg;
+    el.classList.add('flash');
+    setTimeout(function() {
+      el.classList.remove('flash');
+      el.textContent = getPantryId() ? 'Sync ON' : 'Sync: off';
+    }, 1800);
+  }
+
   function loadCC() {
     try { const s = JSON.parse(localStorage.getItem(CC_KEY) || 'null'); if (s && typeof s === 'object') return s; } catch(e){}
     return { food: 0, water: 0, play: 0, happy: 60, lastInteract: Date.now() };
   }
-  function saveCC(s) { try { localStorage.setItem(CC_KEY, JSON.stringify(s)); } catch(e){} }
+  function saveCC(s) { try { localStorage.setItem(CC_KEY, JSON.stringify(s)); } catch(e){} cloudSave(); }
   function tickHappy() {
     const s = loadCC();
     const hoursAgo = (Date.now() - (s.lastInteract || Date.now())) / 3600000;
@@ -3090,10 +3549,21 @@ init();
       </div>
     `;
     anchor.parentNode.insertBefore(row, anchor);
+
+    // Add sync bar under the widgets
+    const syncBar = document.createElement('div');
+    syncBar.className = 'sync-bar';
+    syncBar.innerHTML =
+      '<span class="sync-status" id="syncStatus">' + (getPantryId() ? 'Sync ON' : 'Sync: off') + '</span>' +
+      '<button class="sync-btn" id="btnSyncSetup">' + (getPantryId() ? 'Change ID' : 'Setup sync') + '</button>';
+    anchor.parentNode.insertBefore(syncBar, anchor);
+    if (getPantryId()) document.getElementById('syncStatus').classList.add('on');
+
     document.getElementById('btnWater').addEventListener('click', waterSakura);
     document.getElementById('btnFood').addEventListener('click', () => careAction('food'));
     document.getElementById('btnWat').addEventListener('click', () => careAction('water'));
     document.getElementById('btnPlay').addEventListener('click', () => careAction('play'));
+    document.getElementById('btnSyncSetup').addEventListener('click', setupSync);
   }
   // Hunger system: if cat neglected, trigger hungry mood + bubble
   const HUNGER_MSGS = ["Lapar... bagi makan? \u{1F63F}", "Tummy kosong nih...", "Awak lupa bagi makan eh?", "Aku perlu makanan...", "Hello? Lapar betul ni..."];
@@ -3116,8 +3586,20 @@ init();
     }
   }
 
-  function boot() {
+  async function boot() {
     injectWidgets();
+    wirePlantInteractions();
+    // Pull from cloud first if sync is configured
+    if (getPantryId()) {
+      isSyncing = true;
+      const cloud = await cloudLoad();
+      if (cloud) {
+        if (cloud.sakura) { try { localStorage.setItem(SK_KEY, JSON.stringify(cloud.sakura)); } catch(e){} }
+        if (cloud.catCare) { try { localStorage.setItem(CC_KEY, JSON.stringify(cloud.catCare)); } catch(e){} }
+        flashSync('Pulled ✓');
+      }
+      isSyncing = false;
+    }
     renderSakura();
     renderCC();
     setInterval(function() { renderSakura(); renderCC(); }, 60000);

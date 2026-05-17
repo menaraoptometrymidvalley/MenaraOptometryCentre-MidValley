@@ -2694,5 +2694,367 @@ init();
   }
 })();
 </script>
+<!-- Bottom widgets: Cherry Blossom (3x/day) + Cat Care Corner -->
+<script>
+(function() {
+  const css = document.createElement('style');
+  css.textContent = `
+    .widgets-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0; }
+    @media (max-width: 800px) { .widgets-row { grid-template-columns: 1fr; } }
+    .widget {
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(14px) saturate(150%);
+      -webkit-backdrop-filter: blur(14px) saturate(150%);
+      border: 1px solid var(--line); border-radius: 14px;
+      padding: 18px 20px; box-shadow: var(--shadow); position: relative;
+    }
+    .widget h3 {
+      font-size: 13px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--text); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .widget h3 .icon { font-size: 18px; }
+    .widget-sakura { border-left: 4px solid #f9a8d4; }
+    .sakura-display {
+      display: flex; justify-content: center; align-items: flex-end;
+      height: 170px;
+      background: linear-gradient(180deg, rgba(255,228,239,.5), rgba(247,247,245,.7));
+      border-radius: 10px; padding: 12px 8px; margin-bottom: 12px;
+      position: relative; overflow: hidden;
+    }
+    .sakura-display svg { display: block; transition: transform .5s ease; }
+    .sakura-display:hover svg { transform: scale(1.05); }
+    .sakura-info {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+      font-size: 12px; color: var(--muted); margin-bottom: 10px;
+    }
+    .sakura-info strong { color: var(--text); font-weight: 700; }
+    .water-meter { display: flex; gap: 4px; margin-bottom: 10px; }
+    .water-dot { flex: 1; height: 6px; border-radius: 3px; background: var(--bg-3); transition: background .3s ease; }
+    .water-dot.filled { background: #60a5fa; }
+    .btn-water {
+      width: 100%; padding: 10px;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: #fff; border: none; border-radius: 8px;
+      font-weight: 700; font-size: 13px; cursor: pointer;
+      letter-spacing: .3px; transition: transform .15s, box-shadow .15s;
+    }
+    .btn-water:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(59,130,246,.3); }
+    .btn-water:disabled { background: var(--bg-3); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
+    @keyframes waterFall {
+      0% { transform: translateY(-30px); opacity: 0; }
+      20% { opacity: 1; }
+      100% { transform: translateY(150px); opacity: 0; }
+    }
+    .water-drop { position: absolute; top: 0; font-size: 18px; animation: waterFall 1s ease-in forwards; pointer-events: none; }
+    @keyframes sparkleUp {
+      0% { transform: translate(0, 0) scale(.6); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translate(var(--dx), -80px) scale(1.3); opacity: 0; }
+    }
+    .sparkle { position: absolute; bottom: 30px; font-size: 16px; animation: sparkleUp 1.6s ease-out forwards; pointer-events: none; }
+
+    .widget-cat-care { border-left: 4px solid var(--accent); }
+    .cat-care-display {
+      display: flex; justify-content: space-around; align-items: flex-end;
+      height: 170px;
+      background: linear-gradient(180deg, rgba(247,237,228,.45), rgba(247,247,245,.7));
+      border-radius: 10px; padding: 16px 16px 30px;
+      margin-bottom: 12px; position: relative; overflow: hidden;
+    }
+    .bowl-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; }
+    .bowl { font-size: 40px; transition: transform .3s cubic-bezier(.5,1.5,.5,1); }
+    .bowl-wrap.bounce .bowl { animation: bowlBounce .55s ease-out; }
+    @keyframes bowlBounce {
+      0%, 100% { transform: scale(1); }
+      30% { transform: scale(1.35) translateY(-8px) rotate(-6deg); }
+      60% { transform: scale(.95) rotate(3deg); }
+    }
+    .bowl-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .cat-care-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+    .cat-care-actions button {
+      padding: 9px 4px; background: var(--bg); border: 1px solid var(--line);
+      border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer;
+      transition: all .15s; color: var(--text);
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .cat-care-actions button:hover { background: var(--bg-3); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(27,20,100,.1); }
+    .cat-care-actions button .b-emoji { font-size: 18px; }
+    .cat-care-info { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.7; }
+    .cat-care-info strong { color: var(--accent); font-weight: 700; }
+    .happy-stars { letter-spacing: 3px; font-size: 14px; color: #fbbf24; }
+    @keyframes heartUp {
+      0% { transform: translate(-50%, 0) scale(.5); opacity: 0; }
+      20% { opacity: 1; transform: translate(-50%, -10px) scale(1.4); }
+      100% { transform: translate(calc(-50% + var(--dx, 0px)), -90px) scale(1); opacity: 0; }
+    }
+    .float-icon { position: absolute; bottom: 60px; font-size: 26px; pointer-events: none; animation: heartUp 1.5s ease-out forwards; }
+  `;
+  document.head.appendChild(css);
+
+  function sakuraSvg(stage) {
+    const pot = `
+      <ellipse cx="50" cy="122" rx="22" ry="3" fill="rgba(0,0,0,0.15)"/>
+      <path d="M30 105 L70 105 L67 122 L33 122 Z" fill="#8B5A2B"/>
+      <ellipse cx="50" cy="105" rx="20" ry="3" fill="#A67042"/>
+      <ellipse cx="50" cy="104" rx="18" ry="2" fill="#5A3F2D"/>`;
+    let tree = '', blossoms = '';
+    if (stage === 0) {} 
+    else if (stage === 1) {
+      tree = `<path d="M50 102 Q49 92 50 85" stroke="#6B8E23" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <ellipse cx="47" cy="86" rx="3" ry="4" fill="#84CC16"/>
+              <ellipse cx="53" cy="86" rx="3" ry="4" fill="#84CC16"/>`;
+    } else if (stage === 2) {
+      tree = `<path d="M50 102 L50 75" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <ellipse cx="45" cy="76" rx="7" ry="9" fill="#65a30d"/>
+              <ellipse cx="55" cy="76" rx="7" ry="9" fill="#65a30d"/>
+              <ellipse cx="50" cy="70" rx="7" ry="9" fill="#84cc16"/>`;
+    } else if (stage === 3) {
+      tree = `<path d="M50 102 L50 65" stroke="#92400e" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M50 80 L40 70" stroke="#92400e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M50 80 L60 70" stroke="#92400e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <circle cx="40" cy="68" r="10" fill="#65a30d"/>
+              <circle cx="60" cy="68" r="10" fill="#65a30d"/>
+              <circle cx="50" cy="58" r="12" fill="#84cc16"/>`;
+    } else if (stage === 4) {
+      tree = `<path d="M50 102 L50 55" stroke="#92400e" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <path d="M50 75 L34 60" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M50 75 L66 60" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <circle cx="34" cy="58" r="13" fill="#65a30d"/>
+              <circle cx="66" cy="58" r="13" fill="#65a30d"/>
+              <circle cx="50" cy="48" r="15" fill="#84cc16"/>`;
+      blossoms = `
+        <circle cx="30" cy="55" r="3" fill="#f9a8d4"/>
+        <circle cx="68" cy="56" r="3" fill="#f9a8d4"/>
+        <circle cx="50" cy="42" r="3" fill="#fbb6ce"/>
+        <circle cx="40" cy="46" r="2.5" fill="#f9a8d4"/>
+        <circle cx="58" cy="48" r="2.5" fill="#fbb6ce"/>`;
+    } else {
+      tree = `<path d="M50 102 L50 48" stroke="#7c2d12" stroke-width="6" fill="none" stroke-linecap="round"/>
+              <path d="M50 72 L28 55" stroke="#7c2d12" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M50 72 L72 55" stroke="#7c2d12" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M50 62 L34 48" stroke="#7c2d12" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M50 62 L66 48" stroke="#7c2d12" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+      const positions = [
+        [28,52,14,'#f9a8d4'],[72,52,14,'#f9a8d4'],[50,38,16,'#fbb6ce'],
+        [38,44,11,'#f9a8d4'],[62,44,11,'#fbb6ce'],
+        [22,55,9,'#fbb6ce'],[78,55,9,'#f9a8d4'],
+        [50,54,11,'#fda4af'],[36,34,10,'#f9a8d4'],[64,34,10,'#fbb6ce']
+      ];
+      blossoms = positions.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="${p[2]}" fill="${p[3]}" opacity="0.92"/>`).join('');
+      blossoms += `<circle cx="42" cy="34" r="2" fill="#ffe4e6"/><circle cx="58" cy="34" r="2" fill="#ffe4e6"/><circle cx="50" cy="46" r="2" fill="#ffe4e6"/>`;
+    }
+    return `<svg viewBox="0 0 100 130" width="150" height="195" xmlns="http://www.w3.org/2000/svg">${tree}${blossoms}${pot}</svg>`;
+  }
+
+  const STAGE_NAMES = ['Pasu kosong', 'Cambah', 'Pucuk', 'Pokok muda', 'Berkembang', 'Penuh Bunga! 🌸'];
+  const MAX_STAGE = 5;
+  const SK_KEY = 'mdv_sakura_state_v1';
+
+  function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function dayDiff(d1, d2) {
+    return Math.round((new Date(d2) - new Date(d1)) / 86400000);
+  }
+  function loadSakura() {
+    try { const s = JSON.parse(localStorage.getItem(SK_KEY) || 'null'); if (s && typeof s === 'object') return s; } catch(e){}
+    return { stage: 0, waterToday: 0, lastDay: todayStr(), streak: 0 };
+  }
+  function saveSakura(s) { try { localStorage.setItem(SK_KEY, JSON.stringify(s)); } catch(e){} }
+  function tickSakuraDay() {
+    const s = loadSakura();
+    const today = todayStr();
+    if (s.lastDay !== today) {
+      const days = dayDiff(s.lastDay, today);
+      if (days === 1) {
+        if (s.waterToday >= 3) {
+          s.streak = (s.streak || 0) + 1;
+        } else {
+          s.streak = 0;
+          if (s.stage > 0) s.stage--;
+        }
+      } else if (days > 1) {
+        s.streak = 0;
+        s.stage = Math.max(0, s.stage - Math.min(2, days - 1));
+      }
+      s.waterToday = 0;
+      s.lastDay = today;
+      saveSakura(s);
+    }
+    return s;
+  }
+  function renderSakura() {
+    const s = tickSakuraDay();
+    const svgEl = document.getElementById('sakuraSvg');
+    const stageEl = document.getElementById('sakuraStage');
+    const counterEl = document.getElementById('sakuraCounter');
+    const streakEl = document.getElementById('sakuraStreak');
+    const meterEls = document.querySelectorAll('.water-dot');
+    const btn = document.getElementById('btnWater');
+    if (svgEl) svgEl.innerHTML = sakuraSvg(s.stage);
+    if (stageEl) stageEl.textContent = STAGE_NAMES[s.stage];
+    if (counterEl) counterEl.textContent = `${s.waterToday}/3`;
+    if (streakEl) streakEl.textContent = `${s.streak || 0} hari`;
+    meterEls.forEach((dot, i) => dot.classList.toggle('filled', i < s.waterToday));
+    if (btn) {
+      btn.disabled = s.waterToday >= 3;
+      btn.textContent = s.waterToday >= 3 ? '✓ Cukup untuk hari ni' : '💧 Siram pokok';
+    }
+  }
+  function waterSakura() {
+    const s = tickSakuraDay();
+    if (s.waterToday >= 3) return;
+    s.waterToday++;
+    const display = document.querySelector('.sakura-display');
+    if (display) {
+      for (let i = 0; i < 3; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'water-drop';
+        drop.textContent = '💧';
+        drop.style.left = (35 + i * 12 + Math.random() * 8) + '%';
+        drop.style.animationDelay = (i * 0.1) + 's';
+        display.appendChild(drop);
+        setTimeout(() => drop.remove(), 1500);
+      }
+    }
+    if (s.waterToday === 3 && s.stage < MAX_STAGE) {
+      s.stage++;
+      s.streak = (s.streak || 0) + 1;
+      if (display) {
+        for (let i = 0; i < 10; i++) {
+          const sp = document.createElement('div');
+          sp.className = 'sparkle';
+          sp.textContent = ['✨','🌸','⭐','💫'][i % 4];
+          sp.style.left = (25 + Math.random() * 50) + '%';
+          sp.style.setProperty('--dx', (Math.random() * 60 - 30) + 'px');
+          sp.style.animationDelay = (i * 0.08) + 's';
+          display.appendChild(sp);
+          setTimeout(() => sp.remove(), 2200);
+        }
+      }
+    }
+    saveSakura(s);
+    setTimeout(renderSakura, 400);
+  }
+
+  const CC_KEY = 'mdv_cat_care_v1';
+  function loadCC() {
+    try { const s = JSON.parse(localStorage.getItem(CC_KEY) || 'null'); if (s && typeof s === 'object') return s; } catch(e){}
+    return { food: 0, water: 0, play: 0, happy: 60, lastInteract: Date.now() };
+  }
+  function saveCC(s) { try { localStorage.setItem(CC_KEY, JSON.stringify(s)); } catch(e){} }
+  function tickHappy() {
+    const s = loadCC();
+    const hoursAgo = (Date.now() - (s.lastInteract || Date.now())) / 3600000;
+    const decay = Math.min(50, Math.floor(hoursAgo * 3));
+    s.happy = Math.max(0, (s.happy || 60) - decay);
+    s.lastInteract = Date.now();
+    saveCC(s);
+    return s;
+  }
+  function renderCC() {
+    const s = tickHappy();
+    const fedEl = document.getElementById('ccFed');
+    const watEl = document.getElementById('ccWatered');
+    const playEl = document.getElementById('ccPlayed');
+    const happyEl = document.getElementById('ccHappy');
+    if (fedEl) fedEl.textContent = s.food;
+    if (watEl) watEl.textContent = s.water;
+    if (playEl) playEl.textContent = s.play;
+    if (happyEl) {
+      const stars = Math.round(s.happy / 20);
+      happyEl.textContent = '★'.repeat(stars) + '☆'.repeat(5 - stars);
+    }
+  }
+  const CARE_MSGS = {
+    food: ["Yummy! Terima kasih 😋","Sedap nyamannya~","Lapar betul! 🍱","Makan dulu, baru main"],
+    water: ["Refreshing! 💧","Haus betul tadi!","Air sejuk... best!","Glug glug glug 😊"],
+    play: ["Wheee! Main lagi!","Best gila!","Lompat lompat 🎾","Aku suka main!"]
+  };
+  const CARE_HEARTS = { food: '😋', water: '💧', play: '💛' };
+  const BOWL_POS = { food: '20%', water: '50%', play: '80%' };
+  function careAction(kind) {
+    const s = loadCC();
+    s[kind] = (s[kind] || 0) + 1;
+    s.happy = Math.min(100, (s.happy || 60) + 10);
+    s.lastInteract = Date.now();
+    saveCC(s);
+    const bowl = document.getElementById('bowl-' + kind);
+    if (bowl) { bowl.classList.add('bounce'); setTimeout(() => bowl.classList.remove('bounce'), 550); }
+    const display = document.querySelector('.cat-care-display');
+    if (display) {
+      const h = document.createElement('div');
+      h.className = 'float-icon';
+      h.textContent = CARE_HEARTS[kind];
+      h.style.setProperty('--dx', (Math.random() * 50 - 25) + 'px');
+      h.style.left = BOWL_POS[kind];
+      display.appendChild(h);
+      setTimeout(() => h.remove(), 1500);
+    }
+    const bubble = document.getElementById('opscatBubble');
+    if (bubble) {
+      const msgs = CARE_MSGS[kind];
+      bubble.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+      bubble.classList.add('show');
+      clearTimeout(bubble._t);
+      bubble._t = setTimeout(() => bubble.classList.remove('show'), 3500);
+    }
+    renderCC();
+  }
+
+  function injectWidgets() {
+    if (document.querySelector('.widgets-row')) return;
+    const anchor = document.querySelector('.bg-showcase') || document.querySelector('.footer-hint');
+    if (!anchor) return;
+    const row = document.createElement('div');
+    row.className = 'widgets-row';
+    row.innerHTML = `
+      <div class="widget widget-sakura">
+        <h3><span class="icon">🌸</span> Cherry Blossom</h3>
+        <div class="sakura-display"><div id="sakuraSvg"></div></div>
+        <div class="sakura-info">
+          <div>Stage: <strong id="sakuraStage">—</strong></div>
+          <div>Streak: <strong id="sakuraStreak">0 hari</strong></div>
+          <div style="grid-column: 1 / -1;">Hari ni: <strong id="sakuraCounter">0/3</strong> siram</div>
+        </div>
+        <div class="water-meter"><div class="water-dot"></div><div class="water-dot"></div><div class="water-dot"></div></div>
+        <button id="btnWater" class="btn-water">💧 Siram pokok</button>
+      </div>
+      <div class="widget widget-cat-care">
+        <h3><span class="icon">🐾</span> Cat Care Corner</h3>
+        <div class="cat-care-display">
+          <div class="bowl-wrap" id="bowl-food"><span class="bowl">🍱</span><span class="bowl-label">Makanan</span></div>
+          <div class="bowl-wrap" id="bowl-water"><span class="bowl">🥣</span><span class="bowl-label">Air</span></div>
+          <div class="bowl-wrap" id="bowl-play"><span class="bowl">🎾</span><span class="bowl-label">Mainan</span></div>
+        </div>
+        <div class="cat-care-actions">
+          <button id="btnFood"><span class="b-emoji">🍱</span>Food</button>
+          <button id="btnWat"><span class="b-emoji">💧</span>Air</button>
+          <button id="btnPlay"><span class="b-emoji">🎾</span>Main</button>
+        </div>
+        <div class="cat-care-info">
+          Happiness: <span class="happy-stars" id="ccHappy">★★★☆☆</span><br>
+          <span style="font-size:11px">🍱 <strong id="ccFed">0</strong> · 💧 <strong id="ccWatered">0</strong> · 🎾 <strong id="ccPlayed">0</strong></span>
+        </div>
+      </div>
+    `;
+    anchor.parentNode.insertBefore(row, anchor);
+    document.getElementById('btnWater').addEventListener('click', waterSakura);
+    document.getElementById('btnFood').addEventListener('click', () => careAction('food'));
+    document.getElementById('btnWat').addEventListener('click', () => careAction('water'));
+    document.getElementById('btnPlay').addEventListener('click', () => careAction('play'));
+  }
+  function boot() {
+    injectWidgets();
+    renderSakura();
+    renderCC();
+    setInterval(() => { renderSakura(); renderCC(); }, 60000);
+  }
+  if (document.readyState === 'complete') setTimeout(boot, 250);
+  else window.addEventListener('load', () => setTimeout(boot, 250));
+})();
+</script>
 </body>
 </html>

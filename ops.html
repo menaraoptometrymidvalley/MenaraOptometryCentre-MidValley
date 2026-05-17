@@ -1143,6 +1143,15 @@
     transform: translateX(-50%);
     border: 5px solid transparent; border-top-color: #fff; z-index: 1;
   }
+  /* Cat action overlay animations */
+  @keyframes opscatBob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(3px); }
+  }
+  @keyframes opscatBall {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-14px) rotate(180deg); }
+  }
 
   /* === Bottom backdrop showcase === */
   .bg-showcase {
@@ -2680,6 +2689,37 @@ init();
     S.wrap.style.transform = `translate(${Math.round(S.x - wrapW/2)}px, ${Math.round(-bob)}px)`;
     requestAnimationFrame(tick);
   }
+  // External mood API for cat care widget
+  function showCatOverlay(kind, durationMs) {
+    if (!S.wrap) return;
+    const existing = S.wrap.querySelector('.opscat-overlay');
+    if (existing) existing.remove();
+    const map = {
+      eat:    { emoji: '\u{1F371}', side: 'right',  offset: '-32px', anim: 'opscatBob 0.7s ease-in-out infinite' },
+      drink:  { emoji: '\u{1F4A7}', side: 'right',  offset: '-28px', anim: 'opscatBob 0.9s ease-in-out infinite' },
+      ball:   { emoji: '\u{1F3BE}', side: 'right',  offset: '-30px', anim: 'opscatBall 0.55s ease-in-out infinite' },
+      hungry: { emoji: '\u{1F37D}', side: 'left',   offset: '-30px', anim: 'opscatBob 1.2s ease-in-out infinite' }
+    };
+    const cfg = map[kind];
+    if (!cfg) return;
+    const ov = document.createElement('span');
+    ov.className = 'opscat-overlay';
+    ov.textContent = cfg.emoji;
+    ov.style.cssText = 'position:absolute;font-size:22px;bottom:6px;' + cfg.side + ':' + cfg.offset + ';pointer-events:none;z-index:5;animation:' + cfg.anim + ';';
+    S.wrap.appendChild(ov);
+    setTimeout(function() { if (ov.parentNode) ov.remove(); }, durationMs || 5000);
+  }
+
+  function performAction(kind, durationMs) {
+    const dur = durationMs || 5000;
+    const moodMap = { eat: 'sitting', drink: 'sitting', ball: 'playing', hungry: 'sitting' };
+    const internalMood = moodMap[kind] || 'sitting';
+    S.manualMood = internalMood;
+    S.manualUntil = performance.now() + dur;
+    setMode(internalMood);
+    showCatOverlay(kind, dur);
+  }
+
   S.el = document.getElementById('opscatEl');
   S.wrap = document.getElementById('opscatWrap');
   S.tip = document.getElementById('opscatTip');
@@ -2692,6 +2732,9 @@ init();
     S.wrap.addEventListener('click', cycle);
     requestAnimationFrame(tick);
   }
+
+  // Expose API for cat care widget
+  window.OpsCatAPI = { performAction: performAction };
 })();
 </script>
 <!-- Bottom widgets: Cherry Blossom (3x/day) + Cat Care Corner -->
@@ -2860,7 +2903,7 @@ init();
   }
   function loadSakura() {
     try { const s = JSON.parse(localStorage.getItem(SK_KEY) || 'null'); if (s && typeof s === 'object') return s; } catch(e){}
-    return { stage: 0, waterToday: 0, lastDay: todayStr(), streak: 0 };
+    return { stage: 3, waterToday: 0, lastDay: todayStr(), streak: 0 };
   }
   function saveSakura(s) { try { localStorage.setItem(SK_KEY, JSON.stringify(s)); } catch(e){} }
   function tickSakuraDay() {
@@ -2981,6 +3024,12 @@ init();
     s.happy = Math.min(100, (s.happy || 60) + 10);
     s.lastInteract = Date.now();
     saveCC(s);
+
+    // Trigger walking cat to actually eat/drink/play
+    var catAction = { food: 'eat', water: 'drink', play: 'ball' }[kind];
+    if (catAction && window.OpsCatAPI && window.OpsCatAPI.performAction) {
+      window.OpsCatAPI.performAction(catAction, 5500);
+    }
     const bowl = document.getElementById('bowl-' + kind);
     if (bowl) { bowl.classList.add('bounce'); setTimeout(() => bowl.classList.remove('bounce'), 550); }
     const display = document.querySelector('.cat-care-display');
@@ -3046,11 +3095,34 @@ init();
     document.getElementById('btnWat').addEventListener('click', () => careAction('water'));
     document.getElementById('btnPlay').addEventListener('click', () => careAction('play'));
   }
+  // Hunger system: if cat neglected, trigger hungry mood + bubble
+  const HUNGER_MSGS = ["Lapar... bagi makan? \u{1F63F}", "Tummy kosong nih...", "Awak lupa bagi makan eh?", "Aku perlu makanan...", "Hello? Lapar betul ni..."];
+  let lastHungerNag = 0;
+  function checkHunger() {
+    var s = loadCC();
+    var hoursSince = (Date.now() - (s.lastInteract || Date.now())) / 3600000;
+    if ((s.happy < 30 || hoursSince > 4) && (Date.now() - lastHungerNag) > 90 * 60 * 1000) {
+      lastHungerNag = Date.now();
+      if (window.OpsCatAPI && window.OpsCatAPI.performAction) {
+        window.OpsCatAPI.performAction('hungry', 4500);
+      }
+      var bubble = document.getElementById('opscatBubble');
+      if (bubble) {
+        bubble.textContent = HUNGER_MSGS[Math.floor(Math.random() * HUNGER_MSGS.length)];
+        bubble.classList.add('show');
+        clearTimeout(bubble._t);
+        bubble._t = setTimeout(function() { bubble.classList.remove('show'); }, 4500);
+      }
+    }
+  }
+
   function boot() {
     injectWidgets();
     renderSakura();
     renderCC();
-    setInterval(() => { renderSakura(); renderCC(); }, 60000);
+    setInterval(function() { renderSakura(); renderCC(); }, 60000);
+    setTimeout(checkHunger, 2 * 60 * 1000);
+    setInterval(checkHunger, 15 * 60 * 1000);
   }
   if (document.readyState === 'complete') setTimeout(boot, 250);
   else window.addEventListener('load', () => setTimeout(boot, 250));

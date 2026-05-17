@@ -1262,16 +1262,11 @@
     50%      { translate: 0 -10px; }
   }
 
-  /* === Idle behaviour: sprite IS the pose, just add subtle settling ===*/
+  /* === Idle behaviour: sprite IS the pose, just gentle continuous breathing === */
   .opscat-wrap.yawning .opscat-img,
   .opscat-wrap.grooming .opscat-img,
   .opscat-wrap.stretching .opscat-img {
-    animation: catPosePop 0.45s ease-out forwards, catBreathe 4.5s cubic-bezier(.45,.05,.55,.95) 0.45s infinite;
-  }
-  @keyframes catPosePop {
-    0%   { transform: scale(0.92); opacity: .7; }
-    60%  { transform: scale(1.04); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
+    animation: catBreathe 4.5s cubic-bezier(.45,.05,.55,.95) infinite;
   }
 
   /* Behaviour emoji overlay (yawn 🥱 / groom ✨ / stretch 🐈) */
@@ -2807,8 +2802,12 @@ init();
     S.wrap = document.getElementById('opscatWrap');
     S.tip = document.getElementById('opscatTip');
     if (!S.el || !S.wrap) return false;
-    S.el.innerHTML = '<img class="opscat-img" id="opscatSprite" src="' + POSES.sitting + '" alt="cat" draggable="false">' +
-                     '<span class="opscat-zzz">Z<span style="font-size:13px;margin-left:2px">z</span></span>';
+    S.el.innerHTML =
+      '<video class="opscat-img" id="opscatVideo" autoplay loop muted playsinline preload="auto" style="display:none">' +
+        '<source src="' + BASE + 'cat-walking-video.mp4" type="video/mp4">' +
+      '</video>' +
+      '<img class="opscat-img" id="opscatSprite" src="' + POSES.sitting + '" alt="cat" draggable="false">' +
+      '<span class="opscat-zzz">Z<span style="font-size:13px;margin-left:2px">z</span></span>';
     return true;
   }
 
@@ -2821,20 +2820,28 @@ init();
       yawning:'yawning', grooming:'grooming', stretching:'stretching' }[m] || 'sitting';
     S.wrap.classList.add(visualClass);
     if (S.tip) S.tip.textContent = m;
-    // Swap sprite to match mode
-    const spriteKey = MODE_SPRITE[m] || 'sitting';
+
     const img = document.getElementById('opscatSprite');
-    if (img && POSES[spriteKey]) img.src = POSES[spriteKey];
-    // If walking, start the leg-cycle (alternating two walking poses)
-    clearInterval(S.walkCycle);
-    S.walkCycle = null;
+    const vid = document.getElementById('opscatVideo');
+
     if (m === 'walking') {
-      let flipFrame = false;
-      S.walkCycle = setInterval(function() {
-        flipFrame = !flipFrame;
-        const i = document.getElementById('opscatSprite');
-        if (i) i.src = POSES[flipFrame ? 'walking2' : 'walking'];
-      }, 320); // alternate every 320ms = ~3 steps/sec
+      // Real motion: play the video, hide static sprite
+      if (img) img.style.display = 'none';
+      if (vid) {
+        vid.style.display = '';
+        try { vid.play().catch(function(){}); } catch(e){}
+      }
+    } else {
+      // Static pose: show sprite, pause video to save resources
+      if (vid) {
+        vid.style.display = 'none';
+        try { vid.pause(); } catch(e){}
+      }
+      if (img) {
+        img.style.display = '';
+        const spriteKey = MODE_SPRITE[m] || 'sitting';
+        if (POSES[spriteKey]) img.src = POSES[spriteKey];
+      }
     }
   }
 
@@ -2853,9 +2860,9 @@ init();
     const dx = targetX - S.x;
     const dy = targetY - S.y;
     const distance = Math.sqrt(dx*dx + dy*dy);
-    const baseSpeed = 50 + Math.random() * 60;
+    const baseSpeed = 30 + Math.random() * 40; // slower for more natural feel
     let duration = Math.min(10, Math.max(1.2, distance / baseSpeed));
-    if (Math.random() < 0.12) duration = Math.max(0.6, duration * 0.4);
+    if (Math.random() < 0.05) duration = Math.max(0.8, duration * 0.5); // rare darts
 
     S.facingLeft = (dx < -3);
     S.wrap.classList.toggle('flip', S.facingLeft);
@@ -2878,7 +2885,7 @@ init();
 
   function scheduleNextMove() {
     clearTimeout(S.moveTimer);
-    const pause = 2000 + Math.random() * 7000;
+    const pause = 4000 + Math.random() * 9000; // longer pauses (4-13s) — cats are not always moving
     S.moveTimer = setTimeout(function () {
       if (S.manualMood && performance.now() < S.manualUntil) {
         scheduleNextMove();

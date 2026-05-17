@@ -1179,20 +1179,20 @@
   /* === Interactive walking pixel cat === */
   .opscat-wrap {
     position: fixed; left: 0;
-    bottom: max(12px, env(safe-area-inset-bottom));
+    bottom: max(8px, env(safe-area-inset-bottom));
     z-index: 5;
-    width: 76px; height: 96px;
+    width: 150px; height: 180px;
     display: flex; align-items: flex-end; justify-content: center;
     cursor: pointer; user-select: none;
     -webkit-tap-highlight-color: transparent;
-    filter: drop-shadow(0 8px 16px rgba(27,20,100,.25));
+    filter: drop-shadow(0 10px 22px rgba(27,20,100,.30));
     transform: translate(50vw, 0);
     transition: filter .2s;
   }
   .opscat-wrap:hover { filter: drop-shadow(0 10px 22px rgba(237,28,36,.35)); }
   .opscat-wrap.flip .opscat { transform: scaleX(-1); }
   .opscat { transition: transform 220ms ease; transform-origin: 50% 100%; }
-  .opscat svg { width: 76px; height: 76px; image-rendering: pixelated; display: block; }
+  .opscat svg { width: 150px; height: 150px; display: block; }
   /* Cat mode transforms now applied via inner .cat-whole — see realistic cat block below */
   .opscat { transition: transform 220ms ease; }
   @keyframes opscatHop {
@@ -1213,8 +1213,8 @@
   }
   .opscat-wrap:hover .opscat-tip { opacity: 1; transform: translate(-50%, 0); }
   @media (max-width: 480px) {
-    .opscat-wrap { width: 58px; height: 78px; }
-    .opscat svg { width: 58px; height: 58px; }
+    .opscat-wrap { width: 110px; height: 140px; }
+    .opscat svg { width: 110px; height: 110px; }
   }
 
   /* === Realistic vector cat ============================================ */
@@ -1231,7 +1231,7 @@
   /* Breathing — always on, very gentle */
   .cat-body {
     transform-origin: 50% 92%;
-    animation: catBreathe 3.4s cubic-bezier(.45,.05,.55,.95) infinite;
+    animation: catBreathe 4.5s cubic-bezier(.45,.05,.55,.95) infinite;
   }
   @keyframes catBreathe {
     0%, 100% { transform: scaleY(1) translateY(0); }
@@ -1241,7 +1241,7 @@
   /* Tail sway — always on */
   .cat-tail {
     transform-origin: 25% 73%;
-    animation: catTailSway 3.8s ease-in-out infinite;
+    animation: catTailSway 5s ease-in-out infinite;
     transform-box: fill-box;
   }
   @keyframes catTailSway {
@@ -1282,12 +1282,12 @@
     50%      { transform: translateY(-1.4px) rotate(.6deg); }
   }
   @keyframes catLegA {
-    0%, 100% { transform: rotate(-10deg); }
-    50%      { transform: rotate(10deg); }
+    0%, 100% { transform: rotate(-7deg); }
+    50%      { transform: rotate(7deg); }
   }
   @keyframes catLegB {
-    0%, 100% { transform: rotate(10deg); }
-    50%      { transform: rotate(-10deg); }
+    0%, 100% { transform: rotate(7deg); }
+    50%      { transform: rotate(-7deg); }
   }
 
   .opscat-mode-sitting .cat-whole { transform: translateY(2px); }
@@ -1301,12 +1301,20 @@
     50%      { transform: translateY(-0.6px) scale(1.015); }
   }
 
-  .opscat-mode-sleeping .cat-whole {
-    transform: rotate(-72deg) translate(-12px, 2px) scale(0.92);
-    transform-origin: 50% 80%;
+  .opscat-mode-sleeping .cat-whole { transform: translateY(4px); }
+  .opscat-mode-sleeping .cat-head { transform: translate(-1px, 3px) rotate(-8deg); transform-origin: 50% 65%; transform-box: fill-box; }
+  .opscat-mode-sleeping .cat-body {
+    transform: scaleX(1.12) scaleY(0.88);
+    transform-origin: 50% 100%; transform-box: fill-box;
+    animation: catSleepBreath 4.2s ease-in-out infinite;
   }
   .opscat-mode-sleeping .cat-eyelids { opacity: 1 !important; animation: none; transform: scaleY(1); }
-  .opscat-mode-sleeping .cat-body { animation: catSleepBreath 4s ease-in-out infinite; }
+  .opscat-mode-sleeping .cat-zzz { opacity: 1 !important; animation: catZzz 2.5s ease-in-out infinite; transform-origin: center; }
+  .opscat-mode-sleeping .cat-tail { animation-duration: 8s; }
+  @keyframes catZzz {
+    0%, 100% { opacity: 0.5; transform: translateY(0); }
+    50%      { opacity: 1; transform: translateY(-3px); }
+  }
   @keyframes catSleepBreath {
     0%, 100% { transform: scaleY(1); }
     50%      { transform: scaleY(1.06); }
@@ -2757,96 +2765,118 @@ init();
 //  Click to pet (Shift+click to cycle mood). Auto-sleeps 22:00-06:00.
 // =============================================================
 (function () {
-  // === Realistic vector cat — single static SVG, CSS-driven animations ===
+  // === Realistic kawaii kitten — single SVG, CSS-driven animations ===
   function buildCatSvg() {
     return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="cat-svg" preserveAspectRatio="xMidYMax meet">'
       + '<defs>'
         + '<linearGradient id="furG" x1="0" y1="0" x2="0" y2="1">'
-          + '<stop offset="0%" stop-color="#b8895f"/>'
-          + '<stop offset="55%" stop-color="#825939"/>'
-          + '<stop offset="100%" stop-color="#523822"/>'
+          + '<stop offset="0%" stop-color="#c89878"/>'
+          + '<stop offset="55%" stop-color="#8b6240"/>'
+          + '<stop offset="100%" stop-color="#5a3a22"/>'
         + '</linearGradient>'
-        + '<radialGradient id="bellyG" cx="0.5" cy="0.55" r="0.5">'
-          + '<stop offset="0%" stop-color="#e8c597" stop-opacity="0.75"/>'
-          + '<stop offset="100%" stop-color="#b8895f" stop-opacity="0"/>'
+        + '<radialGradient id="bellyG" cx="0.5" cy="0.5" r="0.6">'
+          + '<stop offset="0%" stop-color="#f0d4a8" stop-opacity="0.9"/>'
+          + '<stop offset="100%" stop-color="#c89878" stop-opacity="0"/>'
         + '</radialGradient>'
         + '<radialGradient id="cheekG" cx="0.5" cy="0.5" r="0.5">'
-          + '<stop offset="0%" stop-color="#e8a8a8" stop-opacity="0.4"/>'
-          + '<stop offset="100%" stop-color="#e8a8a8" stop-opacity="0"/>'
+          + '<stop offset="0%" stop-color="#f5b8c0" stop-opacity="0.6"/>'
+          + '<stop offset="100%" stop-color="#f5b8c0" stop-opacity="0"/>'
         + '</radialGradient>'
-        + '<radialGradient id="eyeG" cx="0.35" cy="0.35" r="0.65">'
-          + '<stop offset="0%" stop-color="#4338ca"/>'
-          + '<stop offset="55%" stop-color="#2d2399"/>'
-          + '<stop offset="100%" stop-color="#1B1464"/>'
+        + '<radialGradient id="eyeG" cx="0.3" cy="0.3" r="0.75">'
+          + '<stop offset="0%" stop-color="#5a4ee0"/>'
+          + '<stop offset="50%" stop-color="#2d2399"/>'
+          + '<stop offset="100%" stop-color="#0d0840"/>'
+        + '</radialGradient>'
+        + '<radialGradient id="noseG" cx="0.5" cy="0.5" r="0.5">'
+          + '<stop offset="0%" stop-color="#ff6b75"/>'
+          + '<stop offset="100%" stop-color="#c01018"/>'
         + '</radialGradient>'
       + '</defs>'
       + '<g class="cat-whole">'
-        // Tail behind everything
+        // Tail — curved S-shape behind body
         + '<g class="cat-tail">'
-          + '<path d="M 25 73 Q 12 68 7 53 Q 4 42 13 33 Q 18 30 22 33" stroke="url(#furG)" stroke-width="6.5" fill="none" stroke-linecap="round"/>'
-          + '<path d="M 25 73 Q 13 68 9 55" stroke="#3d2818" stroke-width="0.5" fill="none" stroke-linecap="round" opacity="0.35"/>'
+          + '<path d="M 70 78 C 82 72, 88 58, 82 42 C 78 34, 84 28, 90 32" stroke="url(#furG)" stroke-width="8" fill="none" stroke-linecap="round"/>'
+          + '<path d="M 70 78 C 82 72, 88 58, 82 42" stroke="#3d2818" stroke-width="0.5" fill="none" stroke-linecap="round" opacity="0.3"/>'
+          // Tail tip lighter
+          + '<circle cx="90" cy="32" r="3.5" fill="#e8c597" opacity="0.4"/>'
         + '</g>'
-        // Back legs (slightly behind body)
-        + '<ellipse class="cat-leg cat-leg-bl" cx="36" cy="85" rx="6" ry="9" fill="url(#furG)"/>'
-        + '<ellipse class="cat-leg cat-leg-br" cx="64" cy="85" rx="6" ry="9" fill="url(#furG)"/>'
-        // Body
+        // Back legs
+        + '<ellipse class="cat-leg cat-leg-bl" cx="38" cy="84" rx="5.5" ry="8" fill="url(#furG)"/>'
+        + '<ellipse class="cat-leg cat-leg-br" cx="62" cy="84" rx="5.5" ry="8" fill="url(#furG)"/>'
+        // Body (smaller relative to head, kawaii)
         + '<g class="cat-body">'
-          + '<ellipse cx="50" cy="72" rx="24" ry="20" fill="url(#furG)"/>'
-          + '<ellipse cx="50" cy="78" rx="16" ry="12" fill="url(#bellyG)"/>'
+          + '<ellipse cx="50" cy="76" rx="22" ry="16" fill="url(#furG)"/>'
+          + '<ellipse cx="50" cy="82" rx="15" ry="10" fill="url(#bellyG)"/>'
         + '</g>'
         // Front legs
-        + '<ellipse class="cat-leg cat-leg-fl" cx="42" cy="89" rx="5" ry="7" fill="url(#furG)"/>'
-        + '<ellipse class="cat-leg cat-leg-fr" cx="58" cy="89" rx="5" ry="7" fill="url(#furG)"/>'
-        // Paw pads
-        + '<ellipse cx="42" cy="94" rx="4" ry="2" fill="#3b2a1e" opacity="0.55"/>'
-        + '<ellipse cx="58" cy="94" rx="4" ry="2" fill="#3b2a1e" opacity="0.55"/>'
-        // Head
+        + '<ellipse class="cat-leg cat-leg-fl" cx="42" cy="90" rx="5" ry="6.5" fill="url(#furG)"/>'
+        + '<ellipse class="cat-leg cat-leg-fr" cx="58" cy="90" rx="5" ry="6.5" fill="url(#furG)"/>'
+        // Tiny paw toe-beans
+        + '<ellipse cx="42" cy="95" rx="3.5" ry="1.5" fill="#3b2a1e" opacity="0.45"/>'
+        + '<ellipse cx="58" cy="95" rx="3.5" ry="1.5" fill="#3b2a1e" opacity="0.45"/>'
+        // === HEAD (big, kawaii) ===
         + '<g class="cat-head">'
           // Ears outer
-          + '<path d="M 28 32 L 22 13 L 43 25 Z" fill="url(#furG)"/>'
-          + '<path d="M 72 32 L 78 13 L 57 25 Z" fill="url(#furG)"/>'
-          // Ears inner (pink)
-          + '<path d="M 30 28 L 26 18 L 39 26 Z" fill="#e8a8a8" opacity="0.85"/>'
-          + '<path d="M 70 28 L 74 18 L 61 26 Z" fill="#e8a8a8" opacity="0.85"/>'
-          // Face shape
-          + '<ellipse cx="50" cy="43" rx="22" ry="20" fill="url(#furG)"/>'
+          + '<path d="M 24 30 L 18 8 L 42 22 Z" fill="url(#furG)" stroke="#5a3a22" stroke-width="0.4" stroke-linejoin="round"/>'
+          + '<path d="M 76 30 L 82 8 L 58 22 Z" fill="url(#furG)" stroke="#5a3a22" stroke-width="0.4" stroke-linejoin="round"/>'
+          // Ears inner pink
+          + '<path d="M 28 26 L 25 14 L 39 22 Z" fill="#f5a8b8" opacity="0.95"/>'
+          + '<path d="M 72 26 L 75 14 L 61 22 Z" fill="#f5a8b8" opacity="0.95"/>'
+          // Face (BIG, round)
+          + '<ellipse cx="50" cy="43" rx="26" ry="24" fill="url(#furG)"/>'
+          // Lighter belly/chin
+          + '<ellipse cx="50" cy="50" rx="18" ry="14" fill="#f0d4a8" opacity="0.45"/>'
+          // Subtle tabby stripes on forehead
+          + '<path d="M 38 25 Q 42 28 38 32" stroke="#5a3a22" stroke-width="0.8" fill="none" opacity="0.45"/>'
+          + '<path d="M 50 22 Q 50 26 50 30" stroke="#5a3a22" stroke-width="0.8" fill="none" opacity="0.45"/>'
+          + '<path d="M 62 25 Q 58 28 62 32" stroke="#5a3a22" stroke-width="0.8" fill="none" opacity="0.45"/>'
           // Cheek blush
-          + '<ellipse cx="32" cy="49" rx="9" ry="6" fill="url(#cheekG)"/>'
-          + '<ellipse cx="68" cy="49" rx="9" ry="6" fill="url(#cheekG)"/>'
-          // Eye whites
+          + '<ellipse cx="28" cy="50" rx="9" ry="6" fill="url(#cheekG)"/>'
+          + '<ellipse cx="72" cy="50" rx="9" ry="6" fill="url(#cheekG)"/>'
+          // === BIG kawaii eyes ===
           + '<g class="cat-eyes">'
-            + '<ellipse cx="40" cy="40" rx="4.2" ry="5" fill="#fff"/>'
-            + '<ellipse cx="60" cy="40" rx="4.2" ry="5" fill="#fff"/>'
-            // Irises
-            + '<ellipse class="cat-iris" cx="40" cy="40" rx="3.4" ry="4.3" fill="url(#eyeG)"/>'
-            + '<ellipse class="cat-iris" cx="60" cy="40" rx="3.4" ry="4.3" fill="url(#eyeG)"/>'
-            // Pupils
-            + '<ellipse class="cat-pupil" cx="40" cy="40" rx="1.3" ry="3.6" fill="#000"/>'
-            + '<ellipse class="cat-pupil" cx="60" cy="40" rx="1.3" ry="3.6" fill="#000"/>'
-            // Highlights
-            + '<circle cx="41" cy="38" r="1" fill="#fff"/>'
-            + '<circle cx="61" cy="38" r="1" fill="#fff"/>'
+            // Eye whites
+            + '<ellipse cx="38" cy="44" rx="6" ry="7.5" fill="#fff"/>'
+            + '<ellipse cx="62" cy="44" rx="6" ry="7.5" fill="#fff"/>'
+            // Iris (big)
+            + '<ellipse class="cat-iris" cx="38" cy="45" rx="5" ry="6.5" fill="url(#eyeG)"/>'
+            + '<ellipse class="cat-iris" cx="62" cy="45" rx="5" ry="6.5" fill="url(#eyeG)"/>'
+            // Pupils (vertical slits like real cats)
+            + '<ellipse class="cat-pupil" cx="38" cy="45" rx="1.8" ry="5.5" fill="#000"/>'
+            + '<ellipse class="cat-pupil" cx="62" cy="45" rx="1.8" ry="5.5" fill="#000"/>'
+            // Sparkle highlights (two each — kawaii effect)
+            + '<circle cx="40" cy="41" r="1.8" fill="#fff"/>'
+            + '<circle cx="64" cy="41" r="1.8" fill="#fff"/>'
+            + '<circle cx="36" cy="47" r="0.9" fill="#fff" opacity="0.8"/>'
+            + '<circle cx="60" cy="47" r="0.9" fill="#fff" opacity="0.8"/>'
           + '</g>'
-          // Eyelids — closed during blink
+          // Eyelids (for blink)
           + '<g class="cat-eyelids">'
-            + '<path d="M 35 40 Q 40 44 45 40 L 45 38 L 35 38 Z" fill="url(#furG)"/>'
-            + '<path d="M 55 40 Q 60 44 65 40 L 65 38 L 55 38 Z" fill="url(#furG)"/>'
+            + '<path d="M 31 44 Q 38 50 45 44 L 45 41 L 31 41 Z" fill="url(#furG)" stroke="#3b2a1e" stroke-width="0.5" stroke-linejoin="round"/>'
+            + '<path d="M 55 44 Q 62 50 69 44 L 69 41 L 55 41 Z" fill="url(#furG)" stroke="#3b2a1e" stroke-width="0.5" stroke-linejoin="round"/>'
           + '</g>'
-          // Nose
-          + '<path d="M 47 50 L 53 50 L 50 53.5 Z" fill="#ED1C24"/>'
-          + '<path d="M 47.5 50.3 Q 50 51 52.5 50.3" stroke="#a01018" stroke-width="0.3" fill="none"/>'
-          // Mouth
-          + '<path d="M 50 54 Q 47 57.5 44 56.5" stroke="#3b2a1e" stroke-width="0.7" fill="none" stroke-linecap="round"/>'
-          + '<path d="M 50 54 Q 53 57.5 56 56.5" stroke="#3b2a1e" stroke-width="0.7" fill="none" stroke-linecap="round"/>'
+          // Nose (heart-shaped)
+          + '<path d="M 45 55 Q 50 53 50 55 Q 50 53 55 55 Q 55 58 50 60 Q 45 58 45 55 Z" fill="url(#noseG)"/>'
+          // Mouth — smile
+          + '<path d="M 50 60 L 50 62" stroke="#3b2a1e" stroke-width="0.8" stroke-linecap="round"/>'
+          + '<path d="M 50 62 Q 46 65 43 64" stroke="#3b2a1e" stroke-width="0.8" fill="none" stroke-linecap="round"/>'
+          + '<path d="M 50 62 Q 54 65 57 64" stroke="#3b2a1e" stroke-width="0.8" fill="none" stroke-linecap="round"/>'
+          // Tiny pink tongue (peeks out)
+          + '<path class="cat-tongue" d="M 49 63 Q 50 65 51 63 Q 51 64.5 50 64.5 Q 49 64.5 49 63 Z" fill="#f08a9a" opacity="0"/>'
           // Whiskers
-          + '<g class="cat-whiskers" opacity="0.75">'
-            + '<line x1="28" y1="50" x2="14" y2="46" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
-            + '<line x1="28" y1="52" x2="14" y2="52" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
-            + '<line x1="28" y1="54" x2="14" y2="58" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
-            + '<line x1="72" y1="50" x2="86" y2="46" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
-            + '<line x1="72" y1="52" x2="86" y2="52" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
-            + '<line x1="72" y1="54" x2="86" y2="58" stroke="#fff" stroke-width="0.4" stroke-linecap="round"/>'
+          + '<g class="cat-whiskers" opacity="0.85">'
+            + '<line x1="22" y1="55" x2="6" y2="50" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
+            + '<line x1="22" y1="58" x2="6" y2="58" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
+            + '<line x1="22" y1="61" x2="6" y2="65" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
+            + '<line x1="78" y1="55" x2="94" y2="50" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
+            + '<line x1="78" y1="58" x2="94" y2="58" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
+            + '<line x1="78" y1="61" x2="94" y2="65" stroke="#fff" stroke-width="0.6" stroke-linecap="round"/>'
           + '</g>'
+        + '</g>'
+        // Z indicator for sleeping mode
+        + '<g class="cat-zzz" opacity="0">'
+          + '<text x="78" y="20" font-family="Georgia, serif" font-size="12" font-weight="bold" fill="#1B1464" opacity="0.7">Z</text>'
+          + '<text x="84" y="14" font-family="Georgia, serif" font-size="9" font-weight="bold" fill="#1B1464" opacity="0.5">z</text>'
         + '</g>'
       + '</g>'
     + '</svg>';
@@ -2873,7 +2903,7 @@ init();
     if (S.modeUntil && performance.now() < S.modeUntil) return;
     const h = new Date().getHours();
     let next;
-    if (h>=22 || h<6) next = 'sleeping';
+    if (h>=1 && h<5) next = 'sleeping';
     else if (h>=7 && h<21 && Math.random()<.15) {
       next = 'playing';
       S.modeUntil = performance.now() + 4500 + Math.random()*2500;

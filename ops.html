@@ -2080,236 +2080,51 @@ init();
   }
 })();
 </script>
-<!-- v4: ALL-IN-ONE — backdrop + hero layout + JAKIM prayer + cat phrases -->
+<!-- v5: high-quality backdrop + frosted cards so image shows through -->
 <script>
 (function() {
-  // ============ Neutralize old Aladhan fetches ============
-  const _origFetch = window.fetch;
-  window.fetch = function(url, opts) {
-    if (typeof url === 'string' && url.includes('aladhan.com')) {
-      return Promise.reject(new Error('Aladhan disabled — using JAKIM'));
-    }
-    return _origFetch.call(this, url, opts);
-  };
+  const HQ = 'https://raw.githubusercontent.com/haz1-90/trading/claude/mdv-dashboard-backend-VkjqT/dashboard/assets/bg-jungfraujoch.webp';
 
-  // ============ Styles ============
-  const styles = document.createElement('style');
-  styles.textContent = `
-    .hero-row {
-      display: flex; align-items: center;
-      gap: 22px; flex-wrap: wrap; margin: 4px 0 8px;
+  // 1. Swap to high-quality hosted image
+  document.documentElement.style.background =
+    `url('${HQ}') center 38% / cover no-repeat fixed, #f7f7f5`;
+
+  // 2. Disable any leftover pseudo-element backdrops
+  const off = document.createElement('style');
+  off.textContent = 'body::before, body::after { display: none !important; }';
+  document.head.appendChild(off);
+
+  // 3. Frost the cards: semi-transparent white + blur behind
+  const frost = document.createElement('style');
+  frost.textContent = `
+    .hero, .strip-card, .sales-panel,
+    .campaigns-section, .incentives-section, .calendar-section,
+    .day-detail, .modal {
+      background: rgba(255, 255, 255, 0.78) !important;
+      backdrop-filter: blur(14px) saturate(150%);
+      -webkit-backdrop-filter: blur(14px) saturate(150%);
     }
-    .hero-row .today-day { flex: 0 0 auto; }
-    .hero-side {
-      display: flex; flex-direction: column;
-      gap: 6px; min-width: 0;
+    .theme-card {
+      background: rgba(255, 255, 255, 0.78) !important;
+      backdrop-filter: blur(10px) saturate(150%);
+      -webkit-backdrop-filter: blur(10px) saturate(150%);
     }
-    .hero-side .hijri-line {
-      font-size: 13px; color: var(--muted);
-      font-weight: 600; letter-spacing: .3px; margin: 0;
+    .hero-card:not(.hero-runrate),
+    .month, .sales-card, .leaderboard-row,
+    .campaign, .incentive {
+      background: rgba(247, 247, 245, 0.60) !important;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
-    .hero-side .prayer-line {
-      display: flex; align-items: baseline;
-      gap: 10px; line-height: 1; flex-wrap: wrap; margin: 0;
+    .campaign.live { background: rgba(255, 255, 255, 0.75) !important; }
+    .topbar {
+      backdrop-filter: blur(8px) saturate(140%);
+      -webkit-backdrop-filter: blur(8px) saturate(140%);
     }
-    .hero-side .prayer-name {
-      font-size: clamp(24px, 3.4vw, 32px);
-      font-weight: 800; color: var(--text);
-      letter-spacing: -.5px; line-height: 1;
-    }
-    .hero-side .prayer-time {
-      font-size: clamp(18px, 2.6vw, 24px);
-      font-weight: 700; color: var(--accent);
-      font-variant-numeric: tabular-nums; line-height: 1;
-    }
-    .opscat-bubble {
-      position: absolute; bottom: calc(100% + 8px); left: 50%;
-      transform: translateX(-50%) translateY(6px);
-      background: #fff; color: var(--text);
-      border: 1.5px solid var(--primary);
-      padding: 6px 12px; border-radius: 14px;
-      font-size: 11px; font-weight: 700;
-      white-space: nowrap; letter-spacing: .2px;
-      box-shadow: 0 6px 14px rgba(27,20,100,.18);
-      opacity: 0; pointer-events: none; z-index: 6;
-      transition: opacity .35s ease, transform .35s ease;
-    }
-    .opscat-bubble.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .opscat-bubble::after {
-      content: ''; position: absolute; top: 100%; left: 50%;
-      transform: translateX(-50%);
-      border: 6px solid transparent; border-top-color: var(--primary);
-    }
-    .opscat-bubble::before {
-      content: ''; position: absolute; top: calc(100% - 1.5px); left: 50%;
-      transform: translateX(-50%);
-      border: 5px solid transparent; border-top-color: #fff; z-index: 1;
-    }
+    /* Keep the navy run-rate card vivid */
+    .hero-runrate { backdrop-filter: none; -webkit-backdrop-filter: none; }
   `;
-  document.head.appendChild(styles);
-
-  // ============ Backdrop: full image, no veil ============
-  function fixBackdrop() {
-    let bgRaw = '';
-    try { bgRaw = getComputedStyle(document.body, '::before').backgroundImage || ''; } catch(e){}
-    if (!bgRaw.includes('data:image')) {
-      try { bgRaw = getComputedStyle(document.documentElement).backgroundImage || ''; } catch(e){}
-    }
-    const m = bgRaw.match(/url\("?(data:image\/webp[^")]+)"?\)/);
-    if (!m) return;
-    document.documentElement.style.background =
-      `url("${m[1]}") center 38% / cover no-repeat fixed, #f7f7f5`;
-    const hide = document.createElement('style');
-    hide.textContent = 'body::before, body::after { display: none !important; }';
-    document.head.appendChild(hide);
-  }
-
-  // ============ Hero layout: big date + Hijri & prayer side ============
-  function setupHero() {
-    // Clean any leftover from previous scripts
-    document.querySelectorAll('.prayer-line').forEach(el => {
-      if (!el.closest('.hero-side')) el.remove();
-    });
-    document.querySelectorAll('.hijri-line').forEach(el => {
-      if (!el.closest('.hero-side')) el.remove();
-    });
-
-    const day = document.getElementById('todayDayName');
-    const rest = document.getElementById('todayFullDate');
-    if (!day) return;
-    day.style.display = '';
-    if (rest) rest.style.display = '';
-    if (day.parentNode.classList.contains('hero-row')) return;
-
-    const row = document.createElement('div');
-    row.className = 'hero-row';
-    day.parentNode.insertBefore(row, day);
-    row.appendChild(day);
-
-    const side = document.createElement('div');
-    side.className = 'hero-side';
-    side.innerHTML =
-      '<div class="hijri-line" id="hijriLine">—</div>' +
-      '<div class="prayer-line">' +
-        '<span class="prayer-name" id="nextPrayerName">Memuat…</span>' +
-        '<span class="prayer-time" id="nextPrayerTime">—</span>' +
-      '</div>';
-    row.appendChild(side);
-  }
-
-  // ============ JAKIM e-solat (WLY01 KL/Putrajaya) ============
-  const PRAYERS = ['fajr','dhuhr','asr','maghrib','isha'];
-  const NAMES = { fajr:'Subuh', dhuhr:'Zohor', asr:'Asar', maghrib:'Maghrib', isha:'Isyak' };
-  const HIJRI_MS = ['Muharram','Safar','Rabiulawal','Rabiulakhir','Jamadilawal','Jamadilakhir','Rejab','Syaaban','Ramadan','Syawal','Zulkaedah','Zulhijjah'];
-  const JAKIM_URL = 'https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=today&zone=WLY01';
-  let cache = null;
-
-  async function tryFetch(url) {
-    try {
-      const res = await _origFetch.call(window, url);
-      if (!res.ok) return null;
-      const text = await res.text();
-      const json = JSON.parse(text);
-      if (json.contents && typeof json.contents === 'string') {
-        try { return JSON.parse(json.contents); } catch(e) { return null; }
-      }
-      return json;
-    } catch (e) { return null; }
-  }
-
-  async function fetchJAKIM() {
-    let data = await tryFetch(JAKIM_URL);
-    if (!data || data.status !== 'OK!') {
-      data = await tryFetch('https://api.allorigins.win/get?url=' + encodeURIComponent(JAKIM_URL));
-    }
-    if (!data || data.status !== 'OK!') {
-      data = await tryFetch('https://corsproxy.io/?' + encodeURIComponent(JAKIM_URL));
-    }
-    if (data && data.status === 'OK!' && data.prayerTime && data.prayerTime[0]) {
-      cache = data.prayerTime[0];
-      console.log('✓ JAKIM e-solat data loaded:', cache);
-    } else {
-      console.warn('JAKIM fetch failed on all routes');
-    }
-    return cache;
-  }
-
-  function fmt12(t24) {
-    const [h,m] = t24.split(':').map(Number);
-    const ap = h >= 12 ? 'PM' : 'AM';
-    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
-    return `${h12}:${String(m).padStart(2,'0')} ${ap}`;
-  }
-
-  function renderPrayer() {
-    if (!cache) return;
-    const now = new Date();
-    const cur = now.getHours() * 60 + now.getMinutes();
-    let nxt = null;
-    for (const p of PRAYERS) {
-      const tStr = (cache[p] || '').slice(0,5);
-      if (!tStr) continue;
-      const [hh, mm] = tStr.split(':').map(Number);
-      if (hh * 60 + mm > cur) { nxt = { key: p, time: tStr }; break; }
-    }
-    if (!nxt) {
-      nxt = { key: 'fajr', time: (cache.fajr || '').slice(0,5), tom: true };
-    }
-    const nameEl = document.getElementById('nextPrayerName');
-    const timeEl = document.getElementById('nextPrayerTime');
-    const hijriEl = document.getElementById('hijriLine');
-    if (nameEl) nameEl.textContent = NAMES[nxt.key] + (nxt.tom ? ' (esok)' : '');
-    if (timeEl) timeEl.textContent = fmt12(nxt.time);
-    if (hijriEl && cache.hijri) {
-      const [yy, mm, dd] = cache.hijri.split('-').map(Number);
-      const monthName = HIJRI_MS[mm - 1] || `Bulan ${mm}`;
-      hijriEl.textContent = `${dd} ${monthName} ${yy}H`;
-    }
-  }
-
-  // ============ Cat speech bubbles ============
-  const PHRASES = [
-    "Hi, how are you?", "Ganbatte! 💪", "Hari yang ceria!", "Semangat ya!",
-    "Senyum dulu 😊", "Awak hebat!", "Coffee break?", "Meow~ 🐾",
-    "You got this!", "Take a breath", "Selamat datang!", "Stay focused!",
-    "Patient first 💙", "Almost there!", "Bismillah 🤲", "Rest sikit",
-    "Keep going!", "Jangan stress", "Be kind 💛", "Eyes on prize 👀"
-  ];
-
-  function injectBubble() {
-    const wrap = document.getElementById('opscatWrap');
-    if (!wrap || document.getElementById('opscatBubble')) return;
-    const b = document.createElement('span');
-    b.className = 'opscat-bubble';
-    b.id = 'opscatBubble';
-    wrap.appendChild(b);
-  }
-  function showBubble() {
-    const b = document.getElementById('opscatBubble');
-    if (!b) return;
-    b.textContent = PHRASES[Math.floor(Math.random() * PHRASES.length)];
-    b.classList.add('show');
-    clearTimeout(b._t);
-    b._t = setTimeout(() => b.classList.remove('show'), 4500);
-  }
-  function scheduleBubble() {
-    setTimeout(() => { showBubble(); scheduleBubble(); }, 10000 + Math.random() * 12000);
-  }
-
-  // ============ Boot ============
-  async function boot() {
-    fixBackdrop();
-    setupHero();
-    injectBubble();
-    await fetchJAKIM();
-    renderPrayer();
-    setInterval(renderPrayer, 60 * 1000);
-    setInterval(fetchJAKIM, 30 * 60 * 1000);
-    setTimeout(() => { showBubble(); scheduleBubble(); }, 4000);
-  }
-
-  if (document.readyState === 'complete') setTimeout(boot, 200);
-  else window.addEventListener('load', () => setTimeout(boot, 200));
+  document.head.appendChild(frost);
 })();
 </script></body>
 </html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#2a2566">
+<meta name="robots" content="noindex,nofollow">
+<title>Staff Dashboard — Menara Sudoku</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3f1ec; --paper-dim:#e9e6dd; --ink:#2a2566; --ink-soft:#6b6790;
+  --line:#c9c5d4; --accent:#c44a42; --good:#4a7a52; --bad:#c44a42; --gold:#b8893f;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;
+  min-height:100vh;-webkit-font-smoothing:antialiased;padding:20px 16px 40px}
+.wrap{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font-family:'Fraunces',serif;font-weight:900;font-size:28px;letter-spacing:-.02em}
+.sub{font-size:11px;color:var(--ink-soft);letter-spacing:.18em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.card{background:var(--paper-dim);border:1px solid var(--line);border-radius:14px;padding:16px}
+.fld{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.fld label{font-size:11px;color:var(--ink-soft);letter-spacing:.12em;text-transform:uppercase;font-weight:600}
+.fld input{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;
+  padding:12px 14px;font-family:'Inter';font-size:16px;color:var(--ink);outline:none;
+  text-transform:uppercase;letter-spacing:.06em}
+.fld input:focus{border-color:var(--ink)}
+.btn{width:100%;padding:14px;border-radius:12px;border:none;background:var(--ink);
+  color:var(--paper);font-family:'Inter';font-weight:700;font-size:14px;cursor:pointer;
+  letter-spacing:.04em}
+.btn.gold{background:var(--gold);color:#fff}
+.btn.bad{background:var(--accent);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--line)}
+.btn:disabled{opacity:.5}
+.row{display:flex;gap:8px}
+.row .btn{flex:1}
+.result{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;display:none}
+.result.show{display:block}
+.result h2{font-family:'Fraunces',serif;font-size:22px;font-weight:900;margin-bottom:4px}
+.result .vcode{font-family:'Fraunces',serif;font-size:24px;font-weight:900;letter-spacing:.06em;color:var(--ink)}
+.result .vval{font-family:'Fraunces',serif;font-size:38px;font-weight:900;color:var(--gold);margin:6px 0 12px}
+.result .det{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:13px;
+  background:var(--paper-dim);border-radius:10px;padding:12px 14px;margin:8px 0 14px}
+.result .det b{color:var(--ink-soft);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.result .det span{font-weight:600;color:var(--ink);word-break:break-all}
+.status{display:inline-block;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase}
+.status.issued{background:#dff0e3;color:var(--good)}
+.status.redeemed{background:#f0dcd7;color:var(--accent)}
+.status.expired{background:#fdf0c8;color:#856404}
+.note{font-size:12px;color:var(--ink-soft);margin-top:10px;line-height:1.5}
+.err{color:var(--bad);font-size:12px;font-weight:600;text-align:center;margin-top:10px}
+.loading{font-size:12px;color:var(--ink-soft);text-align:center;padding:14px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--ink);color:var(--paper);padding:11px 20px;border-radius:30px;font-size:12.5px;
+  font-weight:500;z-index:70;transition:transform .3s;pointer-events:none;max-width:90%;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.cfg{font-size:11px;color:var(--accent);background:#f0dcd7;border-radius:8px;padding:10px 12px;line-height:1.5}
+.tabs{display:flex;gap:6px;background:var(--paper-dim);border-radius:12px;padding:5px;border:1px solid var(--line)}
+.tabs button{flex:1;padding:10px;border-radius:8px;border:none;background:transparent;
+  font-family:'Inter';font-weight:600;font-size:13px;color:var(--ink-soft);cursor:pointer;letter-spacing:.02em}
+.tabs button.active{background:var(--ink);color:var(--paper)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+.tile .lab{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.tile .val{font-family:'Fraunces',serif;font-size:24px;font-weight:900;color:var(--ink);margin-top:4px;line-height:1.1}
+.tile .sub{font-size:11px;color:var(--ink-soft);margin-top:2px}
+.tile.good{border-color:#cfe0d3}.tile.good .val{color:var(--good)}
+.tile.warn{border-color:#f0d99a}.tile.warn .val{color:#856404}
+.tile.bad{border-color:#e8c7c2}.tile.bad .val{color:var(--accent)}
+.vlist{display:flex;flex-direction:column;gap:8px}
+.vrow{background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:12.5px}
+.vrow .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.vrow .vc{font-family:'Fraunces',serif;font-weight:900;font-size:14px;letter-spacing:.04em}
+.vrow .vp{font-weight:700;color:var(--gold)}
+.vrow .mid{color:var(--ink-soft);font-size:11.5px;line-height:1.5}
+.vrow .status{font-size:9.5px;padding:3px 8px}
+.empty{text-align:center;padding:24px;color:var(--ink-soft);font-size:13px}
+.listmeta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <div class="sub">Menara Optometry — Internal</div>
+    <h1>Voucher Dashboard</h1>
+  </div>
+
+  <div class="cfg" id="cfgWarn" style="display:none">
+    &#9888; Backend not connected. Set <b>API_URL</b> in staff.html.
+  </div>
+
+  <div class="tabs">
+    <button id="tabVerify" class="active">Check Code</button>
+    <button id="tabList">Voucher List</button>
+  </div>
+
+  <div id="paneVerify">
+    <div class="card">
+      <div class="fld">
+        <label>Voucher Code</label>
+        <input id="code" placeholder="MNR-X-XXXX-XXX" autocomplete="off" inputmode="text" maxlength="20">
+      </div>
+      <div class="fld">
+        <label>Staff Name (for record)</label>
+        <input id="staff" placeholder="e.g. Aida" style="text-transform:none;letter-spacing:0">
+      </div>
+      <button class="btn" id="btnVerify">Check Code</button>
+    </div>
+  </div>
+
+  <div id="paneList" style="display:none">
+    <div class="listmeta">
+      <span id="listSummary">—</span>
+      <button class="btn ghost" id="btnRefresh" style="width:auto;padding:7px 14px;font-size:11.5px">Refresh</button>
+    </div>
+    <div class="tiles" id="tilesWrap"></div>
+    <div class="vlist" id="vlist"><div class="empty" id="vempty">Tap Refresh to load the list.</div></div>
+  </div>
+
+  <div class="loading" id="loading" style="display:none">Processing...</div>
+
+  <div class="result" id="result">
+    <h2 id="rTitle">Valid Voucher</h2>
+    <div id="rStatusWrap" style="margin-bottom:10px"></div>
+    <div class="vcode" id="rCode"></div>
+    <div class="vval" id="rVal"></div>
+    <div class="det">
+      <b>Tier</b><span id="rTier">—</span>
+      <b>Min Spend</b><span id="rMin">—</span>
+      <b>Name</b><span id="rName">—</span>
+      <b>Phone</b><span id="rPhone">—</span>
+      <b>Issued</b><span id="rIssued">—</span>
+      <b>Expires</b><span id="rExpiry">—</span>
+      <b id="rRedLab" style="display:none">Redeemed</b><span id="rRedeemed" style="display:none">—</span>
+      <b id="rByLab" style="display:none">By</b><span id="rBy" style="display:none">—</span>
+    </div>
+    <button class="btn gold" id="btnRedeem">Mark as Redeemed &rarr;</button>
+    <button class="btn ghost" id="btnClear" style="margin-top:8px">Check Another Voucher</button>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div class="note" id="paneVerifyNote">
+    <b>How to use:</b> Customer shows the code &rarr; staff types code + staff name &rarr;
+    tap <i>Check Code</i>. If valid &amp; not yet redeemed, tap
+    <i>Mark as Redeemed</i> after handing over the reward. Records auto-save
+    to the Vouchers sheet.
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ BACKEND CONFIG ============ */
+const API_URL = "https://script.google.com/macros/s/AKfycbyHa4pk4FiWE036iJhROZ0IAXkgXtKa9oCRalO_-xzpjyFr1z8z0MpeYRvSoZvBEuR9ug/exec";
+const API_SECRET = "2578b684462541567cc461c9b0b67043";  // must match Code.gs SHARED_SECRET
+/* ======================================== */
+
+const $=s=>document.querySelector(s);
+const STAFF_KEY='menara_staff_name';
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');
+  clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2200)}
+
+function configured(){return API_URL&&API_URL.indexOf('PASTE')!==0}
+if(!configured()) $('#cfgWarn').style.display='block';
+
+// Remember staff name across sessions
+try{$('#staff').value=localStorage.getItem(STAFF_KEY)||''}catch(e){}
+$('#staff').addEventListener('change',()=>{
+  try{localStorage.setItem(STAFF_KEY,$('#staff').value.trim())}catch(e){}
+});
+
+function fmtDate(s){
+  if(!s)return '—';
+  try{const d=new Date(s);if(isNaN(d.getTime()))return String(s);
+    return d.toLocaleString('en-MY',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }catch(e){return String(s)}
+}
+
+let lastVoucher=null;
+
+function showResult(d){
+  lastVoucher=d;
+  $('#result').classList.add('show');
+  $('#rCode').textContent=d.code||'—';
+  $('#rVal').textContent='RM'+(d.value||'?');
+  $('#rTier').textContent=(d.tier||'—')+' Master';
+  $('#rMin').textContent=d.minPurchase?'RM'+d.minPurchase+' min':'—';
+  $('#rName').textContent=d.name||'—';
+  let phone=String(d.phone||'—').replace(/^'/,'');
+  $('#rPhone').textContent=phone;
+  $('#rIssued').textContent=fmtDate(d.issuedAt);
+  $('#rExpiry').textContent=fmtDate(d.expiresAt);
+  const sw=$('#rStatusWrap');
+  $('#rRedLab').style.display='none';$('#rRedeemed').style.display='none';
+  $('#rByLab').style.display='none';$('#rBy').style.display='none';
+  $('#err').textContent='';
+  if(d.status==='Redeemed'){
+    sw.innerHTML='<span class="status redeemed">Already Redeemed</span>';
+    $('#rTitle').textContent='Voucher Already Redeemed';
+    $('#rRedLab').style.display='';$('#rRedeemed').style.display='';
+    $('#rByLab').style.display='';$('#rBy').style.display='';
+    $('#rRedeemed').textContent=fmtDate(d.redeemedAt);
+    $('#rBy').textContent=d.redeemedBy||'—';
+    $('#btnRedeem').style.display='none';
+  }else if(d.expired){
+    sw.innerHTML='<span class="status expired">Expired</span>';
+    $('#rTitle').textContent='Voucher Expired';
+    $('#btnRedeem').style.display='none';
+    $('#err').textContent='This voucher has passed its expiry date. Cannot be redeemed.';
+  }else{
+    sw.innerHTML='<span class="status issued">Valid · Not Redeemed</span>';
+    $('#rTitle').textContent='Valid Voucher';
+    $('#btnRedeem').style.display='';
+  }
+}
+
+function clearResult(){
+  $('#result').classList.remove('show');
+  $('#code').value='';$('#code').focus();lastVoucher=null;
+}
+
+function postAction(payload){
+  return fetch(API_URL,{method:'POST',body:JSON.stringify(payload),
+    headers:{'Content-Type':'text/plain;charset=utf-8'}})
+    .then(r=>r.json());
+}
+
+$('#btnVerify').onclick=()=>{
+  const code=$('#code').value.trim().toUpperCase();
+  if(!code){toast('Enter the code first');return}
+  if(!configured()){toast('Backend not connected');return}
+  $('#loading').style.display='';
+  $('#result').classList.remove('show');
+  $('#err').textContent='';
+  postAction({secret:API_SECRET,action:'verify',code:code})
+    .then(d=>{
+      $('#loading').style.display='none';
+      if(!d.ok){toast('Error: '+(d.error||'try again'));return}
+      if(!d.found){
+        $('#result').classList.add('show');
+        $('#rTitle').textContent='Code Not Found';
+        $('#rStatusWrap').innerHTML='<span class="status redeemed">Invalid</span>';
+        $('#rCode').textContent=code;$('#rVal').textContent='—';
+        $('#rTier').textContent='—';$('#rName').textContent='—';
+        $('#rPhone').textContent='—';$('#rIssued').textContent='—';
+        $('#btnRedeem').style.display='none';
+        return;
+      }
+      showResult(d);
+    })
+    .catch(()=>{
+      $('#loading').style.display='none';
+      toast('Connection failed');
+    });
+};
+
+$('#btnRedeem').onclick=()=>{
+  if(!lastVoucher||!lastVoucher.code)return;
+  const staff=$('#staff').value.trim();
+  if(!staff){toast('Enter staff name first');$('#staff').focus();return}
+  const minMsg=lastVoucher.minPurchase?' (Min spend RM'+lastVoucher.minPurchase+')':'';
+  if(!confirm('Confirm customer paid the minimum RM'+(lastVoucher.minPurchase||'?')+
+    '?\n\nRedeem voucher '+lastVoucher.code+' (RM'+lastVoucher.value+')'+minMsg+
+    ' for '+(lastVoucher.name||'—')+'?'))return;
+  $('#btnRedeem').disabled=true;
+  $('#btnRedeem').textContent='Processing...';
+  postAction({secret:API_SECRET,action:'redeem',code:lastVoucher.code,staff:staff})
+    .then(d=>{
+      $('#btnRedeem').disabled=false;
+      $('#btnRedeem').textContent='Mark as Redeemed →';
+      if(d.ok){
+        toast('Voucher redeemed');
+        $('#btnVerify').click();
+      }else if(d.error==='already_redeemed'){
+        toast('Already redeemed earlier');
+        $('#btnVerify').click();
+      }else if(d.error==='expired'){
+        toast('Voucher expired');
+        $('#btnVerify').click();
+      }else{
+        $('#err').textContent='Failed: '+(d.error||'try again');
+      }
+    })
+    .catch(()=>{
+      $('#btnRedeem').disabled=false;
+      $('#btnRedeem').textContent='Mark as Redeemed →';
+      $('#err').textContent='Connection failed';
+    });
+};
+
+$('#btnClear').onclick=clearResult;
+$('#code').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#btnVerify').click()}});
+
+/* ============ TAB: SENARAI VOUCHER ============ */
+function switchTab(which){
+  const v=which==='verify';
+  $('#tabVerify').classList.toggle('active',v);
+  $('#tabList').classList.toggle('active',!v);
+  $('#paneVerify').style.display=v?'':'none';
+  $('#paneVerifyNote').style.display=v?'':'none';
+  $('#result').style.display=v?'':'none';
+  $('#paneList').style.display=v?'none':'';
+  if(!v && !window._listLoaded) loadList();
+}
+$('#tabVerify').onclick=()=>switchTab('verify');
+$('#tabList').onclick=()=>switchTab('list');
+$('#btnRefresh').onclick=loadList;
+
+function fmtShortDate(s){
+  if(!s)return '—';
+  try{const d=new Date(s);if(isNaN(d.getTime()))return String(s);
+    return d.toLocaleDateString('en-MY',{day:'2-digit',month:'short',year:'2-digit'});
+  }catch(e){return String(s)}
+}
+
+function loadList(){
+  if(!configured()){toast('Backend not connected');return}
+  $('#vlist').innerHTML='<div class="empty">Loading...</div>';
+  $('#tilesWrap').innerHTML='';
+  $('#listSummary').textContent='—';
+  postAction({secret:API_SECRET,action:'list'})
+    .then(d=>{
+      if(!d.ok){$('#vlist').innerHTML='<div class="empty">Error: '+(d.error||'')+'</div>';return}
+      window._listLoaded=true;
+      renderList(d);
+    })
+    .catch(()=>{$('#vlist').innerHTML='<div class="empty">Connection failed</div>'});
+}
+
+function renderList(d){
+  const t=d.totals||{};
+  const total=(d.vouchers||[]).length;
+  $('#listSummary').textContent=total+' voucher'+(total===1?'':'s')+' issued';
+  $('#tilesWrap').innerHTML=
+    tile('good','Active',t.issued||0,'RM'+(t.rmOutstanding||0)+' outstanding')+
+    tile('','Redeemed',t.redeemed||0,'RM'+(t.rmRedeemed||0)+' redeemed')+
+    tile('warn','Expired',t.expired||0,'not redeemed')+
+    tile('bad','Total Issued',total,'RM'+(t.rmIssued||0)+' total');
+  const vs=d.vouchers||[];
+  if(!vs.length){$('#vlist').innerHTML='<div class="empty">No vouchers issued yet.</div>';return}
+  $('#vlist').innerHTML=vs.map(v=>{
+    const s=v.status==='Redeemed'?'redeemed':v.status==='Expired'?'expired':'issued';
+    const slabel=v.status==='Redeemed'?'Redeemed':v.status==='Expired'?'Expired':'Active';
+    return '<div class="vrow">'+
+      '<div class="top">'+
+        '<span class="vc">'+esc(v.code)+'</span>'+
+        '<span class="status '+s+'">'+slabel+'</span>'+
+      '</div>'+
+      '<div class="top" style="margin-bottom:6px">'+
+        '<span>'+esc(v.name||'—')+' · '+esc(v.phone||'—')+'</span>'+
+        '<span class="vp">RM'+v.value+'</span>'+
+      '</div>'+
+      '<div class="mid">'+
+        'Issued '+fmtShortDate(v.issuedAt)+' · Expires '+fmtShortDate(v.expiresAt)+
+        (v.status==='Redeemed'?' · Redeemed '+fmtShortDate(v.redeemedAt)+' by '+esc(v.redeemedBy||'?'):'')+
+        (v.email?'<br>'+esc(v.email):'')+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function tile(cls,lab,val,sub){
+  return '<div class="tile '+cls+'"><div class="lab">'+lab+'</div>'+
+    '<div class="val">'+val+'</div><div class="sub">'+sub+'</div></div>';
+}
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,
+  c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+</script>
+</body>
+</html>

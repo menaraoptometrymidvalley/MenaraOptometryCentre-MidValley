@@ -1181,7 +1181,7 @@
     position: fixed; left: 0;
     bottom: max(8px, env(safe-area-inset-bottom));
     z-index: 5;
-    width: 180px; height: 180px;
+    width: 130px; height: 130px;
     display: flex; align-items: flex-end; justify-content: center;
     cursor: pointer; user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -1194,15 +1194,18 @@
 
   .opscat { width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; pointer-events: none; }
   .opscat-img {
-    width: 180px; height: 180px;
+    width: 130px; height: 130px;
     object-fit: contain;
     display: block;
     -webkit-user-drag: none;
     user-drag: none;
+    background: transparent !important;
     transition: transform .35s ease;
     animation: catBreathe 4.5s cubic-bezier(.45,.05,.55,.95) infinite;
     transform-origin: 50% 100%;
   }
+  /* Force video element to honor transparency */
+  video.opscat-img { background: transparent !important; }
   @keyframes catBreathe {
     0%, 100% { transform: scaleY(1) scaleX(1); }
     50%      { transform: scaleY(1.018) scaleX(0.992); }
@@ -1348,8 +1351,8 @@
   }
 
   @media (max-width: 480px) {
-    .opscat-wrap { width: 130px; height: 130px; }
-    .opscat-img { width: 130px; height: 130px; }
+    .opscat-wrap { width: 95px; height: 95px; }
+    .opscat-img { width: 95px; height: 95px; }
   }
 
   /* === Realistic plant SVG ============================================ */
@@ -2809,7 +2812,8 @@ init();
     S.tip = document.getElementById('opscatTip');
     if (!S.el || !S.wrap) return false;
     S.el.innerHTML =
-      '<video class="opscat-img" id="opscatVideo" autoplay loop muted playsinline preload="auto" style="display:none">' +
+      '<video class="opscat-img" id="opscatVideo" autoplay loop muted playsinline preload="auto" style="display:none;background:transparent;">' +
+        '<source src="' + BASE + 'cat-walking-video.webm" type="video/webm">' +
         '<source src="' + BASE + 'cat-walking-video.mp4" type="video/mp4">' +
       '</video>' +
       '<img class="opscat-img" id="opscatSprite" src="' + POSES.sitting + '" alt="cat" draggable="false">' +

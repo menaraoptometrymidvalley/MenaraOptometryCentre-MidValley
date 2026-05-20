@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "schema_version": 1,
+    "schema_version": 2,
     "outlet": "Menara Optometry Centre — Mid Valley",
     "address": "LG-017, Mid Valley Megamall, Kuala Lumpur",
     "whatsapp": "+60 11-5419 7980",
@@ -15,13 +15,7 @@
       "category": "DES",
       "tagline": "Digital Eye Strain",
       "headline": "Are your eyes aging faster than you?",
-      "image": "assets/promos/7dp-mon-des.jpg",
-      "perks": [
-        "FREE DES screening on the spot",
-        "FREE 1.56 UV420 lens with selected frame",
-        "Comprehensive eye exam with spectacle purchase",
-        "FREE Blue Light upgrade — 10% off anti-fatigue lenses"
-      ]
+      "image": "assets/promos/7dp-mon-des.jpg"
     },
     {
       "day": 2,
@@ -30,12 +24,7 @@
       "category": "MyopiaCARE",
       "tagline": "Let's control myopia",
       "headline": "Children myopia screening, ages 4–17",
-      "image": "assets/promos/7dp-tue-myopia.jpg",
-      "perks": [
-        "FREE children myopia risk screening",
-        "20% off MIYOSMART & Stellest (with follow-up commitment)",
-        "Paediatric fee waived for every spectacle purchase"
-      ]
+      "image": "assets/promos/7dp-tue-myopia.jpg"
     },
     {
       "day": 3,
@@ -44,11 +33,7 @@
       "category": "Brand",
       "tagline": "It's the way we thanks",
       "headline": "20% off for spending RM500+",
-      "image": "assets/promos/7dp-wed-wow.jpg",
-      "perks": [
-        "20% off for any spend above RM500",
-        "Drop by today!"
-      ]
+      "image": "assets/promos/7dp-wed-wow.jpg"
     },
     {
       "day": 4,
@@ -57,12 +42,7 @@
       "category": "Contact Lens",
       "tagline": "Fresh, Shine & Bright",
       "headline": "Into your eyes — contact lens day",
-      "image": "assets/promos/7dp-thu-cl.jpg",
-      "perks": [
-        "FREE clear contact lens trial (RM350+ spectacle)",
-        "FREE clear/color contact lenses (RM600+ spectacle)",
-        "Complimentary aftercare with 6-month purchase"
-      ]
+      "image": "assets/promos/7dp-thu-cl.jpg"
     },
     {
       "day": 5,
@@ -71,11 +51,7 @@
       "category": "Loyalty",
       "tagline": "Show up yourself",
       "headline": "Small thanks, every Friday",
-      "image": "assets/promos/7dp-fri-blessed.jpg",
-      "perks": [
-        "Free treat with any purchase",
-        "Different surprise every week for first 10 customers"
-      ]
+      "image": "assets/promos/7dp-fri-blessed.jpg"
     },
     {
       "day": 6,
@@ -84,12 +60,7 @@
       "category": "MyopiaCARE",
       "tagline": "Let's control myopia",
       "headline": "Children myopia screening, ages 4–17",
-      "image": "assets/promos/7dp-tue-myopia.jpg",
-      "perks": [
-        "FREE children myopia risk screening",
-        "20% off MIYOSMART & Stellest (with follow-up commitment)",
-        "Paediatric fee waived for every spectacle purchase"
-      ]
+      "image": "assets/promos/7dp-tue-myopia.jpg"
     },
     {
       "day": 0,
@@ -98,11 +69,52 @@
       "category": "UV/Cataract",
       "tagline": "Protect the eyes that protect you",
       "headline": "Bring your parents — we'll take care of the rest",
-      "image": "assets/promos/7dp-sun-shield.jpg",
-      "perks": [
-        "FREE slit-lamp cataract screening for ages 40+",
-        "50% off second pair Rx tinted (with RM900+ main pair)",
-        "Sun-protected lens at RM280 (while stock last)"
+      "image": "assets/promos/7dp-sun-shield.jpg"
+    }
+  ],
+  "dayBonus": {
+    "4": [
+      {
+        "id": "cl-aftercare",
+        "title": "CL Aftercare — eye exam for contact lens wearers",
+        "subtitle": "Refraction · Fitting Assessment · Aftercare Service · RM5 rebate",
+        "image": "assets/promos/cl-aftercare.jpg",
+        "category": "Contact Lens"
+      }
+    ]
+  },
+  "campaigns": [
+    {
+      "id": "beli-menang-2026",
+      "title": "Beli & Menang 2026",
+      "subtitle": "Anniversary lucky-draw campaign",
+      "category": "Anniversary",
+      "partner": "Menara × Essilor",
+      "validFrom": "2026-02-13",
+      "validUntil": "2026-12-31",
+      "priority": 10,
+      "playAsSequence": true,
+      "sequence": [
+        {
+          "id": "beli-menang-01-intro",
+          "image": "assets/promos/beli-menang-01-intro.jpg",
+          "label": "Beli & Menang"
+        },
+        {
+          "id": "beli-menang-02-hadiah-utama",
+          "image": "assets/promos/beli-menang-02-hadiah-utama.jpg",
+          "label": "Hadiah Utama"
+        },
+        {
+          "id": "beli-menang-03-hadiah-emas",
+          "image": "assets/promos/beli-menang-03-hadiah-emas.jpg",
+          "label": "Hadiah Istimewa"
+        },
+        {
+          "id": "beli-menang-04-terma",
+          "image": "assets/promos/beli-menang-04-terma.jpg",
+          "label": "Terma & Syarat"
+        }
       ]
     }
   ],
@@ -110,13 +122,24 @@
     {
       "id": "stellest-disney-cruise",
       "title": "Disney Cruise Lucky Draw",
-      "subtitle": "Stand a chance to win one family gateway per month — 2 adults + 1 child (≤12 yo)",
+      "subtitle": "Stand a chance to win one family gateway per month — 2 adults + 1 child",
       "image": "assets/promos/stellest-disney-cruise.jpg",
       "category": "Lucky Draw",
       "partner": "Stellest × Essilor",
       "validFrom": "2026-05-01",
       "validUntil": "2026-06-30",
       "priority": 9
+    },
+    {
+      "id": "essilor-varilux",
+      "title": "Varilux Progressive — FREE Upgrade",
+      "subtitle": "Get Varilux progressive lenses starting RM750 & claim your FREE upgrade",
+      "image": "assets/promos/essilor-varilux.jpg",
+      "category": "Multifocal",
+      "partner": "Essilor",
+      "validFrom": "2026-05-01",
+      "validUntil": "2026-06-30",
+      "priority": 8
     },
     {
       "id": "essilor-laptop-sleeve",
@@ -130,9 +153,20 @@
       "priority": 7
     },
     {
+      "id": "hoya-supereader",
+      "title": "HOYA — SUPEREADER PERCUMA",
+      "subtitle": "Sepasang kanta SUPEREADER percuma dengan setiap pembelian produk HOYA terpilih",
+      "image": "assets/promos/hoya-supereader.jpg",
+      "category": "2nd Pair",
+      "partner": "HOYA",
+      "validFrom": "2026-04-01",
+      "validUntil": "2026-06-30",
+      "priority": 7
+    },
+    {
       "id": "hari-ibu-tradein",
       "title": "Istimewa Hari Ibu — Trade-in Cermin Mata",
-      "subtitle": "Tukar beli cermin mata dengan penjimatan sehingga RM100. Beli & Menang eMAS.",
+      "subtitle": "Tukar beli cermin mata dengan penjimatan sehingga RM100",
       "image": "assets/promos/hari-ibu-tradein.jpg",
       "category": "Mother's Day",
       "partner": "Menara × Essilor",
@@ -142,25 +176,14 @@
     },
     {
       "id": "hari-ibu-hoya",
-      "title": "Hari Ibu × HOYA — SUPERREADER PERCUMA",
-      "subtitle": "Sepasang kanta SUPERREADER percuma dengan setiap pembelian produk HOYA terpilih",
+      "title": "Hari Ibu × HOYA — SUPEREADER PERCUMA",
+      "subtitle": "Sepasang kanta SUPEREADER percuma dengan setiap pembelian produk HOYA terpilih",
       "image": "assets/promos/hari-ibu-hoya.jpg",
       "category": "Mother's Day",
       "partner": "HOYA",
       "validFrom": "2026-04-15",
       "validUntil": "2026-05-31",
       "priority": 10
-    },
-    {
-      "id": "beli-menang-emas",
-      "title": "Cabutan Bertuah Bulanan — Menangi eMAS",
-      "subtitle": "Kempen Beli & Menang sempena Ulangtahun ke-30 Menara Optometry",
-      "image": "assets/promos/beli-menang-emas.jpg",
-      "category": "Anniversary",
-      "partner": "Menara × Essilor",
-      "validFrom": "2026-01-01",
-      "validUntil": "2026-12-31",
-      "priority": 6
     }
   ],
   "evergreen": [
@@ -170,6 +193,14 @@
       "subtitle": "Menara Optometry — 30 years of caring for your family's vision",
       "image": "assets/promos/30-tahun-brand.jpg",
       "category": "Brand"
+    },
+    {
+      "id": "sudoku-brain-break",
+      "title": "Brain Break — Sudoku",
+      "subtitle": "Scan to play. Solve puzzles, win vouchers up to RM100.",
+      "image": "assets/promos/sudoku-brain-break.jpg",
+      "category": "Engagement",
+      "alwaysShow": true
     }
   ]
 }

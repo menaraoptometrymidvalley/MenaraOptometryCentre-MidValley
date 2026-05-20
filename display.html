@@ -78,19 +78,14 @@
     align-items: center;
     gap: 10px;
   }
-  .brand-mark {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    font-size: 22px;
-    letter-spacing: -0.5px;
-    color: var(--gold);
-    line-height: 1;
-  }
-  .brand-mark sup {
-    font-size: 10px;
-    color: var(--gold);
-    margin-left: 2px;
-    vertical-align: super;
+  .brand-logo {
+    height: 32px;
+    width: auto;
+    display: block;
+    background: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
   }
   .brand-sub {
     font-size: 8px;
@@ -98,7 +93,7 @@
     color: rgba(255,255,255,0.7);
     text-transform: uppercase;
     font-weight: 600;
-    margin-top: 2px;
+    margin-top: 3px;
   }
   .anniversary {
     display: flex;
@@ -453,10 +448,7 @@
 <!-- Header -->
 <header class="header">
   <div class="brand">
-    <div>
-      <div class="brand-mark">menara<sup>®</sup></div>
-      <div class="brand-sub">Optometry</div>
-    </div>
+    <img class="brand-logo" src="assets/brand/menara-logo.jpg" alt="Menara Optometry" />
   </div>
   <div class="anniversary">30 Tahun</div>
   <div class="clock">
@@ -627,7 +619,7 @@
     showSlide((currentIndex + 1) % slides.length);
   }
 
-  // ─── Build slide deck — CURATED for today only (~4-6 slides) ───
+  // ─── Build slide deck — CURATED for today only ───
   function buildDeck(data) {
     const today = todayISO();
     const dayOfWeek = new Date().getDay();
@@ -643,7 +635,40 @@
       });
     }
 
-    // 2. Expiring active promos (≤14 days) — urgency first
+    // 2. Day-specific bonus content (e.g., Thursday adds CL Aftercare)
+    const dayBonus = (data.dayBonus && data.dayBonus[String(dayOfWeek)]) || [];
+    dayBonus.forEach(p => {
+      deck.push({
+        image: p.image,
+        alt: p.title,
+        todayBadge: p.category || 'Today'
+      });
+    });
+
+    // 3. Beli & Menang campaign sequence (plays all 4 slides in order)
+    const campaigns = (data.campaigns || [])
+      .filter(c => isPromoActive(c, today))
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+
+    campaigns.forEach(c => {
+      if (c.playAsSequence && Array.isArray(c.sequence)) {
+        c.sequence.forEach((s, idx) => {
+          deck.push({
+            image: s.image,
+            alt: c.title + ' — ' + (s.label || ''),
+            goldBadge: s.label || c.title
+          });
+        });
+      } else {
+        deck.push({
+          image: c.image,
+          alt: c.title,
+          goldBadge: c.category || c.title
+        });
+      }
+    });
+
+    // 4. Expiring active promos (≤14 days) — urgency first
     const active = (data.activePromos || [])
       .filter(p => isPromoActive(p, today))
       .map(p => ({ ...p, _daysLeft: daysUntil(p.validUntil) }));
@@ -660,7 +685,7 @@
       });
     });
 
-    // 3. Top 2 active promos (not expiring) by priority
+    // 5. Top 2 active promos (not expiring) by priority
     const longRunning = active
       .filter(p => p._daysLeft > 14)
       .sort((a, b) => (b.priority || 0) - (a.priority || 0))
@@ -673,7 +698,17 @@
       });
     });
 
-    // 4. 30 Tahun anniversary closer
+    // 6. Sudoku brain-break (engagement — scan to play while waiting)
+    const sudoku = (data.evergreen || []).find(e => e.id === 'sudoku-brain-break');
+    if (sudoku) {
+      deck.push({
+        image: sudoku.image,
+        alt: sudoku.title,
+        goldBadge: 'Brain Break'
+      });
+    }
+
+    // 7. 30 Tahun anniversary closer
     const anniversary = (data.evergreen || []).find(e => e.id === '30-tahun');
     if (anniversary) {
       deck.push({

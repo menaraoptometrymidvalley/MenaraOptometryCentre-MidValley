@@ -198,7 +198,8 @@
       "id": "sudoku-brain-break",
       "title": "Brain Break — Sudoku",
       "subtitle": "Scan to play. Solve puzzles, win vouchers up to RM100.",
-      "image": "assets/promos/sudoku-brain-break.jpg",
+      "template": "sudoku",
+      "qrUrl": "https://menaraoptometrymidvalley.github.io/menaraoptometrycentre-midvalley/sudoku/",
       "category": "Engagement",
       "alwaysShow": true
     }

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   :root {
     --navy: #1B1464;
@@ -385,40 +385,236 @@
     font-weight: 700;
   }
 
-  /* ────── CAT CORNER (Lottie) ────── */
+  /* ────── SUDOKU TEMPLATE SLIDE ────── */
+  .sudoku-slide {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(212,168,67,0.18) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(230,0,18,0.10) 0%, transparent 50%),
+      linear-gradient(160deg, #faf6ec 0%, #ffffff 60%, #f4f6fb 100%);
+    color: #1B1464;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 30px 22px 24px;
+    text-align: center;
+  }
+  .sudoku-eyebrow {
+    font-size: 11px;
+    letter-spacing: 4.5px;
+    font-weight: 800;
+    color: #E60012;
+    text-transform: uppercase;
+  }
+  .sudoku-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 58px;
+    font-weight: 700;
+    color: #1B1464;
+    letter-spacing: -2px;
+    margin: 4px 0 4px;
+    line-height: 1;
+  }
+  .sudoku-tagline {
+    font-size: 13px;
+    color: #5A6478;
+    font-weight: 500;
+    max-width: 280px;
+    line-height: 1.4;
+  }
+  .sudoku-qr-frame {
+    background: #fff;
+    padding: 16px;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(27,20,100,0.12), 0 2px 6px rgba(27,20,100,0.04);
+    border: 2px solid #D4A843;
+    text-align: center;
+    position: relative;
+  }
+  .sudoku-qr-frame::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(212,168,67,0.4), transparent);
+    z-index: -1;
+    filter: blur(8px);
+  }
+  .sudoku-qr-target {
+    width: 200px; height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+  .sudoku-qr-target img, .sudoku-qr-target canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .sudoku-qr-caption {
+    margin-top: 10px;
+    font-size: 10px;
+    color: #5A6478;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+  .sudoku-qr-caption strong {
+    display: block;
+    font-size: 13px;
+    color: #1B1464;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 2px;
+  }
+  .sudoku-vouchers-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    font-weight: 800;
+    color: #1B1464;
+    text-transform: uppercase;
+  }
+  .sudoku-tiers {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+    max-width: 320px;
+  }
+  .tier {
+    background: #fff;
+    border-radius: 12px;
+    padding: 11px 4px 9px;
+    box-shadow: 0 3px 10px rgba(27,20,100,0.08);
+    border-top: 3px solid;
+  }
+  .tier-bronze { border-color: #cd7f32; }
+  .tier-silver { border-color: #B8B8B8; }
+  .tier-gold {
+    border-color: #D4A843;
+    background: linear-gradient(180deg, rgba(212,168,67,0.10), #fff);
+    transform: scale(1.04);
+    box-shadow: 0 6px 18px rgba(212,168,67,0.25);
+  }
+  .tier-label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    font-weight: 800;
+  }
+  .tier-bronze .tier-label { color: #cd7f32; }
+  .tier-silver .tier-label { color: #777; }
+  .tier-gold .tier-label { color: #b8860b; }
+  .tier-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #1B1464;
+    margin: 2px 0 0;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .tier-detail {
+    font-size: 8.5px;
+    color: #5A6478;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+  .tier-puzzles {
+    font-size: 10px;
+    color: #1B1464;
+    font-weight: 700;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(27,20,100,0.08);
+  }
+  .sudoku-footnote {
+    font-size: 10px;
+    color: #5A6478;
+    letter-spacing: 0.5px;
+    font-style: italic;
+    max-width: 290px;
+    line-height: 1.4;
+  }
+
+  /* ────── CAT CORNER (inline SVG, CSS-animated) ────── */
   .cat-corner {
     position: absolute;
-    bottom: 14px;
-    left: 14px;
-    width: 110px;
-    height: 110px;
+    bottom: 12px;
+    left: 12px;
+    width: 130px;
+    height: 130px;
     z-index: 5;
     pointer-events: none;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
-    transition: opacity 0.6s ease;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
   }
-  .cat-corner.hidden { display: none; }
-  .cat-corner.fading { opacity: 0; }
+  .cat-svg { width: 100%; height: 100%; overflow: visible; }
   .cat-state-label {
     position: absolute;
-    bottom: -2px;
+    bottom: 2px;
     left: 50%;
     transform: translateX(-50%);
     font-size: 8px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.7);
-    background: rgba(13,11,111,0.6);
+    color: #fff;
+    background: rgba(13,11,111,0.85);
     backdrop-filter: blur(8px);
     padding: 2px 8px;
     border-radius: 999px;
     white-space: nowrap;
     opacity: 0;
-    transition: opacity 0.4s;
+    transition: opacity 0.5s;
   }
-  .cat-corner:hover .cat-state-label,
   .cat-corner.show-label .cat-state-label { opacity: 1; }
+
+  /* Subtle shadow under cat */
+  .cat-shadow { animation: shadowPulse 1.8s ease-in-out infinite; transform-origin: center; }
+  @keyframes shadowPulse { 0%,100%{transform:scaleX(1);opacity:.25} 50%{transform:scaleX(.92);opacity:.2} }
+
+  /* Hide state extras by default */
+  .cat-zzz, .cat-bowl, .cat-ball, .cat-food { opacity: 0; transition: opacity .4s; }
+  .cat-svg .cat-eye-closed { opacity: 0; transition: opacity .3s; }
+
+  /* === WALKING === gentle body bob + tail wag + slight tail/head sway === */
+  .cat-walking .cat-body,
+  .cat-walking .cat-belly,
+  .cat-walking .cat-head { animation: catBob 0.55s ease-in-out infinite alternate; }
+  .cat-walking .cat-tail { animation: tailWag 0.7s ease-in-out infinite; transform-origin: 78px 75px; }
+  .cat-walking .cat-leg-bl { animation: legStep1 0.55s linear infinite; transform-origin: 33px 92px; }
+  .cat-walking .cat-leg-br { animation: legStep2 0.55s linear infinite; transform-origin: 72px 92px; }
+  @keyframes catBob { from { transform: translateY(0) } to { transform: translateY(-2px) } }
+  @keyframes tailWag { 0%,100% { transform: rotate(-8deg) } 50% { transform: rotate(15deg) } }
+  @keyframes legStep1 { 0%,100% { transform: rotate(0) } 50% { transform: rotate(-15deg) } }
+  @keyframes legStep2 { 0%,100% { transform: rotate(0) } 50% { transform: rotate(15deg) } }
+
+  /* === SLEEPING === breathing, eyes closed, ZZZ floats === */
+  .cat-sleeping .cat-eye { opacity: 0; }
+  .cat-sleeping .cat-eye-closed { opacity: 1; }
+  .cat-sleeping .cat-body,
+  .cat-sleeping .cat-belly { animation: breathe 3s ease-in-out infinite; transform-origin: center bottom; }
+  .cat-sleeping .cat-head { animation: breatheHead 3s ease-in-out infinite; }
+  .cat-sleeping .cat-zzz { opacity: 1; animation: zzzFloat 3s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { transform: scaleY(1) } 50% { transform: scaleY(1.05) } }
+  @keyframes breatheHead { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-1.5px) } }
+  @keyframes zzzFloat { 0% { opacity:0; transform: translateY(0) } 30% { opacity:1 } 100% { opacity:0; transform: translateY(-14px) } }
+
+  /* === PLAYING === hopping, tail very active, ball appears === */
+  .cat-playing { animation: catHop 0.7s ease-in-out infinite; transform-origin: center bottom; }
+  .cat-playing .cat-tail { animation: tailWag 0.3s ease-in-out infinite; transform-origin: 78px 75px; }
+  .cat-playing .cat-ball { opacity: 1; animation: ballRoll 0.7s ease-in-out infinite; transform-origin: 95px 100px; }
+  @keyframes catHop { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+  @keyframes ballRoll { 0%,100% { transform: translateX(0) rotate(0deg) } 50% { transform: translateX(-8px) rotate(-180deg) } }
+
+  /* === EATING === head bobs down to bowl === */
+  .cat-eating .cat-head { animation: eatBob 0.9s ease-in-out infinite; transform-origin: bottom right; }
+  .cat-eating .cat-bowl { opacity: 1; }
+  .cat-eating .cat-food { opacity: 1; animation: foodNibble 0.9s ease-in-out infinite; }
+  @keyframes eatBob { 0%,100% { transform: translateY(0) rotate(0deg) } 50% { transform: translateY(6px) rotate(-8deg) } }
+  @keyframes foodNibble { 0%,100% { opacity: 1; transform: scale(1) } 50% { opacity: .6; transform: scale(.85) } }
 
   /* ────── STATUS / LOADING ────── */
   .loading {
@@ -505,9 +701,88 @@
   <div class="promo-card" id="promoCard">
     <!-- Slides injected by JS -->
   </div>
-  <!-- Lottie cat corner — drop JSON files into assets/cat/ to activate -->
-  <div class="cat-corner hidden" id="catCorner">
-    <div id="catContainer" style="width:100%;height:100%"></div>
+  <!-- Inline SVG tuxedo cat — cycles walking/sleeping/playing/eating -->
+  <div class="cat-corner cat-walking" id="catCorner">
+    <svg class="cat-svg" viewBox="-10 0 130 130" xmlns="http://www.w3.org/2000/svg">
+      <!-- shadow under cat -->
+      <ellipse class="cat-shadow" cx="55" cy="115" rx="40" ry="4" fill="rgba(0,0,0,0.4)"/>
+
+      <!-- Tail -->
+      <path class="cat-tail" d="M78 75 Q105 55 95 25" stroke="#1a1a1a" stroke-width="9" fill="none" stroke-linecap="round"/>
+
+      <!-- Body -->
+      <ellipse class="cat-body" cx="50" cy="80" rx="32" ry="20" fill="#1a1a1a"/>
+      <!-- Belly (white) -->
+      <ellipse class="cat-belly" cx="50" cy="85" rx="20" ry="12" fill="#fff"/>
+
+      <!-- Back legs -->
+      <rect class="cat-leg cat-leg-bl" x="30" y="92" width="7" height="14" rx="3" fill="#1a1a1a"/>
+      <rect class="cat-leg cat-leg-br" x="69" y="92" width="7" height="14" rx="3" fill="#1a1a1a"/>
+      <!-- White paws -->
+      <ellipse cx="33.5" cy="107" rx="5" ry="3" fill="#fff"/>
+      <ellipse cx="72.5" cy="107" rx="5" ry="3" fill="#fff"/>
+
+      <!-- Head (group so it can animate together) -->
+      <g class="cat-head" transform="translate(8 38)">
+        <!-- Ears -->
+        <polygon points="2,8 8,-8 16,5" fill="#1a1a1a"/>
+        <polygon points="28,5 36,-8 42,8" fill="#1a1a1a"/>
+        <!-- Inner ears (pink) -->
+        <polygon points="6,7 9,-2 13,6" fill="#ff9eb5" opacity="0.55"/>
+        <polygon points="30,6 35,-2 38,7" fill="#ff9eb5" opacity="0.55"/>
+        <!-- Head circle -->
+        <circle cx="22" cy="15" r="20" fill="#1a1a1a"/>
+        <!-- White face mask -->
+        <path d="M10,20 Q22,36 34,20 Q30,33 22,33 Q14,33 10,20 Z" fill="#fff"/>
+        <!-- Eyes (open) -->
+        <ellipse class="cat-eye cat-eye-left" cx="15" cy="15" rx="3" ry="4" fill="#7fc678"/>
+        <ellipse class="cat-eye cat-eye-right" cx="29" cy="15" rx="3" ry="4" fill="#7fc678"/>
+        <!-- Eye pupils -->
+        <ellipse class="cat-eye cat-eye-left" cx="15" cy="15" rx="1" ry="3" fill="#1a1a1a"/>
+        <ellipse class="cat-eye cat-eye-right" cx="29" cy="15" rx="1" ry="3" fill="#1a1a1a"/>
+        <!-- Eye highlights -->
+        <circle class="cat-eye" cx="16" cy="13.5" r="0.9" fill="#fff"/>
+        <circle class="cat-eye" cx="30" cy="13.5" r="0.9" fill="#fff"/>
+        <!-- Eyes (closed - sleeping) -->
+        <path class="cat-eye-closed" d="M12,16 Q15,14 18,16" stroke="#1a1a1a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <path class="cat-eye-closed" d="M26,16 Q29,14 32,16" stroke="#1a1a1a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <!-- Nose -->
+        <polygon points="20,22 24,22 22,25" fill="#ff9eb5"/>
+        <!-- Mouth -->
+        <path d="M22,25 Q19,28 17,27 M22,25 Q25,28 27,27" stroke="#1a1a1a" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+        <!-- Whiskers -->
+        <line x1="10" y1="24" x2="2" y2="23" stroke="#fff" stroke-width="0.6"/>
+        <line x1="10" y1="26" x2="2" y2="27" stroke="#fff" stroke-width="0.6"/>
+        <line x1="34" y1="24" x2="42" y2="23" stroke="#fff" stroke-width="0.6"/>
+        <line x1="34" y1="26" x2="42" y2="27" stroke="#fff" stroke-width="0.6"/>
+      </g>
+
+      <!-- ZZZ for sleeping -->
+      <g class="cat-zzz">
+        <text x="78" y="35" fill="#fff" font-family="Plus Jakarta Sans,sans-serif" font-size="13" font-weight="800">Z</text>
+        <text x="88" y="24" fill="#fff" font-family="Plus Jakarta Sans,sans-serif" font-size="10" font-weight="800" opacity="0.75">z</text>
+        <text x="95" y="15" fill="#fff" font-family="Plus Jakarta Sans,sans-serif" font-size="7" font-weight="800" opacity="0.5">z</text>
+      </g>
+
+      <!-- Food bowl for eating -->
+      <g class="cat-bowl">
+        <ellipse cx="20" cy="106" rx="13" ry="3" fill="#D4A843"/>
+        <path d="M8,104 L11,110 L29,110 L32,104 Z" fill="#D4A843"/>
+        <ellipse cx="20" cy="104" rx="11" ry="2.5" fill="#a07b2c"/>
+      </g>
+      <g class="cat-food">
+        <circle cx="17" cy="103" r="1.2" fill="#3a2a1a"/>
+        <circle cx="21" cy="102" r="1.2" fill="#3a2a1a"/>
+        <circle cx="24" cy="103" r="1.2" fill="#3a2a1a"/>
+      </g>
+
+      <!-- Ball for playing -->
+      <g class="cat-ball">
+        <circle cx="95" cy="100" r="6" fill="#E60012"/>
+        <path d="M90,98 Q95,95 100,98" stroke="#fff" stroke-width="0.9" fill="none" opacity="0.7"/>
+        <path d="M91,103 Q95,105 99,103" stroke="#fff" stroke-width="0.9" fill="none" opacity="0.4"/>
+      </g>
+    </svg>
     <div class="cat-state-label" id="catStateLabel">walking</div>
   </div>
 </div>
@@ -595,20 +870,85 @@
     }
   }
 
-  // ─── Slide builder (image-only, badges optional) ───
+  // ─── Slide templates ───
+  function renderSudokuTemplate() {
+    return `
+      <div class="sudoku-slide">
+        <div>
+          <div class="sudoku-eyebrow">Brain Break</div>
+          <h1 class="sudoku-title">Sudoku</h1>
+          <div class="sudoku-tagline">Bored while waiting? Scan, solve, and win.</div>
+        </div>
+        <div class="sudoku-qr-frame">
+          <div class="sudoku-qr-target" data-qr></div>
+          <div class="sudoku-qr-caption">
+            <strong>SCAN TO PLAY</strong>
+            Free · No app · Play in browser
+          </div>
+        </div>
+        <div>
+          <div class="sudoku-vouchers-label">Win vouchers up to RM100</div>
+        </div>
+        <div class="sudoku-tiers">
+          <div class="tier tier-bronze">
+            <div class="tier-label">BRONZE</div>
+            <div class="tier-amount">RM30</div>
+            <div class="tier-detail">Voucher</div>
+            <div class="tier-puzzles">Solve 15</div>
+          </div>
+          <div class="tier tier-silver">
+            <div class="tier-label">SILVER</div>
+            <div class="tier-amount">RM50</div>
+            <div class="tier-detail">Voucher</div>
+            <div class="tier-puzzles">Solve 30</div>
+          </div>
+          <div class="tier tier-gold">
+            <div class="tier-label">GOLD</div>
+            <div class="tier-amount">RM100</div>
+            <div class="tier-detail">Voucher</div>
+            <div class="tier-puzzles">Solve 50</div>
+          </div>
+        </div>
+        <div class="sudoku-footnote">Show your score at the counter to claim your voucher.</div>
+      </div>
+    `;
+  }
+
+  function injectQRCode(slideEl, url) {
+    const target = slideEl.querySelector('[data-qr]');
+    if (!target || typeof QRCode === 'undefined') return;
+    target.innerHTML = '';
+    new QRCode(target, {
+      text: url,
+      width: 200,
+      height: 200,
+      colorDark: '#1B1464',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  // ─── Slide builder ───
   function buildSlideElement(s, index) {
     const div = document.createElement('div');
     div.className = 'slide';
     div.dataset.index = index;
 
-    const img = document.createElement('img');
-    img.src = s.image;
-    img.alt = s.alt || '';
-    img.onerror = () => {
-      img.style.display = 'none';
-      div.style.background = 'linear-gradient(135deg, #0D0B6F, #1B1464)';
-    };
-    div.appendChild(img);
+    if (s.template === 'sudoku') {
+      div.innerHTML = renderSudokuTemplate();
+      // Generate QR after element exists in DOM
+      const qrUrl = s.qrUrl || 'https://menaraoptometrymidvalley.github.io/menaraoptometrycentre-midvalley/sudoku/';
+      requestAnimationFrame(() => injectQRCode(div, qrUrl));
+    } else {
+      const img = document.createElement('img');
+      img.src = s.image;
+      img.alt = s.alt || '';
+      img.onerror = () => {
+        img.style.display = 'none';
+        div.style.background = 'linear-gradient(135deg, #0D0B6F, #1B1464)';
+      };
+      div.appendChild(img);
+    }
 
     // Top-left badge (today / anniversary)
     if (s.todayBadge) {
@@ -739,13 +1079,13 @@
       });
     });
 
-    // 6. Sudoku brain-break (engagement — scan to play while waiting)
+    // 6. Sudoku brain-break (rendered as HTML template, includes live QR + voucher tiers)
     const sudoku = (data.evergreen || []).find(e => e.id === 'sudoku-brain-break');
     if (sudoku) {
       deck.push({
-        image: sudoku.image,
-        alt: sudoku.title,
-        goldBadge: 'Brain Break'
+        template: 'sudoku',
+        qrUrl: sudoku.qrUrl,
+        alt: sudoku.title
       });
     }
 
@@ -800,69 +1140,28 @@
     }
   }
 
-  // ─── Lottie cat corner ───
+  // ─── Inline SVG cat — cycles through 4 states ───
   const CAT_STATES = ['walking', 'sleeping', 'playing', 'eating'];
-  const CAT_STATE_INTERVAL = 18000;  // 18 sec per state
-  let catAnimData = {};
-  let catLottie = null;
+  const CAT_STATE_INTERVAL = 14000;  // 14 sec per state
   let catIdx = 0;
 
-  async function loadCatAnimations() {
-    for (const state of CAT_STATES) {
-      try {
-        const res = await fetch(`assets/cat/cat-${state}.json?t=${Date.now()}`);
-        if (!res.ok) continue;
-        const data = await res.json();
-        catAnimData[state] = data;
-      } catch (e) { /* skip missing state */ }
-    }
-
-    const available = Object.keys(catAnimData);
-    if (available.length === 0 || typeof lottie === 'undefined') {
-      // No Lottie files yet — keep cat hidden gracefully
-      return;
-    }
-
+  function setCatState(state) {
     const cat = document.getElementById('catCorner');
-    cat.classList.remove('hidden');
-    cat.classList.add('show-label');
-    setTimeout(() => cat.classList.remove('show-label'), 3500);
-
-    playCatState(available[0]);
-    if (available.length > 1) {
-      setInterval(rotateCatState, CAT_STATE_INTERVAL);
-    }
-  }
-
-  function playCatState(state) {
-    if (catLottie) {
-      catLottie.destroy();
-      catLottie = null;
-    }
-    catLottie = lottie.loadAnimation({
-      container: document.getElementById('catContainer'),
-      renderer: 'svg',
-      loop: true,
-      autoplay: true,
-      animationData: catAnimData[state]
-    });
+    CAT_STATES.forEach(s => cat.classList.remove('cat-' + s));
+    cat.classList.add('cat-' + state);
     document.getElementById('catStateLabel').textContent = state;
-    // Briefly show the label on state change
-    const cat = document.getElementById('catCorner');
     cat.classList.add('show-label');
-    setTimeout(() => cat.classList.remove('show-label'), 2000);
+    setTimeout(() => cat.classList.remove('show-label'), 2500);
   }
 
   function rotateCatState() {
-    const available = Object.keys(catAnimData);
-    if (available.length <= 1) return;
-    catIdx = (catIdx + 1) % available.length;
-    const cat = document.getElementById('catCorner');
-    cat.classList.add('fading');
-    setTimeout(() => {
-      playCatState(available[catIdx]);
-      cat.classList.remove('fading');
-    }, 600);
+    catIdx = (catIdx + 1) % CAT_STATES.length;
+    setCatState(CAT_STATES[catIdx]);
+  }
+
+  function startCat() {
+    setCatState(CAT_STATES[0]);
+    setInterval(rotateCatState, CAT_STATE_INTERVAL);
   }
 
   // Hard refresh every hour to pick up new promos.json
@@ -901,7 +1200,7 @@
   });
 
   boot();
-  loadCatAnimations();
+  startCat();
 })();
 </script>
 </body>

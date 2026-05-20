@@ -32,8 +32,10 @@
     color: #fff;
     -webkit-font-smoothing: antialiased;
     user-select: none;
-    cursor: none;
   }
+  /* Hide cursor only in fullscreen / kiosk mode (?kiosk=1) */
+  body.kiosk-mode { cursor: none; }
+  body.kiosk-mode * { cursor: none !important; }
 
   body {
     display: flex;
@@ -724,6 +726,15 @@
 
   // Hard refresh every hour to pick up new promos.json
   setTimeout(() => location.reload(), REFRESH_INTERVAL);
+
+  // Cursor hiding — only in kiosk/fullscreen mode
+  function syncKioskMode() {
+    const isKiosk = !!document.fullscreenElement
+      || new URLSearchParams(location.search).has('kiosk');
+    document.body.classList.toggle('kiosk-mode', isKiosk);
+  }
+  document.addEventListener('fullscreenchange', syncKioskMode);
+  syncKioskMode();
 
   // Connection monitoring
   window.addEventListener('online', () => {

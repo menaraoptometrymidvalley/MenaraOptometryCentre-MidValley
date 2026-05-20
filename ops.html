@@ -1344,6 +1344,46 @@
     font-size: 18px; pointer-events: none;
     animation: catHeartFloat 1.4s ease-out forwards;
   }
+  .opscat-wrap { cursor: grab; }
+  .opscat-wrap.opscat-dragging { cursor: grabbing !important; filter: drop-shadow(0 18px 26px rgba(237,28,36,.45)) brightness(1.1); }
+  .opscat-wrap.opscat-dragging .opscat-img { transform: scale(1.05); animation-play-state: paused; }
+  .cat-party-container {
+    position: fixed; inset: 0; pointer-events: none; z-index: 4; overflow: hidden;
+  }
+  .cat-party-cat {
+    position: absolute;
+    object-fit: contain;
+    opacity: 0;
+    filter: drop-shadow(0 6px 12px rgba(0,0,0,.30));
+    animation: partyFadeIn .6s ease-out forwards, partyFloat 3s ease-in-out infinite;
+  }
+  @keyframes partyFadeIn {
+    from { opacity: 0; transform: translateY(20px) scale(.6); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes partyFloat {
+    0%, 100% { translate: 0 0; }
+    50%      { translate: 0 -8px; }
+  }
+  .cat-party-container.fading .cat-party-cat {
+    transition: opacity 1s ease-out, transform 1s ease-out;
+    opacity: 0;
+    transform: translateY(20px) scale(.7);
+  }
+  .cat-party-banner {
+    position: fixed; top: 80px; left: 50%;
+    transform: translateX(-50%) translateY(-30px);
+    background: linear-gradient(135deg, var(--accent), #f59e0b);
+    color: #fff; padding: 10px 22px;
+    border-radius: 99px;
+    font-weight: 800; font-size: 14px;
+    letter-spacing: .5px;
+    box-shadow: 0 8px 24px rgba(237,28,36,.4);
+    opacity: 0; pointer-events: none; z-index: 6;
+    animation: partyBannerIn .5s ease-out .3s forwards, partyBannerOut .8s ease-in 9s forwards;
+  }
+  @keyframes partyBannerIn { to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+  @keyframes partyBannerOut { to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
   @keyframes catHeartFloat {
     0%   { transform: translate(-50%, 0) scale(.5); opacity: 0; }
     20%  { transform: translate(-50%, -10px) scale(1.2); opacity: 1; }
@@ -3255,7 +3295,65 @@ init();
     S.wrap.style.transform = 'translate3d(' + S.x + 'px, 0, 0)';
     setMode('sitting');
     evaluateMood();
-    S.wrap.addEventListener('click', petCat);
+    let drag = { x:0, y:0, t:0, moved:false };
+    function onDown(e) {
+      const ev = e.touches ? e.touches[0] : e;
+      drag.x = ev.clientX; drag.y = ev.clientY;
+      drag.t = Date.now(); drag.moved = false;
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('mouseup', onUp);
+      document.addEventListener('touchend', onUp);
+    }
+    function onMove(e) {
+      const ev = e.touches ? e.touches[0] : e;
+      const dx = ev.clientX - drag.x;
+      const dy = ev.clientY - drag.y;
+      if (!drag.moved && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+        drag.moved = true;
+        clearTimeout(S.moveTimer);
+        clearTimeout(S.arrivalTimer);
+        if (S.boundCard && typeof climbDownFromCard === 'function') climbDownFromCard();
+        S.wrap.classList.add('opscat-dragging');
+        S.manualMood = 'dragging';
+        S.manualUntil = performance.now() + 60000;
+      }
+      if (drag.moved) {
+        if (e.cancelable) e.preventDefault();
+        const wrapW = S.wrap.offsetWidth;
+        const wrapH = S.wrap.offsetHeight;
+        const newX = Math.max(0, Math.min(window.innerWidth - wrapW, ev.clientX - wrapW/2));
+        const newY = Math.max(0, Math.min(window.innerHeight - 80, window.innerHeight - ev.clientY - wrapH/2));
+        S.wrap.style.transitionDuration = '0s';
+        S.wrap.style.transform = 'translate3d(' + newX + 'px, ' + (-newY) + 'px, 0)';
+        S.x = newX; S.y = newY;
+      }
+    }
+    function onUp() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      document.removeEventListener('touchend', onUp);
+      const elapsed = Date.now() - drag.t;
+      if (drag.moved) {
+        S.wrap.classList.remove('opscat-dragging');
+        S.manualMood = null;
+        setMode('sitting');
+        scheduleNextMove();
+        const b = document.getElementById('opscatBubble');
+        if (b) {
+          const msgs = ['Heheh thanks!', 'OK saya pindah sini', 'Lebih selesa~', 'Best di sini', 'Aaa~ awak gerak saya'];
+          b.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+          b.classList.add('show');
+          clearTimeout(b._t);
+          b._t = setTimeout(function() { b.classList.remove('show'); }, 2500);
+        }
+      } else if (elapsed < 300) {
+        petCat();
+      }
+    }
+    S.wrap.addEventListener('mousedown', onDown);
+    S.wrap.addEventListener('touchstart', onDown, { passive: true });
     setTimeout(scheduleNextMove, 1500);
     requestAnimationFrame(tick);
     window.addEventListener('resize', function () {
@@ -3272,7 +3370,71 @@ init();
     boot();
   }
 
-  window.OpsCatAPI = { performAction: performAction };
+  // === Cat party gimmick ===
+  const PARTY_POSES_LIST = ['sitting', 'walking', 'walking2', 'playing', 'grooming', 'stretching', 'sleeping', 'yawning'];
+  const PARTY_MSGS = ['Cat Party! \u{1F389}', 'Frens are here!', 'Meowtastic! \u{1F389}', 'Cats unite!', 'Tea-time with frens!'];
+  let partyLastHour = new Date().getHours();
+  let partyInProgress = false;
+  function spawnCatParty() {
+    if (partyInProgress) return;
+    partyInProgress = true;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const N = 6 + Math.floor(Math.random() * 4);
+    const container = document.createElement('div');
+    container.className = 'cat-party-container';
+    document.body.appendChild(container);
+    const banner = document.createElement('div');
+    banner.className = 'cat-party-banner';
+    banner.textContent = PARTY_MSGS[Math.floor(Math.random() * PARTY_MSGS.length)];
+    document.body.appendChild(banner);
+    for (let i = 0; i < N; i++) {
+      const cat = document.createElement('img');
+      cat.className = 'cat-party-cat';
+      const poseKey = PARTY_POSES_LIST[Math.floor(Math.random() * PARTY_POSES_LIST.length)];
+      cat.src = POSES[poseKey];
+      const size = 70 + Math.floor(Math.random() * 60);
+      const xMargin = 80;
+      const x = xMargin + Math.random() * Math.max(1, vw - 2 * xMargin - size);
+      const yLift = Math.random() * Math.min(220, vh * 0.4);
+      const facingLeft = Math.random() < 0.5;
+      const delay = i * 90;
+      const hueShift = Math.random() < 0.4 ? Math.floor(Math.random() * 60 - 30) : 0;
+      cat.style.cssText =
+        'left:' + x + 'px;' +
+        'bottom:' + (10 + yLift) + 'px;' +
+        'width:' + size + 'px;' +
+        'height:' + size + 'px;' +
+        (facingLeft ? 'transform: scaleX(-1);' : '') +
+        (hueShift ? 'filter: drop-shadow(0 6px 12px rgba(0,0,0,.3)) hue-rotate(' + hueShift + 'deg);' : '') +
+        'animation-delay: ' + delay + 'ms, ' + (delay + 600) + 'ms;' +
+        'animation-duration: .6s, ' + (2.5 + Math.random() * 1.5) + 's;';
+      container.appendChild(cat);
+    }
+    const bubble = document.getElementById('opscatBubble');
+    if (bubble) {
+      bubble.textContent = 'Oh! Frens datang!';
+      bubble.classList.add('show');
+      clearTimeout(bubble._t);
+      bubble._t = setTimeout(function() { bubble.classList.remove('show'); }, 3500);
+    }
+    setTimeout(function() { container.classList.add('fading'); }, 9000);
+    setTimeout(function() {
+      if (container.parentNode) container.remove();
+      if (banner.parentNode) banner.remove();
+      partyInProgress = false;
+    }, 10500);
+  }
+  function checkPartyTime() {
+    const h = new Date().getHours();
+    if (h !== partyLastHour) {
+      partyLastHour = h;
+      if (h >= 7 && h < 23) spawnCatParty();
+    }
+  }
+  setInterval(checkPartyTime, 30 * 1000);
+  // window.OpsCatAPI.party() to trigger manually for testing
+  window.OpsCatAPI = { performAction: performAction, party: spawnCatParty };
 })();
 </script>
 <!-- Bottom widgets: Cherry Blossom (3x/day) + Cat Care Corner -->

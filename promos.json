@@ -1,0 +1,175 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "outlet": "Menara Optometry Centre — Mid Valley",
+    "address": "LG-017, Mid Valley Megamall, Kuala Lumpur",
+    "whatsapp": "+60 11-5419 7980",
+    "wa_link": "https://wa.me/601154197980",
+    "last_updated": "2026-05-20"
+  },
+  "weekly7DP": [
+    {
+      "day": 1,
+      "dayName": "Cyber Monday",
+      "dayMy": "Isnin",
+      "category": "DES",
+      "tagline": "Digital Eye Strain",
+      "headline": "Are your eyes aging faster than you?",
+      "image": "assets/promos/7dp-mon-des.jpg",
+      "perks": [
+        "FREE DES screening on the spot",
+        "FREE 1.56 UV420 lens with selected frame",
+        "Comprehensive eye exam with spectacle purchase",
+        "FREE Blue Light upgrade — 10% off anti-fatigue lenses"
+      ]
+    },
+    {
+      "day": 2,
+      "dayName": "MyopiaCARE Tuesday",
+      "dayMy": "Selasa",
+      "category": "MyopiaCARE",
+      "tagline": "Let's control myopia",
+      "headline": "Children myopia screening, ages 4–17",
+      "image": "assets/promos/7dp-tue-myopia.jpg",
+      "perks": [
+        "FREE children myopia risk screening",
+        "20% off MIYOSMART & Stellest (with follow-up commitment)",
+        "Paediatric fee waived for every spectacle purchase"
+      ]
+    },
+    {
+      "day": 3,
+      "dayName": "Wow Wednesday",
+      "dayMy": "Rabu",
+      "category": "Brand",
+      "tagline": "It's the way we thanks",
+      "headline": "20% off for spending RM500+",
+      "image": "assets/promos/7dp-wed-wow.jpg",
+      "perks": [
+        "20% off for any spend above RM500",
+        "Drop by today!"
+      ]
+    },
+    {
+      "day": 4,
+      "dayName": "Look Fresh Thursday",
+      "dayMy": "Khamis",
+      "category": "Contact Lens",
+      "tagline": "Fresh, Shine & Bright",
+      "headline": "Into your eyes — contact lens day",
+      "image": "assets/promos/7dp-thu-cl.jpg",
+      "perks": [
+        "FREE clear contact lens trial (RM350+ spectacle)",
+        "FREE clear/color contact lenses (RM600+ spectacle)",
+        "Complimentary aftercare with 6-month purchase"
+      ]
+    },
+    {
+      "day": 5,
+      "dayName": "Blessed Friday",
+      "dayMy": "Jumaat",
+      "category": "Loyalty",
+      "tagline": "Show up yourself",
+      "headline": "Small thanks, every Friday",
+      "image": "assets/promos/7dp-fri-blessed.jpg",
+      "perks": [
+        "Free treat with any purchase",
+        "Different surprise every week for first 10 customers"
+      ]
+    },
+    {
+      "day": 6,
+      "dayName": "MyopiaCARE Saturday",
+      "dayMy": "Sabtu",
+      "category": "MyopiaCARE",
+      "tagline": "Let's control myopia",
+      "headline": "Children myopia screening, ages 4–17",
+      "image": "assets/promos/7dp-tue-myopia.jpg",
+      "perks": [
+        "FREE children myopia risk screening",
+        "20% off MIYOSMART & Stellest (with follow-up commitment)",
+        "Paediatric fee waived for every spectacle purchase"
+      ]
+    },
+    {
+      "day": 0,
+      "dayName": "Sun-Day Shield",
+      "dayMy": "Ahad",
+      "category": "UV/Cataract",
+      "tagline": "Protect the eyes that protect you",
+      "headline": "Bring your parents — we'll take care of the rest",
+      "image": "assets/promos/7dp-sun-shield.jpg",
+      "perks": [
+        "FREE slit-lamp cataract screening for ages 40+",
+        "50% off second pair Rx tinted (with RM900+ main pair)",
+        "Sun-protected lens at RM280 (while stock last)"
+      ]
+    }
+  ],
+  "activePromos": [
+    {
+      "id": "stellest-disney-cruise",
+      "title": "Disney Cruise Lucky Draw",
+      "subtitle": "Stand a chance to win one family gateway per month — 2 adults + 1 child (≤12 yo)",
+      "image": "assets/promos/stellest-disney-cruise.jpg",
+      "category": "Lucky Draw",
+      "partner": "Stellest × Essilor",
+      "validFrom": "2026-05-01",
+      "validUntil": "2026-06-30",
+      "priority": 9
+    },
+    {
+      "id": "essilor-laptop-sleeve",
+      "title": "Laptop Sleeve Bag Eksklusif",
+      "subtitle": "Hadiah eksklusif dengan pembelian kanta Essilor Varilux atau Eyezen",
+      "image": "assets/promos/essilor-laptop-sleeve.jpg",
+      "category": "Premium Gift",
+      "partner": "Essilor",
+      "validFrom": "2026-04-01",
+      "validUntil": "2026-06-30",
+      "priority": 7
+    },
+    {
+      "id": "hari-ibu-tradein",
+      "title": "Istimewa Hari Ibu — Trade-in Cermin Mata",
+      "subtitle": "Tukar beli cermin mata dengan penjimatan sehingga RM100. Beli & Menang eMAS.",
+      "image": "assets/promos/hari-ibu-tradein.jpg",
+      "category": "Mother's Day",
+      "partner": "Menara × Essilor",
+      "validFrom": "2026-04-15",
+      "validUntil": "2026-05-31",
+      "priority": 10
+    },
+    {
+      "id": "hari-ibu-hoya",
+      "title": "Hari Ibu × HOYA — SUPERREADER PERCUMA",
+      "subtitle": "Sepasang kanta SUPERREADER percuma dengan setiap pembelian produk HOYA terpilih",
+      "image": "assets/promos/hari-ibu-hoya.jpg",
+      "category": "Mother's Day",
+      "partner": "HOYA",
+      "validFrom": "2026-04-15",
+      "validUntil": "2026-05-31",
+      "priority": 10
+    },
+    {
+      "id": "beli-menang-emas",
+      "title": "Cabutan Bertuah Bulanan — Menangi eMAS",
+      "subtitle": "Kempen Beli & Menang sempena Ulangtahun ke-30 Menara Optometry",
+      "image": "assets/promos/beli-menang-emas.jpg",
+      "category": "Anniversary",
+      "partner": "Menara × Essilor",
+      "validFrom": "2026-01-01",
+      "validUntil": "2026-12-31",
+      "priority": 6
+    }
+  ],
+  "evergreen": [
+    {
+      "id": "30-tahun",
+      "title": "Terima kasih bersama 30 Tahun",
+      "subtitle": "Menara Optometry — 30 years of caring for your family's vision",
+      "image": "assets/promos/30-tahun-brand.jpg",
+      "category": "Brand"
+    }
+  ]
+}

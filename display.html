@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Menara Optometry MDV — Live Display</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1B1464;
+    --navy-deep: #0D0B6F;
+    --scarlet: #E60012;
+    --gold: #D4A843;
+    --gold-glow: #F2C94C;
+    --cyan: #3EADD6;
+    --cream: #FAFBFE;
+    --soft: #F4F6FB;
+    --line: rgba(255,255,255,0.12);
+    --ink: #0F1629;
+    --muted: #A8B0C4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--navy);
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    cursor: none;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+  }
+
+  /* Ambient gradient behind everything */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at top, rgba(212,168,67,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom, rgba(230,0,18,0.06) 0%, transparent 50%),
+      linear-gradient(180deg, #0D0B6F 0%, #1B1464 50%, #0D0B6F 100%);
+    z-index: -1;
+    animation: ambientShift 30s ease-in-out infinite;
+  }
+  @keyframes ambientShift {
+    0%, 100% { filter: hue-rotate(0deg); }
+    50% { filter: hue-rotate(8deg); }
+  }
+
+  /* ────── HEADER ────── */
+  .header {
+    flex-shrink: 0;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(13,11,111,0.95) 0%, rgba(27,20,100,0.65) 100%);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--line);
+    z-index: 10;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-mark {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .brand-mark sup {
+    font-size: 10px;
+    color: var(--gold);
+    margin-left: 2px;
+    vertical-align: super;
+  }
+  .brand-sub {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .anniversary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: linear-gradient(135deg, rgba(212,168,67,0.18), rgba(242,201,76,0.08));
+    border: 1px solid rgba(212,168,67,0.35);
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gold-glow);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .anniversary::before {
+    content: '✦';
+    font-size: 11px;
+    animation: sparkle 2.5s ease-in-out infinite;
+  }
+  @keyframes sparkle {
+    0%, 100% { opacity: 1; transform: rotate(0deg) scale(1); }
+    50% { opacity: 0.5; transform: rotate(180deg) scale(0.9); }
+  }
+  .clock {
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    text-align: right;
+    line-height: 1.3;
+  }
+  .clock-time {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  /* ────── TODAY BADGE ────── */
+  .today-band {
+    flex-shrink: 0;
+    padding: 16px 22px 8px;
+    text-align: center;
+  }
+  .today-day {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .today-day .day-accent {
+    color: var(--gold);
+    font-style: italic;
+  }
+  .today-date {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+  .today-promo-strip {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(230,0,18,0.15);
+    border: 1px solid rgba(230,0,18,0.4);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #FFB3B8;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .today-promo-strip::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--scarlet);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(230,0,18,0.7); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(230,0,18,0); }
+  }
+
+  /* ────── HERO STAGE ────── */
+  .stage {
+    flex: 1;
+    position: relative;
+    padding: 10px 22px 14px;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .promo-card {
+    position: relative;
+    flex: 1;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      0 20px 60px rgba(0,0,0,0.45),
+      0 4px 14px rgba(0,0,0,0.3),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+    background: #000;
+    min-height: 0;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: scale(1.04);
+    transition: opacity 1.1s cubic-bezier(0.4, 0, 0.2, 1), transform 8.5s linear;
+    pointer-events: none;
+  }
+  .slide.active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+  .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Slides show poster image as-is, no text overlay.
+     Only small floating badges for special states (today, expiring). */
+  .slide-badge {
+    position: absolute;
+    top: 14px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  }
+  .slide-badge.today {
+    left: 14px;
+    background: rgba(230,0,18,0.95);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+  }
+  .slide-badge.today::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    animation: pulseDot 1.5s ease-in-out infinite;
+  }
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+  .slide-badge.expiring {
+    right: 14px;
+    background: rgba(255,193,7,0.95);
+    border: 1px solid rgba(255,255,255,0.4);
+    color: #1B1464;
+  }
+  .slide-badge.expiring.last-day {
+    background: rgba(230,0,18,0.95);
+    color: #fff;
+    animation: lastDayPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes lastDayPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 16px rgba(230,0,18,0.5); }
+    50% { transform: scale(1.05); box-shadow: 0 4px 22px rgba(230,0,18,0.8); }
+  }
+  .slide-badge.gold {
+    left: 14px;
+    background: linear-gradient(135deg, rgba(212,168,67,0.96), rgba(242,201,76,0.92));
+    border: 1px solid rgba(255,255,255,0.4);
+    color: #1B1464;
+  }
+
+  /* ────── COMING-UP / DOTS ────── */
+  .progress {
+    flex-shrink: 0;
+    padding: 12px 22px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .progress-label {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .dots {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    transition: all 0.35s ease;
+  }
+  .dot.active {
+    background: var(--gold);
+    width: 22px;
+    border-radius: 999px;
+    box-shadow: 0 0 10px rgba(212,168,67,0.5);
+  }
+
+  /* ────── FOOTER ────── */
+  .footer {
+    flex-shrink: 0;
+    padding: 14px 22px 18px;
+    background: linear-gradient(180deg, transparent 0%, rgba(13,11,111,0.75) 50%, rgba(13,11,111,0.95) 100%);
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .contact {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .wa-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.3px;
+  }
+  .wa-line .wa-icon {
+    width: 16px;
+    height: 16px;
+    background: #25D366;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+  }
+  .location {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.6px;
+    font-weight: 500;
+  }
+  .qr-stub {
+    text-align: center;
+    font-size: 8px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    line-height: 1.3;
+  }
+  .qr-stub strong {
+    display: block;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+    text-transform: none;
+    font-weight: 700;
+  }
+
+  /* ────── STATUS / LOADING ────── */
+  .loading {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--navy);
+    z-index: 100;
+    transition: opacity 0.5s;
+  }
+  .loading.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255,255,255,0.12);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .status-dot {
+    position: fixed;
+    bottom: 6px;
+    right: 8px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(80,200,120,0.7);
+    z-index: 99;
+  }
+  .status-dot.offline { background: rgba(230,0,18,0.7); }
+
+  /* Mid-Valley orientation guard:
+     Optimized for 768x1366 portrait (Philips DISPLAY2).
+     Scales gracefully on other ratios. */
+  @media (min-aspect-ratio: 4/5) {
+    /* Landscape fallback — content reflow */
+    body { padding: 0; }
+  }
+
+  /* High-DPI tuning */
+  @media (min-width: 900px) and (orientation: portrait) {
+    .today-day { font-size: 40px; }
+    .slide-title { font-size: 24px; }
+    .slide-subtitle { font-size: 14px; }
+    .brand-mark { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+</div>
+
+<!-- Header -->
+<header class="header">
+  <div class="brand">
+    <div>
+      <div class="brand-mark">menara<sup>®</sup></div>
+      <div class="brand-sub">Optometry</div>
+    </div>
+  </div>
+  <div class="anniversary">30 Tahun</div>
+  <div class="clock">
+    <div class="clock-time" id="clockTime">--:--</div>
+    <div id="clockDate">—</div>
+  </div>
+</header>
+
+<!-- Today Band -->
+<div class="today-band">
+  <div class="today-day" id="todayDay">—</div>
+  <div class="today-date" id="todayDate">—</div>
+  <div class="today-promo-strip" id="todayPromoStrip">Today's Special</div>
+</div>
+
+<!-- Stage -->
+<div class="stage">
+  <div class="promo-card" id="promoCard">
+    <!-- Slides injected by JS -->
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="progress">
+  <div class="progress-label">Coming Up</div>
+  <div class="dots" id="dots"></div>
+  <div class="progress-label" id="slideCounter">0 / 0</div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="contact">
+    <div class="wa-line">
+      <span class="wa-icon">W</span>
+      +60 11-5419 7980
+    </div>
+    <div class="location">LG-017 · Mid Valley Megamall · Kuala Lumpur</div>
+  </div>
+  <div class="qr-stub">
+    Scan / WhatsApp
+    <strong>Walk-in welcome</strong>
+  </div>
+</footer>
+
+<!-- Status indicator -->
+<div class="status-dot" id="statusDot" title="Connection status"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  const SLIDE_DURATION = 8500;        // ms per slide
+  const REFRESH_INTERVAL = 60 * 60e3; // reload page every 1 hr
+  const DATA_URL = 'promos.json';
+
+  const DAY_NAMES_MY = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+  const DAY_NAMES_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const MONTHS_MY = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+
+  let slides = [];
+  let currentIndex = 0;
+  let timer = null;
+
+  // ─── Date helpers ───
+  function todayISO() {
+    const d = new Date();
+    return d.toISOString().split('T')[0];
+  }
+  function isPromoActive(promo, todayStr) {
+    if (promo.validFrom && todayStr < promo.validFrom) return false;
+    if (promo.validUntil && todayStr > promo.validUntil) return false;
+    return true;
+  }
+  function daysUntil(dateStr) {
+    if (!dateStr) return Infinity;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const target = new Date(dateStr);
+    return Math.ceil((target - today) / 86400000);
+  }
+
+  // ─── Clock ───
+  function updateClock() {
+    const d = new Date();
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mm = String(d.getMinutes()).padStart(2,'0');
+    document.getElementById('clockTime').textContent = `${hh}:${mm}`;
+    document.getElementById('clockDate').textContent = `${d.getDate()} ${MONTHS_MY[d.getMonth()]}`;
+  }
+
+  // ─── Today band ───
+  function paintTodayBand(today7DP) {
+    const d = new Date();
+    const dayEN = DAY_NAMES_EN[d.getDay()];
+    const dayMY = DAY_NAMES_MY[d.getDay()];
+    document.getElementById('todayDay').innerHTML =
+      `${dayEN} <span class="day-accent">/ ${dayMY}</span>`;
+    document.getElementById('todayDate').textContent =
+      `${d.getDate()} ${MONTHS_MY[d.getMonth()]} ${d.getFullYear()}`;
+    if (today7DP) {
+      document.getElementById('todayPromoStrip').textContent = today7DP.dayName;
+    } else {
+      document.getElementById('todayPromoStrip').textContent = 'Today\'s Special';
+    }
+  }
+
+  // ─── Slide builder (image-only, badges optional) ───
+  function buildSlideElement(s, index) {
+    const div = document.createElement('div');
+    div.className = 'slide';
+    div.dataset.index = index;
+
+    const img = document.createElement('img');
+    img.src = s.image;
+    img.alt = s.alt || '';
+    img.onerror = () => {
+      img.style.display = 'none';
+      div.style.background = 'linear-gradient(135deg, #0D0B6F, #1B1464)';
+    };
+    div.appendChild(img);
+
+    // Top-left badge (today / anniversary)
+    if (s.todayBadge) {
+      const b = document.createElement('div');
+      b.className = 'slide-badge today';
+      b.textContent = s.todayBadge;
+      div.appendChild(b);
+    } else if (s.goldBadge) {
+      const b = document.createElement('div');
+      b.className = 'slide-badge gold';
+      b.textContent = s.goldBadge;
+      div.appendChild(b);
+    }
+
+    // Top-right badge (expiry urgency)
+    if (s.expiryDays !== undefined && s.expiryDays >= 0 && s.expiryDays <= 14) {
+      const ef = document.createElement('div');
+      ef.className = 'slide-badge expiring' + (s.expiryDays === 0 ? ' last-day' : '');
+      ef.textContent = s.expiryDays === 0
+        ? '⏰ Last Day!'
+        : `⏰ ${s.expiryDays}d left`;
+      div.appendChild(ef);
+    }
+
+    return div;
+  }
+
+  function renderDots() {
+    const dotsEl = document.getElementById('dots');
+    dotsEl.innerHTML = '';
+    slides.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i === currentIndex ? ' active' : '');
+      dotsEl.appendChild(d);
+    });
+    document.getElementById('slideCounter').textContent =
+      `${currentIndex + 1} / ${slides.length}`;
+  }
+
+  function showSlide(idx) {
+    const cards = document.querySelectorAll('.slide');
+    cards.forEach((c, i) => c.classList.toggle('active', i === idx));
+    currentIndex = idx;
+    renderDots();
+  }
+
+  function advance() {
+    if (slides.length === 0) return;
+    showSlide((currentIndex + 1) % slides.length);
+  }
+
+  // ─── Build slide deck — CURATED for today only (~4-6 slides) ───
+  function buildDeck(data) {
+    const today = todayISO();
+    const dayOfWeek = new Date().getDay();
+    const deck = [];
+
+    // 1. TODAY's 7DP — the headliner
+    const today7DP = (data.weekly7DP || []).find(p => p.day === dayOfWeek);
+    if (today7DP) {
+      deck.push({
+        image: today7DP.image,
+        alt: today7DP.dayName,
+        todayBadge: 'Today · ' + today7DP.dayName
+      });
+    }
+
+    // 2. Expiring active promos (≤14 days) — urgency first
+    const active = (data.activePromos || [])
+      .filter(p => isPromoActive(p, today))
+      .map(p => ({ ...p, _daysLeft: daysUntil(p.validUntil) }));
+
+    const expiring = active
+      .filter(p => p._daysLeft >= 0 && p._daysLeft <= 14)
+      .sort((a, b) => a._daysLeft - b._daysLeft);
+
+    expiring.forEach(p => {
+      deck.push({
+        image: p.image,
+        alt: p.title,
+        expiryDays: p._daysLeft
+      });
+    });
+
+    // 3. Top 2 active promos (not expiring) by priority
+    const longRunning = active
+      .filter(p => p._daysLeft > 14)
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0))
+      .slice(0, 2);
+
+    longRunning.forEach(p => {
+      deck.push({
+        image: p.image,
+        alt: p.title
+      });
+    });
+
+    // 4. 30 Tahun anniversary closer
+    const anniversary = (data.evergreen || []).find(e => e.id === '30-tahun');
+    if (anniversary) {
+      deck.push({
+        image: anniversary.image,
+        alt: anniversary.title,
+        goldBadge: '30 Tahun'
+      });
+    }
+
+    return deck;
+  }
+
+  // ─── Boot ───
+  async function boot() {
+    updateClock();
+    setInterval(updateClock, 30000);
+
+    try {
+      const res = await fetch(DATA_URL + '?t=' + Date.now());
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+
+      const today7DP = (data.weekly7DP || []).find(p => p.day === new Date().getDay());
+      paintTodayBand(today7DP);
+
+      slides = buildDeck(data);
+
+      const card = document.getElementById('promoCard');
+      card.innerHTML = '';
+      slides.forEach((s, i) => card.appendChild(buildSlideElement(s, i)));
+
+      if (slides.length > 0) {
+        showSlide(0);
+        timer = setInterval(advance, SLIDE_DURATION);
+      }
+
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('statusDot').classList.remove('offline');
+    } catch (err) {
+      console.error('Failed to load promos.json:', err);
+      document.getElementById('statusDot').classList.add('offline');
+      document.getElementById('loading').innerHTML =
+        '<div style="color:#fff;text-align:center;font-family:Plus Jakarta Sans,sans-serif">' +
+        '<div style="font-size:48px;margin-bottom:12px">⚠</div>' +
+        '<div style="font-size:14px;opacity:0.7">Loading promotions failed</div>' +
+        '<div style="font-size:11px;opacity:0.5;margin-top:6px">Retrying in 30 seconds</div></div>';
+      setTimeout(() => location.reload(), 30000);
+    }
+  }
+
+  // Hard refresh every hour to pick up new promos.json
+  setTimeout(() => location.reload(), REFRESH_INTERVAL);
+
+  // Connection monitoring
+  window.addEventListener('online', () => {
+    document.getElementById('statusDot').classList.remove('offline');
+  });
+  window.addEventListener('offline', () => {
+    document.getElementById('statusDot').classList.add('offline');
+  });
+
+  // Click anywhere to advance manually (useful during setup)
+  document.addEventListener('click', () => {
+    clearInterval(timer);
+    advance();
+    timer = setInterval(advance, SLIDE_DURATION);
+  });
+
+  // Press F for fullscreen
+  document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'f') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+
+  boot();
+})();
+</script>
+</body>
+</html>

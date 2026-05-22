@@ -354,6 +354,8 @@
   }
   .q-rr-context strong { color: var(--text); font-weight: 700; }
   .q-rr-cleared { color: var(--success); font-size: 22px; font-weight: 800; margin-top: 6px; }
+  .hero-rr-stamp { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.55); margin-top: 10px; font-weight: 600; }
+  .q-rr-stamp { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted-2); margin-top: 10px; font-weight: 600; }
 
   /* === SALES PANEL === */
   .sales-panel {
@@ -2294,7 +2296,8 @@ function renderRunRate() {
     t1: s.tier1 || 0,
     t2: s.tier2 || 0,
     std: s.std || 0,
-    daysLeft: daysLeftMonth
+    daysLeft: daysLeftMonth,
+    lastUpdated: s.lastUpdated || ""
   });
 
   renderQuarterlyRunrate({
@@ -2302,19 +2305,22 @@ function renderRunRate() {
     t1: s.quarterT1 || 0,
     t2: s.quarterT2 || 0,
     std: s.quarterStd || 0,
-    daysLeft: daysLeftQuarter
+    daysLeft: daysLeftQuarter,
+    lastUpdated: s.lastUpdated || ""
   });
 }
 
-function renderHeroRunrate({ period, t1, t2, std, daysLeft }) {
+function renderHeroRunrate({ period, t1, t2, std, daysLeft, lastUpdated }) {
   const body = document.getElementById("heroRunrateBody");
   if (!body) return;
+  const stampHtml = lastUpdated ? `<div class="hero-rr-stamp">Updated · ${lastUpdated}</div>` : '';
 
   if (t1 === 0 && t2 === 0) {
     body.innerHTML = `
       <div class="hero-rr-period">${period}</div>
       <div class="hero-rr-cleared">— set target —</div>
       <div class="hero-rr-context">Tier targets not configured</div>
+      ${stampHtml}
     `;
     return;
   }
@@ -2326,6 +2332,7 @@ function renderHeroRunrate({ period, t1, t2, std, daysLeft }) {
       <div class="hero-rr-period">${period} · BOTH TIERS ✓</div>
       <div class="hero-rr-cleared">🎉 RM ${fmtNumber(std)}</div>
       <div class="hero-rr-context">RM ${fmtNumber(above)} above T2 · keep going · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+      ${stampHtml}
     `;
     return;
   }
@@ -2342,6 +2349,7 @@ function renderHeroRunrate({ period, t1, t2, std, daysLeft }) {
         <strong>RM ${fmtNumber(remaining)}</strong> to go ·
         ${daysLeft} day${daysLeft===1?'':'s'} left
       </div>
+      ${stampHtml}
     `;
     return;
   }
@@ -2357,18 +2365,20 @@ function renderHeroRunrate({ period, t1, t2, std, daysLeft }) {
       <strong>RM ${fmtNumber(remaining)}</strong> to go ·
       ${daysLeft} day${daysLeft===1?'':'s'} left
     </div>
+    ${stampHtml}
   `;
 }
 
-function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft }) {
+function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft, lastUpdated }) {
   const body = document.getElementById("quarterlyBody");
   const labelEl = document.getElementById("quarterlyLabel");
+  const stampHtml = lastUpdated ? `<div class="q-rr-stamp">Updated · ${lastUpdated}</div>` : '';
   if (!body) return;
 
   labelEl.textContent = `🎯 Quarterly Pace · ${qLabel}`;
 
   if (t1 === 0 && t2 === 0) {
-    body.innerHTML = `<div class="empty">Quarterly targets not set</div>`;
+    body.innerHTML = `<div class="empty">Quarterly targets not set</div>${stampHtml}`;
     return;
   }
 
@@ -2377,6 +2387,7 @@ function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft }) {
     body.innerHTML = `
       <div class="q-rr-cleared">🎉 BOTH ✓</div>
       <div class="q-rr-context">RM ${fmtNumber(std)} · RM ${fmtNumber(above)} above T2</div>
+      ${stampHtml}
     `;
     return;
   }
@@ -2387,6 +2398,7 @@ function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft }) {
     body.innerHTML = `
       <div class="q-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day to T2</span></div>
       <div class="q-rr-context"><strong>T1 ✓</strong> · RM ${fmtNumber(std)} of RM ${fmtNumber(t2)} · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+      ${stampHtml}
     `;
     return;
   }
@@ -2396,6 +2408,7 @@ function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft }) {
   body.innerHTML = `
     <div class="q-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day to T1</span></div>
     <div class="q-rr-context">RM ${fmtNumber(std)} of RM ${fmtNumber(t1)} · RM ${fmtNumber(remaining)} to go · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+    ${stampHtml}
   `;
 }
 

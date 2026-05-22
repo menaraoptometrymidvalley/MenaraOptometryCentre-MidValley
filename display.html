@@ -1429,12 +1429,50 @@
       }
 
       // Schedule every 1 second — picks up notes that fall within the lookahead window
-      scheduleAhead();
-      intervalHandle = setInterval(scheduleAhead, 1000);
+      let lastSchedulerRun = Date.now();
+      function tickScheduler() {
+        if (stopped) return;
+        lastSchedulerRun = Date.now();
+        scheduleAhead();
+      }
+      tickScheduler();
+      intervalHandle = setInterval(tickScheduler, 1000);
+
+      // Watchdog: every 10 sec, check audio health and recover if needed
+      const watchdogHandle = setInterval(() => {
+        if (stopped) return;
+        // Resume if browser auto-suspended (common after long idle)
+        if (ctx.state === 'suspended') {
+          ctx.resume();
+        }
+        // If scheduler hasn't run in 6+ sec, something hung — restart audio
+        if (Date.now() - lastSchedulerRun > 6000) {
+          console.warn('Audio watchdog: scheduler stalled, restarting music');
+          clearInterval(watchdogHandle);
+          if (ambientStopFn) ambientStopFn();
+          setTimeout(() => startProceduralAmbient(volume), 1200);
+        }
+      }, 10000);
+
+      // Preventive soft-restart every 15 minutes (crossfaded — no silence gap)
+      const preventiveHandle = setInterval(() => {
+        if (stopped) return;
+        console.log('Audio preventive refresh');
+        // Fade out cleanly, then start fresh
+        master.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+        setTimeout(() => {
+          clearInterval(watchdogHandle);
+          clearInterval(preventiveHandle);
+          if (ambientStopFn) ambientStopFn();
+          setTimeout(() => startProceduralAmbient(volume), 200);
+        }, 1600);
+      }, 15 * 60 * 1000);
 
       ambientStopFn = () => {
         stopped = true;
         if (intervalHandle) clearInterval(intervalHandle);
+        clearInterval(watchdogHandle);
+        clearInterval(preventiveHandle);
         master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5);
         setTimeout(() => {
           try {

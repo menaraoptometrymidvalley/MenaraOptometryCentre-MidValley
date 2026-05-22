@@ -1574,11 +1574,14 @@
     if (!audioConfig) return;
     baseVolume = (typeof audioConfig.volume === 'number') ? audioConfig.volume : 0.25;
 
-    // No MP3 tracks configured? Fall back to procedural ambient (or honor explicit mode)
+    // Explicit "off" mode = no audio at all
+    if (audioConfig.mode === 'off') return;
+
+    // No MP3 tracks configured? Fall back to procedural ambient (unless turned off above)
     const useProcedural = audioConfig.mode === 'procedural'
       || (!Array.isArray(audioConfig.tracks) || audioConfig.tracks.length === 0);
     if (useProcedural) {
-      startProceduralAmbient(baseVolume * 0.85);  // procedural is intrinsically softer, only slight reduction
+      startProceduralAmbient(baseVolume * 0.85);
       return;
     }
 

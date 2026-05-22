@@ -1046,14 +1046,18 @@
       const qrUrl = s.qrUrl || 'https://menaraoptometrymidvalley.github.io/menaraoptometrycentre-midvalley/sudoku/';
       requestAnimationFrame(() => injectQRCode(div, qrUrl));
     } else if (s.type === 'video') {
-      // Video slide: autoplay muted by default. Set s.unmute=true if you want audio (e.g., educational)
+      // Video slide: plays once to completion, then carousel advances.
+      // (Not looped — we want full natural play, then move on.)
       const video = document.createElement('video');
       video.src = s.video;
       video.autoplay = true;
-      video.loop = true;
+      video.loop = false;           // play to completion, don't loop within the slot
       video.playsInline = true;
       video.muted = !s.unmute;
       video.preload = 'auto';
+      if (s.unmute) {
+        video.volume = 0.55;        // softer than full blast — closer to ambient music level
+      }
       video.onerror = () => {
         video.style.display = 'none';
         div.style.background = 'linear-gradient(135deg, #0D0B6F, #1B1464)';
@@ -1143,24 +1147,23 @@
       clearTimeout(timer);
     }
     if (activeVideo) {
-      // Wait for the video to finish, then advance.
-      // Use 'ended' if it's playing without loop; otherwise fall back to duration timer.
-      const startWait = () => {
-        // If duration is known, use it (capped). Otherwise fall back to default.
-        const durMs = (isFinite(activeVideo.duration) && activeVideo.duration > 0)
-          ? Math.min(activeVideo.duration * 1000, SLIDE_MAX)
-          : SLIDE_DURATION;
-        timer = setTimeout(advance, durMs + 250);  // small buffer for the fade
+      // Primary trigger: 'ended' event (fires when video genuinely finishes)
+      const onEnded = () => {
+        activeVideo.removeEventListener('ended', onEnded);
+        // Small breath before transitioning to the next slide
+        timer = setTimeout(advance, 400);
       };
-      if (activeVideo.readyState >= 1) {
-        startWait();
-      } else {
-        activeVideo.addEventListener('loadedmetadata', startWait, { once: true });
-        // Safety: if metadata never loads in 1.5s, advance after default
-        setTimeout(() => {
-          if (!timer) startWait();
-        }, 1500);
-      }
+      activeVideo.addEventListener('ended', onEnded);
+
+      // Safety net: if duration is known, cap the wait at duration + 1.5s buffer
+      // (in case 'ended' never fires for some reason)
+      const safetyMs = (isFinite(activeVideo.duration) && activeVideo.duration > 0)
+        ? Math.min(activeVideo.duration * 1000 + 1500, SLIDE_MAX + 1500)
+        : SLIDE_MAX;
+      timer = setTimeout(() => {
+        activeVideo.removeEventListener('ended', onEnded);
+        advance();
+      }, safetyMs);
     } else {
       timer = setTimeout(advance, SLIDE_DURATION);
     }

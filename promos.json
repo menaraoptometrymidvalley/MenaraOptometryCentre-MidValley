@@ -103,13 +103,6 @@
       "playAsSequence": true,
       "sequence": [
         {
-          "id": "beli-menang-01-intro",
-          "type": "video",
-          "video": "assets/videos/beli-menang-01-intro.mp4",
-          "unmute": true,
-          "label": "Beli & Menang"
-        },
-        {
           "id": "beli-menang-02-hadiah-utama",
           "type": "video",
           "video": "assets/videos/beli-menang-02-hadiah-utama.mp4",

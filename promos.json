@@ -8,10 +8,12 @@
     "last_updated": "2026-05-22"
   },
   "audio": {
-    "volume": 0.5,
+    "volume": 0.45,
     "shuffle": true,
-    "mode": "off",
-    "tracks": []
+    "loop": true,
+    "tracks": [
+      { "title": "The Mountain (Lounge)", "src": "assets/audio/the-mountain-lounge.mp3" }
+    ]
   },
   "weekly7DP": [
     {

@@ -1574,6 +1574,13 @@
     if (!audioConfig) return;
     baseVolume = (typeof audioConfig.volume === 'number') ? audioConfig.volume : 0.25;
 
+    // URL override: ?music=off disables all audio (used by Toggle Music button)
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('music') === 'off') {
+      console.log('Music disabled by URL parameter');
+      return;
+    }
+
     // Explicit "off" mode = no audio at all
     if (audioConfig.mode === 'off') return;
 
@@ -1597,7 +1604,11 @@
 
     const audio = document.getElementById('bgAudio');
     audio.volume = baseVolume;
-    audio.addEventListener('ended', playNextTrack);
+    // If only one track, use native loop for seamless playback (no gap)
+    audio.loop = (audioTracks.length === 1);
+    if (!audio.loop) {
+      audio.addEventListener('ended', playNextTrack);
+    }
     audio.addEventListener('error', () => {
       console.warn('Audio error — skipping to next track');
       setTimeout(playNextTrack, 1500);

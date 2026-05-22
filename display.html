@@ -1354,11 +1354,11 @@
         while (scheduled < now + lookahead) {
           // Pick a random note from the scale
           const freq = PENTATONIC[Math.floor(Math.random() * PENTATONIC.length)];
-          const duration = 4 + Math.random() * 6;  // 4-10 sec sustain
-          const gain = 0.08 + Math.random() * 0.06;
+          const duration = 3 + Math.random() * 5;   // 3-8 sec sustain
+          const gain = 0.18 + Math.random() * 0.10; // bigger per-note volume
           playNote(freq, scheduled, duration, gain);
-          // Notes overlap — schedule next one every 1.5-3 sec
-          scheduled += 1.5 + Math.random() * 1.5;
+          // Notes overlap — schedule next one every 1.0-2.0 sec (more active)
+          scheduled += 1.0 + Math.random() * 1.0;
         }
         setTimeout(scheduler, 2500);
       }
@@ -1420,7 +1420,7 @@
     const useProcedural = audioConfig.mode === 'procedural'
       || (!Array.isArray(audioConfig.tracks) || audioConfig.tracks.length === 0);
     if (useProcedural) {
-      startProceduralAmbient(baseVolume * 0.5);  // procedural already softer, halve
+      startProceduralAmbient(baseVolume * 0.85);  // procedural is intrinsically softer, only slight reduction
       return;
     }
 

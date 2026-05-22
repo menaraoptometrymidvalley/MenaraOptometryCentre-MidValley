@@ -1315,156 +1315,133 @@
     }
   }
 
-  // ─── Procedural background music (Web Audio API) ───
-  //   Real chord progression (C - Am - F - G) with arpeggios + soft bass.
-  //   Sounds like ambient piano. Warm, not eerie.
+  // ─── Procedural background music — persistent oscillators, low CPU ───
+  //   Chord progression (C-Am-F-G) via PERSISTENT oscillators that just change
+  //   frequency at bar boundaries. Plus a few melody hits per bar.
+  //   Uses AudioContext clock + lookahead scheduler — no setTimeout drift.
   let ambientCtx = null;
   let ambientGain = null;
   let ambientStopFn = null;
 
   function startProceduralAmbient(volume) {
-    if (ambientCtx) return;  // already running
+    if (ambientCtx) return;
     try {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
-      ambientCtx = new AC();
+      const ctx = new AC();
+      ambientCtx = ctx;
 
-      // Master volume
-      const masterGain = ambientCtx.createGain();
-      masterGain.gain.value = volume || 0.4;
-      masterGain.connect(ambientCtx.destination);
-      ambientGain = masterGain;
+      const master = ctx.createGain();
+      master.gain.value = volume || 0.4;
+      master.connect(ctx.destination);
+      ambientGain = master;
 
-      // Light reverb (short delay network) — warmth, not space
-      const lowpass = ambientCtx.createBiquadFilter();
-      lowpass.type = 'lowpass';
-      lowpass.frequency.value = 3200;     // brighter than before
-      const delay = ambientCtx.createDelay();
-      delay.delayTime.value = 0.18;
-      const feedback = ambientCtx.createGain();
-      feedback.gain.value = 0.22;
-      delay.connect(feedback);
-      feedback.connect(delay);
-      lowpass.connect(delay);
-      delay.connect(masterGain);
-      lowpass.connect(masterGain);
+      // Gentle lowpass — warmth
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 2800;
+      lp.connect(master);
 
-      // ───── Piano-like note function ─────
-      function pianoNote(freq, when, duration, gain) {
-        // Two oscillators: sine fundamental + soft triangle harmonic
-        const osc1 = ambientCtx.createOscillator();
-        osc1.type = 'sine';
-        osc1.frequency.value = freq;
-        const osc2 = ambientCtx.createOscillator();
-        osc2.type = 'triangle';
-        osc2.frequency.value = freq;
-        const osc3 = ambientCtx.createOscillator();
-        osc3.type = 'sine';
-        osc3.frequency.value = freq * 2;   // one octave up — shimmer
-
-        const env = ambientCtx.createGain();
-        env.gain.setValueAtTime(0, when);
-        // Quick piano-like attack
-        env.gain.linearRampToValueAtTime(gain, when + 0.02);
-        // Natural decay
-        env.gain.exponentialRampToValueAtTime(gain * 0.4, when + 0.4);
-        env.gain.exponentialRampToValueAtTime(0.0001, when + duration);
-
-        const osc3Gain = ambientCtx.createGain();
-        osc3Gain.gain.value = 0.25;       // shimmer is quieter
-
-        osc1.connect(env);
-        osc2.connect(env);
-        osc3.connect(osc3Gain);
-        osc3Gain.connect(env);
-        env.connect(lowpass);
-
-        osc1.start(when);
-        osc2.start(when);
-        osc3.start(when);
-        osc1.stop(when + duration + 0.1);
-        osc2.stop(when + duration + 0.1);
-        osc3.stop(when + duration + 0.1);
-      }
-
-      // ───── Chord progression (C-Am-F-G — sounds warm) ─────
-      // Each entry: { bass, chord [3 notes], scale [for melody] }
-      const PROGRESSION = [
-        {  // C major
-          bass: 65.41,                              // C2
-          chord: [261.63, 329.63, 392.00],          // C4 E4 G4
-          scale: [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25] // C major
-        },
-        {  // A minor
-          bass: 55.00,                              // A1
-          chord: [220.00, 261.63, 329.63],          // A3 C4 E4
-          scale: [220.00, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00, 440.00]
-        },
-        {  // F major
-          bass: 43.65,                              // F1
-          chord: [174.61, 220.00, 261.63],          // F3 A3 C4
-          scale: [174.61, 196.00, 220.00, 233.08, 261.63, 293.66, 329.63, 349.23]
-        },
-        {  // G major
-          bass: 49.00,                              // G1
-          chord: [196.00, 246.94, 293.66],          // G3 B3 D4
-          scale: [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00]
-        }
+      // C - Am - F - G  (each = {bass, [3 chord notes]})
+      const CHORDS = [
+        { bass: 65.41,  notes: [261.63, 329.63, 392.00] },  // C  / C4 E4 G4
+        { bass: 55.00,  notes: [220.00, 261.63, 329.63] },  // Am / A3 C4 E4
+        { bass: 43.65,  notes: [174.61, 220.00, 261.63] },  // F  / F3 A3 C4
+        { bass: 49.00,  notes: [196.00, 246.94, 293.66] }   // G  / G3 B3 D4
+      ];
+      const SCALES = [
+        [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25], // C
+        [220.00, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00, 440.00], // Am
+        [174.61, 196.00, 220.00, 233.08, 261.63, 293.66, 329.63, 349.23], // F
+        [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00]  // G
       ];
 
-      // 4-second bars — 4 beats per bar, ~60 BPM (upbeat-but-mall-friendly)
-      const BAR_LENGTH = 4.0;
-      const BEAT = BAR_LENGTH / 4;
-      let bar = 0;
-      let nextBarTime = ambientCtx.currentTime + 0.3;
-      let stopRequested = false;
+      // ───── Persistent oscillators (1 bass + 3 pad) ─────
+      function makeOsc(type, freq, gainValue) {
+        const o = ctx.createOscillator();
+        o.type = type;
+        o.frequency.value = freq;
+        const g = ctx.createGain();
+        g.gain.value = gainValue;
+        o.connect(g);
+        g.connect(lp);
+        o.start();
+        return { osc: o, gain: g };
+      }
+      const bass = makeOsc('sine', CHORDS[0].bass, 0.22);
+      const pads = [
+        makeOsc('sine', CHORDS[0].notes[0], 0.085),
+        makeOsc('sine', CHORDS[0].notes[1], 0.085),
+        makeOsc('sine', CHORDS[0].notes[2], 0.085)
+      ];
 
-      function scheduleBar() {
-        if (stopRequested) return;
-        const c = PROGRESSION[bar % PROGRESSION.length];
-        const t0 = nextBarTime;
-
-        // Walking bass — root on beat 1+3, fifth on beat 2+4
-        const fifth = c.bass * 1.4983;  // 3/2 ratio = perfect fifth
-        pianoNote(c.bass, t0 + 0 * BEAT, BEAT * 0.95, 0.28);
-        pianoNote(fifth,  t0 + 1 * BEAT, BEAT * 0.95, 0.22);
-        pianoNote(c.bass, t0 + 2 * BEAT, BEAT * 0.95, 0.28);
-        pianoNote(fifth,  t0 + 3 * BEAT, BEAT * 0.95, 0.22);
-
-        // Chord stabs — short staccato on each beat (gives groove)
-        for (let beat = 0; beat < 4; beat++) {
-          const stabTime = t0 + beat * BEAT + 0.05;  // a hair after the beat for swing
-          c.chord.forEach((n, i) => {
-            pianoNote(n, stabTime + i * 0.012, BEAT * 0.5, 0.13);
-          });
-        }
-
-        // Melody — 4-6 notes per bar, faster movement
-        const melodyCount = 4 + Math.floor(Math.random() * 3);
-        for (let i = 0; i < melodyCount; i++) {
-          // Spread melody notes across the bar with slight randomness
-          const offset = (i / melodyCount) * BAR_LENGTH + (Math.random() - 0.5) * 0.15;
-          const useChord = Math.random() < 0.5;
-          const noteSource = useChord ? c.chord : c.scale;
-          let pick = noteSource[Math.floor(Math.random() * noteSource.length)];
-          pick *= 2;  // octave up for clarity
-          pianoNote(pick, t0 + offset, 0.5 + Math.random() * 0.5, 0.18);
-        }
-
-        bar++;
-        nextBarTime += BAR_LENGTH;
-
-        // Schedule next bar with lookahead
-        setTimeout(scheduleBar, BAR_LENGTH * 1000 * 0.5);
+      // ───── Short melody note (rare — only ~2 per bar) ─────
+      function melodyHit(freq, when, duration, peakGain) {
+        const o = ctx.createOscillator();
+        o.type = 'triangle';
+        o.frequency.value = freq;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, when);
+        g.gain.linearRampToValueAtTime(peakGain, when + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, when + duration);
+        o.connect(g).connect(lp);
+        o.start(when);
+        o.stop(when + duration + 0.05);
       }
 
-      scheduleBar();
+      // ───── Lookahead scheduler ─────
+      const BAR = 6.0;                        // 6 sec per chord (calm, easy to follow)
+      let nextBarStart = ctx.currentTime + 0.5;
+      let bar = 0;
+      let stopped = false;
+      let intervalHandle = null;
+
+      function scheduleAhead() {
+        if (stopped) return;
+        const horizon = ctx.currentTime + 8;
+        while (nextBarStart < horizon) {
+          const c = CHORDS[bar % CHORDS.length];
+          const sc = SCALES[bar % SCALES.length];
+          const t = nextBarStart;
+
+          // Smoothly glide oscillator frequencies to new chord at bar start
+          bass.osc.frequency.setValueAtTime(c.bass, t);
+          pads.forEach((p, i) => p.osc.frequency.setValueAtTime(c.notes[i], t));
+
+          // Gentle gain envelope on each chord change (subtle pulse, not staccato)
+          bass.gain.gain.setValueAtTime(0.12, t);
+          bass.gain.gain.linearRampToValueAtTime(0.22, t + 0.5);
+          bass.gain.gain.linearRampToValueAtTime(0.18, t + BAR);
+          pads.forEach(p => {
+            p.gain.gain.setValueAtTime(0.04, t);
+            p.gain.gain.linearRampToValueAtTime(0.085, t + 0.6);
+          });
+
+          // 2 melody hits per bar (one-shot oscillators, but only 2/bar = low load)
+          const m1 = sc[Math.floor(Math.random() * sc.length)] * 2;
+          const m2 = sc[Math.floor(Math.random() * sc.length)] * 2;
+          melodyHit(m1, t + BAR * 0.25, 0.9, 0.13);
+          melodyHit(m2, t + BAR * 0.65, 0.9, 0.13);
+
+          bar++;
+          nextBarStart += BAR;
+        }
+      }
+
+      // Schedule every 1 second — picks up notes that fall within the lookahead window
+      scheduleAhead();
+      intervalHandle = setInterval(scheduleAhead, 1000);
 
       ambientStopFn = () => {
-        stopRequested = true;
-        masterGain.gain.linearRampToValueAtTime(0, ambientCtx.currentTime + 0.5);
+        stopped = true;
+        if (intervalHandle) clearInterval(intervalHandle);
+        master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5);
         setTimeout(() => {
-          ambientCtx.close();
+          try {
+            bass.osc.stop();
+            pads.forEach(p => p.osc.stop());
+            ctx.close();
+          } catch (e) {}
           ambientCtx = null;
           ambientGain = null;
         }, 700);

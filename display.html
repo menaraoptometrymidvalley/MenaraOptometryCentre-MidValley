@@ -1347,11 +1347,18 @@
       master.connect(ctx.destination);
       ambientGain = master;
 
-      // Gentle lowpass — warmth (routes into compressor)
+      // Gentle lowpass — softens harsh highs on cheap speakers
       const lp = ctx.createBiquadFilter();
       lp.type = 'lowpass';
-      lp.frequency.value = 3000;
-      lp.connect(comp);
+      lp.frequency.value = 2200;     // tighter cutoff for cheap mono speakers
+      lp.Q.value = 0.7;
+      // High-shelf to tame piercing highs further
+      const hs = ctx.createBiquadFilter();
+      hs.type = 'highshelf';
+      hs.frequency.value = 1800;
+      hs.gain.value = -3;            // 3 dB cut above 1.8 kHz
+      lp.connect(hs);
+      hs.connect(comp);
 
       // C - Am - F - G  (each = {bass, [3 chord notes]})
       // Bass moved up one octave (C3 instead of C2) so cheap speakers can reproduce it
@@ -1380,13 +1387,13 @@
         o.start();
         return { osc: o, gain: g };
       }
-      // Bass uses 'triangle' (richer harmonics → survives cheap speakers).
-      // Pads slightly louder to provide audible foundation.
-      const bass = makeOsc('triangle', CHORDS[0].bass, 0.30);
+      // Sawtooth bass — rich harmonics that survive cheap mono speakers.
+      // Pads bumped up so they form the main audible foundation.
+      const bass = makeOsc('sawtooth', CHORDS[0].bass, 0.15);
       const pads = [
-        makeOsc('sine', CHORDS[0].notes[0], 0.13),
-        makeOsc('sine', CHORDS[0].notes[1], 0.13),
-        makeOsc('sine', CHORDS[0].notes[2], 0.13)
+        makeOsc('triangle', CHORDS[0].notes[0], 0.18),
+        makeOsc('triangle', CHORDS[0].notes[1], 0.16),
+        makeOsc('triangle', CHORDS[0].notes[2], 0.14)
       ];
 
       // ───── Short melody note (rare — only ~2 per bar) ─────
@@ -1438,29 +1445,30 @@
           bass.osc.frequency.setValueAtTime(c.bass, t);
           pads.forEach((p, i) => p.osc.frequency.setValueAtTime(c.notes[i], t));
 
-          // Subtle gain pulse — rhythmic feel from persistent oscs too
-          bass.gain.gain.setValueAtTime(0.22, t);
-          bass.gain.gain.linearRampToValueAtTime(0.30, t + 0.3);
-          pads.forEach(p => {
-            p.gain.gain.setValueAtTime(0.09, t);
-            p.gain.gain.linearRampToValueAtTime(0.13, t + 0.4);
+          // Sustained foundation — louder, smoother envelope (main audible layer on cheap speakers)
+          bass.gain.gain.setValueAtTime(0.12, t);
+          bass.gain.gain.linearRampToValueAtTime(0.15, t + 0.4);
+          pads.forEach((p, i) => {
+            const baseG = [0.18, 0.16, 0.14][i];
+            p.gain.gain.setValueAtTime(baseG * 0.7, t);
+            p.gain.gain.linearRampToValueAtTime(baseG, t + 0.5);
           });
 
           // ── Walking bass STAB on beats 2 and 4 (the "fifth") ──
           const fifth = c.bass * 1.4983;
-          stab(fifth, t + BEAT * 1, BEAT * 0.7, 0.22, 'triangle');
-          stab(fifth, t + BEAT * 3, BEAT * 0.7, 0.22, 'triangle');
+          stab(fifth, t + BEAT * 1, BEAT * 0.7, 0.13, 'triangle');
+          stab(fifth, t + BEAT * 3, BEAT * 0.7, 0.13, 'triangle');
 
-          // ── Chord STABS on every 2nd beat (less density = less clutter) ──
+          // ── Chord STABS on beats 2 and 4 (subtle rhythm — sit below the pad) ──
           c.chord.forEach((n, i) => {
-            stab(n, t + BEAT * 1 + 0.04 + i * 0.01, BEAT * 0.35, 0.07, 'triangle');
-            stab(n, t + BEAT * 3 + 0.04 + i * 0.01, BEAT * 0.35, 0.07, 'triangle');
+            stab(n, t + BEAT * 1 + 0.04 + i * 0.01, BEAT * 0.35, 0.04, 'triangle');
+            stab(n, t + BEAT * 3 + 0.04 + i * 0.01, BEAT * 0.35, 0.04, 'triangle');
           });
 
-          // ── Melody — 2 notes per bar, ONE octave up (sits distinctly ABOVE chord) ──
+          // ── Melody — 2 notes per bar, one octave up (distinct but soft) ──
           [1.5, 3.0].forEach(beatPos => {
             const note = sc[Math.floor(Math.random() * sc.length)] * 2;
-            stab(note, t + beatPos * BEAT, BEAT * 0.7, 0.10, 'triangle');
+            stab(note, t + beatPos * BEAT, BEAT * 0.7, 0.06, 'triangle');
           });
 
           bar++;

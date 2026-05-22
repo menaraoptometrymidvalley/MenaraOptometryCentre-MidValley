@@ -872,9 +872,13 @@
   let timer = null;
 
   // ─── Date helpers ───
+  // Use LOCAL date components (not UTC). For MYT (UTC+8) this means
+  // cutoffs happen at midnight Malaysia time, not 8am MYT.
   function todayISO() {
     const d = new Date();
-    return d.toISOString().split('T')[0];
+    return d.getFullYear() + '-' +
+           String(d.getMonth() + 1).padStart(2, '0') + '-' +
+           String(d.getDate()).padStart(2, '0');
   }
   function isPromoActive(promo, todayStr) {
     if (promo.validFrom && todayStr < promo.validFrom) return false;
@@ -1060,14 +1064,17 @@
     }
 
     // 2. Day-specific bonus content (e.g., Thursday adds CL Aftercare)
+    //    Items with validFrom/validUntil are filtered; undated items pass through.
     const dayBonus = (data.dayBonus && data.dayBonus[String(dayOfWeek)]) || [];
-    dayBonus.forEach(p => {
-      deck.push({
-        image: p.image,
-        alt: p.title,
-        todayBadge: p.category || 'Today'
+    dayBonus
+      .filter(p => isPromoActive(p, today))
+      .forEach(p => {
+        deck.push({
+          image: p.image,
+          alt: p.title,
+          todayBadge: p.category || 'Today'
+        });
       });
-    });
 
     // 3. Beli & Menang campaign sequence (plays all 4 slides in order)
     const campaigns = (data.campaigns || [])

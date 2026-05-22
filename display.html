@@ -1281,10 +1281,9 @@
     }
   }
 
-  // ─── Procedural ambient music (Web Audio API) ───
-  //   Generates calming, slow, never-repeating ambient tones using
-  //   a pentatonic scale (C major pentatonic — sounds harmonious always).
-  //   No external files, no copyright, professional.
+  // ─── Procedural background music (Web Audio API) ───
+  //   Real chord progression (C - Am - F - G) with arpeggios + soft bass.
+  //   Sounds like ambient piano. Warm, not eerie.
   let ambientCtx = null;
   let ambientGain = null;
   let ambientStopFn = null;
@@ -1295,75 +1294,126 @@
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       ambientCtx = new AC();
+
+      // Master volume
       const masterGain = ambientCtx.createGain();
-      masterGain.gain.value = volume || 0.12;  // very gentle
+      masterGain.gain.value = volume || 0.4;
       masterGain.connect(ambientCtx.destination);
       ambientGain = masterGain;
 
-      // Soft reverb-ish chain: lowpass + delay feedback
+      // Light reverb (short delay network) — warmth, not space
       const lowpass = ambientCtx.createBiquadFilter();
       lowpass.type = 'lowpass';
-      lowpass.frequency.value = 1800;
+      lowpass.frequency.value = 3200;     // brighter than before
       const delay = ambientCtx.createDelay();
-      delay.delayTime.value = 0.45;
+      delay.delayTime.value = 0.18;
       const feedback = ambientCtx.createGain();
-      feedback.gain.value = 0.35;
+      feedback.gain.value = 0.22;
       delay.connect(feedback);
       feedback.connect(delay);
       lowpass.connect(delay);
       delay.connect(masterGain);
       lowpass.connect(masterGain);
 
-      // C major pentatonic over 3 octaves (always sounds good)
-      const PENTATONIC = [
-        130.81, 146.83, 164.81, 196.00, 220.00,   // C3 D3 E3 G3 A3
-        261.63, 293.66, 329.63, 392.00, 440.00,   // C4 D4 E4 G4 A4
-        523.25, 587.33, 659.25, 783.99, 880.00    // C5 D5 E5 G5 A5
-      ];
-
-      function playNote(freq, when, duration, gain) {
+      // ───── Piano-like note function ─────
+      function pianoNote(freq, when, duration, gain) {
+        // Two oscillators: sine fundamental + soft triangle harmonic
         const osc1 = ambientCtx.createOscillator();
-        const osc2 = ambientCtx.createOscillator();
         osc1.type = 'sine';
-        osc2.type = 'triangle';
         osc1.frequency.value = freq;
-        osc2.frequency.value = freq * 2.005;  // slight detune for shimmer
+        const osc2 = ambientCtx.createOscillator();
+        osc2.type = 'triangle';
+        osc2.frequency.value = freq;
+        const osc3 = ambientCtx.createOscillator();
+        osc3.type = 'sine';
+        osc3.frequency.value = freq * 2;   // one octave up — shimmer
 
         const env = ambientCtx.createGain();
         env.gain.setValueAtTime(0, when);
-        env.gain.linearRampToValueAtTime(gain, when + duration * 0.15);
+        // Quick piano-like attack
+        env.gain.linearRampToValueAtTime(gain, when + 0.02);
+        // Natural decay
+        env.gain.exponentialRampToValueAtTime(gain * 0.4, when + 0.4);
         env.gain.exponentialRampToValueAtTime(0.0001, when + duration);
+
+        const osc3Gain = ambientCtx.createGain();
+        osc3Gain.gain.value = 0.25;       // shimmer is quieter
 
         osc1.connect(env);
         osc2.connect(env);
+        osc3.connect(osc3Gain);
+        osc3Gain.connect(env);
         env.connect(lowpass);
 
         osc1.start(when);
         osc2.start(when);
+        osc3.start(when);
         osc1.stop(when + duration + 0.1);
         osc2.stop(when + duration + 0.1);
+        osc3.stop(when + duration + 0.1);
       }
 
-      // Schedule notes continuously — runs forever
-      let scheduled = 0;
-      let stopRequested = false;
-      function scheduler() {
-        if (stopRequested) return;
-        const now = ambientCtx.currentTime;
-        const lookahead = 8;  // schedule 8 sec ahead
-        while (scheduled < now + lookahead) {
-          // Pick a random note from the scale
-          const freq = PENTATONIC[Math.floor(Math.random() * PENTATONIC.length)];
-          const duration = 3 + Math.random() * 5;   // 3-8 sec sustain
-          const gain = 0.18 + Math.random() * 0.10; // bigger per-note volume
-          playNote(freq, scheduled, duration, gain);
-          // Notes overlap — schedule next one every 1.0-2.0 sec (more active)
-          scheduled += 1.0 + Math.random() * 1.0;
+      // ───── Chord progression (C-Am-F-G — sounds warm) ─────
+      // Each entry: { bass, chord [3 notes], scale [for melody] }
+      const PROGRESSION = [
+        {  // C major
+          bass: 65.41,                              // C2
+          chord: [261.63, 329.63, 392.00],          // C4 E4 G4
+          scale: [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25] // C major
+        },
+        {  // A minor
+          bass: 55.00,                              // A1
+          chord: [220.00, 261.63, 329.63],          // A3 C4 E4
+          scale: [220.00, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00, 440.00]
+        },
+        {  // F major
+          bass: 43.65,                              // F1
+          chord: [174.61, 220.00, 261.63],          // F3 A3 C4
+          scale: [174.61, 196.00, 220.00, 233.08, 261.63, 293.66, 329.63, 349.23]
+        },
+        {  // G major
+          bass: 49.00,                              // G1
+          chord: [196.00, 246.94, 293.66],          // G3 B3 D4
+          scale: [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00]
         }
-        setTimeout(scheduler, 2500);
+      ];
+
+      const BAR_LENGTH = 7;        // seconds per chord (very relaxed pace)
+      let bar = 0;
+      let nextBarTime = ambientCtx.currentTime + 0.3;
+      let stopRequested = false;
+
+      function scheduleBar() {
+        if (stopRequested) return;
+        const c = PROGRESSION[bar % PROGRESSION.length];
+        const t0 = nextBarTime;
+
+        // Bass note — sustained
+        pianoNote(c.bass, t0, BAR_LENGTH * 1.05, 0.22);
+
+        // Chord pad — three notes together, sustained
+        c.chord.forEach((n, i) => pianoNote(n, t0 + i * 0.04, BAR_LENGTH * 0.95, 0.18));
+
+        // Melody — pick 3-4 scale notes over the bar, with rhythm
+        const melodyCount = 3 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < melodyCount; i++) {
+          const offset = (i / melodyCount) * BAR_LENGTH + Math.random() * 0.3;
+          // Prefer chord tones for harmonic resolution, occasional scale color
+          const useChord = Math.random() < 0.6;
+          const noteSource = useChord ? c.chord : c.scale;
+          let pick = noteSource[Math.floor(Math.random() * noteSource.length)];
+          pick *= 2;                                  // one octave up for melody clarity
+          pianoNote(pick, t0 + offset, 1.5 + Math.random() * 1.2, 0.16);
+        }
+
+        bar++;
+        nextBarTime += BAR_LENGTH;
+
+        // Schedule the next bar with lookahead
+        setTimeout(scheduleBar, BAR_LENGTH * 1000 * 0.5);
       }
-      scheduled = ambientCtx.currentTime + 0.2;
-      scheduler();
+
+      scheduleBar();
 
       ambientStopFn = () => {
         stopRequested = true;
@@ -1375,7 +1425,7 @@
         }, 700);
       };
 
-      showAudioIndicator('Ambient · Live');
+      showAudioIndicator('Piano · Live');
     } catch (e) {
       console.warn('Procedural audio init failed:', e);
     }

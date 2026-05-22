@@ -354,6 +354,8 @@
   }
   .q-rr-context strong { color: var(--text); font-weight: 700; }
   .q-rr-cleared { color: var(--success); font-size: 22px; font-weight: 800; margin-top: 6px; }
+  .hero-rr-stamp { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.55); margin-top: 10px; font-weight: 600; }
+  .q-rr-stamp { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted-2); margin-top: 10px; font-weight: 600; }
 
   /* === SALES PANEL === */
   .sales-panel {
@@ -1527,7 +1529,10 @@
 <div class="sales-panel">
   <div class="sales-header" onclick="toggleSales()">
     <h3><span class="lock-icon" id="salesLock">🔒</span> Sales Performance · This Month</h3>
-    <button class="toggle-btn" id="salesToggle">SHOW</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="toggle-btn" id="salesLockBtn" style="display:none;background:var(--accent);color:#fff;" onclick="event.stopPropagation();lockSales()">🔒 LOCK</button>
+      <button class="toggle-btn" id="salesToggle">SHOW</button>
+    </div>
   </div>
   <div class="sales-body" id="salesBody">
     <div class="sales-grid" id="salesGrid"></div>
@@ -2126,17 +2131,31 @@ function checkPin() {
   const val = document.getElementById("pinInput").value;
   if (val === CONFIG.PIN) {
     state.salesUnlocked = true;
-    sessionStorage.setItem(CONFIG.PIN_SESSION_KEY, "1");
+    // Intentionally NOT persisted in sessionStorage — every page reload
+    // requires the PIN again, so covering staff can't see the leaderboard.
     closePin();
     document.getElementById("salesBody").classList.add("show");
     document.getElementById("salesToggle").textContent = "HIDE";
     document.getElementById("salesToggle").classList.add("shown");
     document.getElementById("salesLock").textContent = "🔓";
+    const lb = document.getElementById("salesLockBtn");
+    if (lb) lb.style.display = "";
     renderSales();
   } else {
     document.getElementById("pinError").textContent = "Wrong PIN. Try again.";
     document.getElementById("pinInput").value = "";
   }
+}
+
+function lockSales() {
+  state.salesUnlocked = false;
+  const body = document.getElementById("salesBody");
+  body.classList.remove("show");
+  document.getElementById("salesToggle").textContent = "SHOW";
+  document.getElementById("salesToggle").classList.remove("shown");
+  document.getElementById("salesLock").textContent = "🔒";
+  const lb = document.getElementById("salesLockBtn");
+  if (lb) lb.style.display = "none";
 }
 
 function renderSales() {
@@ -2277,7 +2296,8 @@ function renderRunRate() {
     t1: s.tier1 || 0,
     t2: s.tier2 || 0,
     std: s.std || 0,
-    daysLeft: daysLeftMonth
+    daysLeft: daysLeftMonth,
+    lastUpdated: s.lastUpdated || ""
   });
 
   renderQuarterlyRunrate({
@@ -2285,19 +2305,22 @@ function renderRunRate() {
     t1: s.quarterT1 || 0,
     t2: s.quarterT2 || 0,
     std: s.quarterStd || 0,
-    daysLeft: daysLeftQuarter
+    daysLeft: daysLeftQuarter,
+    lastUpdated: s.lastUpdated || ""
   });
 }
 
-function renderHeroRunrate({ period, t1, t2, std, daysLeft }) {
+function renderHeroRunrate({ period, t1, t2, std, daysLeft, lastUpdated }) {
   const body = document.getElementById("heroRunrateBody");
   if (!body) return;
+  const stampHtml = lastUpdated ? `<div class="hero-rr-stamp">Updated · ${lastUpdated}</div>` : '';
 
   if (t1 === 0 && t2 === 0) {
     body.innerHTML = `
       <div class="hero-rr-period">${period}</div>
       <div class="hero-rr-cleared">— set target —</div>
       <div class="hero-rr-context">Tier targets not configured</div>
+      ${stampHtml}
     `;
     return;
   }
@@ -2309,6 +2332,7 @@ function renderHeroRunrate({ period, t1, t2, std, daysLeft }) {
       <div class="hero-rr-period">${period} · BOTH TIERS ✓</div>
       <div class="hero-rr-cleared">🎉 RM ${fmtNumber(std)}</div>
       <div class="hero-rr-context">RM ${fmtNumber(above)} above T2 · keep going · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+      ${stampHtml}
     `;
     return;
   }
@@ -2325,6 +2349,7 @@ function renderHeroRunrate({ period, t1, t2, std, daysLeft }) {
         <strong>RM ${fmtNumber(remaining)}</strong> to go ·
         ${daysLeft} day${daysLeft===1?'':'s'} left
       </div>
+      ${stampHtml}
     `;
     return;
   }
@@ -2340,18 +2365,20 @@ function renderHeroRunrate({ period, t1, t2, std, daysLeft }) {
       <strong>RM ${fmtNumber(remaining)}</strong> to go ·
       ${daysLeft} day${daysLeft===1?'':'s'} left
     </div>
+    ${stampHtml}
   `;
 }
 
-function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft }) {
+function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft, lastUpdated }) {
   const body = document.getElementById("quarterlyBody");
   const labelEl = document.getElementById("quarterlyLabel");
+  const stampHtml = lastUpdated ? `<div class="q-rr-stamp">Updated · ${lastUpdated}</div>` : '';
   if (!body) return;
 
   labelEl.textContent = `🎯 Quarterly Pace · ${qLabel}`;
 
   if (t1 === 0 && t2 === 0) {
-    body.innerHTML = `<div class="empty">Quarterly targets not set</div>`;
+    body.innerHTML = `<div class="empty">Quarterly targets not set</div>${stampHtml}`;
     return;
   }
 
@@ -2360,6 +2387,7 @@ function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft }) {
     body.innerHTML = `
       <div class="q-rr-cleared">🎉 BOTH ✓</div>
       <div class="q-rr-context">RM ${fmtNumber(std)} · RM ${fmtNumber(above)} above T2</div>
+      ${stampHtml}
     `;
     return;
   }
@@ -2370,6 +2398,7 @@ function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft }) {
     body.innerHTML = `
       <div class="q-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day to T2</span></div>
       <div class="q-rr-context"><strong>T1 ✓</strong> · RM ${fmtNumber(std)} of RM ${fmtNumber(t2)} · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+      ${stampHtml}
     `;
     return;
   }
@@ -2379,6 +2408,7 @@ function renderQuarterlyRunrate({ qLabel, t1, t2, std, daysLeft }) {
   body.innerHTML = `
     <div class="q-rr-rate">RM ${fmtNumber(ratePerDay)}<span class="suffix">/day to T1</span></div>
     <div class="q-rr-context">RM ${fmtNumber(std)} of RM ${fmtNumber(t1)} · RM ${fmtNumber(remaining)} to go · ${daysLeft} day${daysLeft===1?'':'s'} left</div>
+    ${stampHtml}
   `;
 }
 
@@ -2665,9 +2695,11 @@ function renderAll() {
 //  INIT
 // =============================================================
 async function init() {
-  if (sessionStorage.getItem(CONFIG.PIN_SESSION_KEY) === "1") {
-    state.salesUnlocked = true;
-  }
+  // Sales section is locked on every page load — user must enter the PIN
+  // each time. This prevents covering staff from seeing the leaderboard
+  // even if the previous user left the browser open.
+  state.salesUnlocked = false;
+  sessionStorage.removeItem(CONFIG.PIN_SESSION_KEY);
   document.getElementById("pinInput").addEventListener("keyup", e => {
     if (e.key === "Enter") checkPin();
     if (e.key === "Escape") closePin();

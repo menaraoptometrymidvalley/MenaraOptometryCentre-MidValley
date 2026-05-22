@@ -1390,11 +1390,27 @@
       }
 
       // ───── Lookahead scheduler ─────
-      const BAR = 6.0;                        // 6 sec per chord (calm, easy to follow)
+      // 4-second bars, 4 beats per bar — upbeat lounge feel
+      const BAR = 4.0;
+      const BEAT = BAR / 4;
       let nextBarStart = ctx.currentTime + 0.5;
       let bar = 0;
       let stopped = false;
       let intervalHandle = null;
+
+      // Short rhythmic stab — single oscillator with fast envelope
+      function stab(freq, when, duration, peakGain, type) {
+        const o = ctx.createOscillator();
+        o.type = type || 'triangle';
+        o.frequency.value = freq;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, when);
+        g.gain.linearRampToValueAtTime(peakGain, when + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.001, when + duration);
+        o.connect(g).connect(lp);
+        o.start(when);
+        o.stop(when + duration + 0.05);
+      }
 
       function scheduleAhead() {
         if (stopped) return;
@@ -1404,24 +1420,36 @@
           const sc = SCALES[bar % SCALES.length];
           const t = nextBarStart;
 
-          // Smoothly glide oscillator frequencies to new chord at bar start
+          // Persistent oscillators glide to new chord at bar start
           bass.osc.frequency.setValueAtTime(c.bass, t);
           pads.forEach((p, i) => p.osc.frequency.setValueAtTime(c.notes[i], t));
 
-          // Gentle gain envelope on each chord change (subtle pulse, not staccato)
-          bass.gain.gain.setValueAtTime(0.12, t);
-          bass.gain.gain.linearRampToValueAtTime(0.22, t + 0.5);
-          bass.gain.gain.linearRampToValueAtTime(0.18, t + BAR);
+          // Subtle gain pulse — rhythmic feel from persistent oscs too
+          bass.gain.gain.setValueAtTime(0.16, t);
+          bass.gain.gain.linearRampToValueAtTime(0.22, t + 0.3);
           pads.forEach(p => {
-            p.gain.gain.setValueAtTime(0.04, t);
-            p.gain.gain.linearRampToValueAtTime(0.085, t + 0.6);
+            p.gain.gain.setValueAtTime(0.06, t);
+            p.gain.gain.linearRampToValueAtTime(0.085, t + 0.4);
           });
 
-          // 2 melody hits per bar (one-shot oscillators, but only 2/bar = low load)
-          const m1 = sc[Math.floor(Math.random() * sc.length)] * 2;
-          const m2 = sc[Math.floor(Math.random() * sc.length)] * 2;
-          melodyHit(m1, t + BAR * 0.25, 0.9, 0.13);
-          melodyHit(m2, t + BAR * 0.65, 0.9, 0.13);
+          // ── Walking bass STAB on beats 2 and 4 (the "fifth") ──
+          const fifth = c.bass * 1.4983;
+          stab(fifth, t + BEAT * 1, BEAT * 0.7, 0.20, 'sine');
+          stab(fifth, t + BEAT * 3, BEAT * 0.7, 0.20, 'sine');
+
+          // ── Chord STABS on each beat (groove from off-beat accent) ──
+          // 1 osc per chord note × 3 chord notes × 4 beats = 12 oscs per bar
+          c.chord.forEach((n, i) => {
+            for (let b = 0; b < 4; b++) {
+              stab(n, t + BEAT * b + 0.04 + i * 0.01, BEAT * 0.35, 0.06, 'triangle');
+            }
+          });
+
+          // ── Melody — 3 notes per bar on off-beats ──
+          [1.5, 2.5, 3.5].forEach(beatPos => {
+            const note = sc[Math.floor(Math.random() * sc.length)] * 2;
+            stab(note, t + beatPos * BEAT, BEAT * 0.7, 0.12, 'triangle');
+          });
 
           bar++;
           nextBarStart += BAR;

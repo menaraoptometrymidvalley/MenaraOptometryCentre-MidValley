@@ -1110,6 +1110,8 @@
       `${currentIndex + 1} / ${slides.length}`;
   }
 
+  const SLIDE_MAX = 35000;   // cap any single slide at 35 sec (long videos)
+
   function showSlide(idx) {
     const cards = document.querySelectorAll('.slide');
     cards.forEach((c, i) => c.classList.toggle('active', i === idx));
@@ -1117,12 +1119,14 @@
     renderDots();
 
     // Pause/resume videos when slide changes (so audio doesn't bleed)
+    let activeVideo = null;
     cards.forEach((c, i) => {
       const vid = c.querySelector('video');
       if (vid) {
         if (i === idx) {
           vid.currentTime = 0;
           vid.play().catch(() => {});
+          activeVideo = vid;
         } else {
           vid.pause();
         }
@@ -1132,6 +1136,34 @@
     // Duck background music if this slide has an unmuted video
     const activeCard = cards[idx];
     duckAudioForVideo(activeCard && activeCard.dataset.videoDucksAudio === '1');
+
+    // ── Reschedule the next-slide timer based on slide type ──
+    if (timer) {
+      clearInterval(timer);
+      clearTimeout(timer);
+    }
+    if (activeVideo) {
+      // Wait for the video to finish, then advance.
+      // Use 'ended' if it's playing without loop; otherwise fall back to duration timer.
+      const startWait = () => {
+        // If duration is known, use it (capped). Otherwise fall back to default.
+        const durMs = (isFinite(activeVideo.duration) && activeVideo.duration > 0)
+          ? Math.min(activeVideo.duration * 1000, SLIDE_MAX)
+          : SLIDE_DURATION;
+        timer = setTimeout(advance, durMs + 250);  // small buffer for the fade
+      };
+      if (activeVideo.readyState >= 1) {
+        startWait();
+      } else {
+        activeVideo.addEventListener('loadedmetadata', startWait, { once: true });
+        // Safety: if metadata never loads in 1.5s, advance after default
+        setTimeout(() => {
+          if (!timer) startWait();
+        }, 1500);
+      }
+    } else {
+      timer = setTimeout(advance, SLIDE_DURATION);
+    }
   }
 
   function advance() {
@@ -1258,8 +1290,7 @@
       slides.forEach((s, i) => card.appendChild(buildSlideElement(s, i)));
 
       if (slides.length > 0) {
-        showSlide(0);
-        timer = setInterval(advance, SLIDE_DURATION);
+        showSlide(0);   // showSlide now schedules its own next-advance timer based on slide type
       }
 
       document.getElementById('loading').classList.add('hidden');
@@ -1581,8 +1612,8 @@
   // Click anywhere to advance manually (useful during setup)
   document.addEventListener('click', () => {
     clearInterval(timer);
-    advance();
-    timer = setInterval(advance, SLIDE_DURATION);
+    clearTimeout(timer);
+    advance();  // showSlide reschedules per slide type
   });
 
   // Press F for fullscreen

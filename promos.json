@@ -47,7 +47,8 @@
       "category": "Contact Lens",
       "tagline": "Fresh, Shine & Bright",
       "headline": "Into your eyes — contact lens day",
-      "image": "assets/promos/7dp-thu-cl.jpg"
+      "type": "video",
+      "video": "assets/videos/7dp-thu-cl.mp4"
     },
     {
       "day": 5,
@@ -108,7 +109,8 @@
         },
         {
           "id": "beli-menang-02-hadiah-utama",
-          "image": "assets/promos/beli-menang-02-hadiah-utama.jpg",
+          "type": "video",
+          "video": "assets/videos/beli-menang-02-hadiah-utama.mp4",
           "label": "Hadiah Utama"
         },
         {

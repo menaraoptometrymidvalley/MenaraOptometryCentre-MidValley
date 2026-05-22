@@ -221,11 +221,63 @@
     transform: scale(1);
     pointer-events: auto;
   }
-  .slide img {
+  .slide img,
+  .slide video {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+  .slide video {
+    background: #000;
+  }
+
+  /* Audio player corner (right side of footer) */
+  .audio-indicator {
+    position: fixed;
+    bottom: 22px;
+    right: 18px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px;
+    background: rgba(13,11,111,0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+  .audio-indicator.visible { opacity: 1; }
+  .audio-indicator.muted { opacity: 0.55; }
+  .audio-bars {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 11px;
+  }
+  .audio-bars span {
+    display: block;
+    width: 2px;
+    background: var(--gold);
+    border-radius: 1px;
+    animation: audioBar 0.9s ease-in-out infinite;
+  }
+  .audio-bars span:nth-child(1) { height: 50%; animation-delay: 0s; }
+  .audio-bars span:nth-child(2) { height: 80%; animation-delay: 0.2s; }
+  .audio-bars span:nth-child(3) { height: 60%; animation-delay: 0.1s; }
+  .audio-bars span:nth-child(4) { height: 90%; animation-delay: 0.3s; }
+  .audio-indicator.muted .audio-bars span { animation-play-state: paused; opacity: 0.4; }
+  @keyframes audioBar {
+    0%, 100% { transform: scaleY(0.4); }
+    50% { transform: scaleY(1); }
   }
   /* Slides show poster image as-is, no text overlay.
      Only small floating badges for special states (today, expiring). */
@@ -855,6 +907,13 @@
 <!-- Status indicator -->
 <div class="status-dot" id="statusDot" title="Connection status"></div>
 
+<!-- Audio playback (hidden) -->
+<audio id="bgAudio" preload="auto"></audio>
+<div class="audio-indicator" id="audioIndicator">
+  <span class="audio-bars"><span></span><span></span><span></span><span></span></span>
+  <span id="audioLabel">Music</span>
+</div>
+
 <script>
 (function() {
   'use strict';
@@ -986,6 +1045,22 @@
       // Generate QR after element exists in DOM
       const qrUrl = s.qrUrl || 'https://menaraoptometrymidvalley.github.io/menaraoptometrycentre-midvalley/sudoku/';
       requestAnimationFrame(() => injectQRCode(div, qrUrl));
+    } else if (s.type === 'video') {
+      // Video slide: autoplay muted by default. Set s.unmute=true if you want audio (e.g., educational)
+      const video = document.createElement('video');
+      video.src = s.video;
+      video.autoplay = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.muted = !s.unmute;
+      video.preload = 'auto';
+      video.onerror = () => {
+        video.style.display = 'none';
+        div.style.background = 'linear-gradient(135deg, #0D0B6F, #1B1464)';
+      };
+      div.appendChild(video);
+      div.dataset.hasVideo = '1';
+      if (s.unmute) div.dataset.videoDucksAudio = '1';
     } else {
       const img = document.createElement('img');
       img.src = s.image;
@@ -1040,6 +1115,23 @@
     cards.forEach((c, i) => c.classList.toggle('active', i === idx));
     currentIndex = idx;
     renderDots();
+
+    // Pause/resume videos when slide changes (so audio doesn't bleed)
+    cards.forEach((c, i) => {
+      const vid = c.querySelector('video');
+      if (vid) {
+        if (i === idx) {
+          vid.currentTime = 0;
+          vid.play().catch(() => {});
+        } else {
+          vid.pause();
+        }
+      }
+    });
+
+    // Duck background music if this slide has an unmuted video
+    const activeCard = cards[idx];
+    duckAudioForVideo(activeCard && activeCard.dataset.videoDucksAudio === '1');
   }
 
   function advance() {
@@ -1053,14 +1145,24 @@
     const dayOfWeek = new Date().getDay();
     const deck = [];
 
+    // Helper: forward all the fields that can render a slide (image OR video OR template)
+    function slideFrom(p, extras = {}) {
+      return {
+        type: p.type,
+        image: p.image,
+        video: p.video,
+        unmute: p.unmute,
+        template: p.template,
+        qrUrl: p.qrUrl,
+        alt: p.title || p.dayName || '',
+        ...extras
+      };
+    }
+
     // 1. TODAY's 7DP — the headliner
     const today7DP = (data.weekly7DP || []).find(p => p.day === dayOfWeek);
     if (today7DP) {
-      deck.push({
-        image: today7DP.image,
-        alt: today7DP.dayName,
-        todayBadge: 'Today · ' + today7DP.dayName
-      });
+      deck.push(slideFrom(today7DP, { todayBadge: 'Today · ' + today7DP.dayName }));
     }
 
     // 2. Day-specific bonus content (e.g., Thursday adds CL Aftercare)
@@ -1069,11 +1171,7 @@
     dayBonus
       .filter(p => isPromoActive(p, today))
       .forEach(p => {
-        deck.push({
-          image: p.image,
-          alt: p.title,
-          todayBadge: p.category || 'Today'
-        });
+        deck.push(slideFrom(p, { todayBadge: p.category || 'Today' }));
       });
 
     // 3. Beli & Menang campaign sequence (plays all 4 slides in order)
@@ -1083,19 +1181,14 @@
 
     campaigns.forEach(c => {
       if (c.playAsSequence && Array.isArray(c.sequence)) {
-        c.sequence.forEach((s, idx) => {
-          deck.push({
-            image: s.image,
+        c.sequence.forEach((s) => {
+          deck.push(slideFrom(s, {
             alt: c.title + ' — ' + (s.label || ''),
             goldBadge: s.label || c.title
-          });
+          }));
         });
       } else {
-        deck.push({
-          image: c.image,
-          alt: c.title,
-          goldBadge: c.category || c.title
-        });
+        deck.push(slideFrom(c, { goldBadge: c.category || c.title }));
       }
     });
 
@@ -1109,11 +1202,7 @@
       .sort((a, b) => a._daysLeft - b._daysLeft);
 
     expiring.forEach(p => {
-      deck.push({
-        image: p.image,
-        alt: p.title,
-        expiryDays: p._daysLeft
-      });
+      deck.push(slideFrom(p, { expiryDays: p._daysLeft }));
     });
 
     // 5. Top 2 active promos (not expiring) by priority
@@ -1123,10 +1212,7 @@
       .slice(0, 2);
 
     longRunning.forEach(p => {
-      deck.push({
-        image: p.image,
-        alt: p.title
-      });
+      deck.push(slideFrom(p));
     });
 
     // 6. Sudoku brain-break (rendered as HTML template, includes live QR + voucher tiers)
@@ -1178,6 +1264,11 @@
 
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('statusDot').classList.remove('offline');
+
+      // Kick off background music if configured
+      if (data.audio) {
+        setupBackgroundMusic(data.audio);
+      }
     } catch (err) {
       console.error('Failed to load promos.json:', err);
       document.getElementById('statusDot').classList.add('offline');
@@ -1188,6 +1279,81 @@
         '<div style="font-size:11px;opacity:0.5;margin-top:6px">Retrying in 30 seconds</div></div>';
       setTimeout(() => location.reload(), 30000);
     }
+  }
+
+  // ─── Background music player ───
+  let audioTracks = [];
+  let audioIdx = 0;
+  let baseVolume = 0.25;  // gentle default — mall is noisy but we don't want to blast customers
+  let isDucked = false;
+
+  function showAudioIndicator(label) {
+    const ind = document.getElementById('audioIndicator');
+    ind.classList.add('visible');
+    ind.classList.remove('muted');
+    document.getElementById('audioLabel').textContent = label || 'Music';
+  }
+
+  function setMuted(muted) {
+    const ind = document.getElementById('audioIndicator');
+    const audio = document.getElementById('bgAudio');
+    if (muted) {
+      audio.volume = 0;
+      ind.classList.add('muted');
+    } else {
+      audio.volume = isDucked ? baseVolume * 0.15 : baseVolume;
+      ind.classList.remove('muted');
+    }
+  }
+
+  async function setupBackgroundMusic(audioConfig) {
+    if (!audioConfig || !Array.isArray(audioConfig.tracks) || audioConfig.tracks.length === 0) {
+      return;  // no music configured
+    }
+    audioTracks = audioConfig.tracks;
+    baseVolume = (typeof audioConfig.volume === 'number') ? audioConfig.volume : 0.25;
+    const shuffle = audioConfig.shuffle !== false;
+    if (shuffle) {
+      // Fisher-Yates
+      for (let i = audioTracks.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [audioTracks[i], audioTracks[j]] = [audioTracks[j], audioTracks[i]];
+      }
+    }
+
+    const audio = document.getElementById('bgAudio');
+    audio.volume = baseVolume;
+    audio.addEventListener('ended', playNextTrack);
+    audio.addEventListener('error', () => {
+      console.warn('Audio error — skipping to next track');
+      setTimeout(playNextTrack, 1500);
+    });
+
+    playNextTrack();
+  }
+
+  function playNextTrack() {
+    if (audioTracks.length === 0) return;
+    const track = audioTracks[audioIdx];
+    audioIdx = (audioIdx + 1) % audioTracks.length;
+    const audio = document.getElementById('bgAudio');
+    audio.src = track.src;
+    const playPromise = audio.play();
+    if (playPromise && playPromise.catch) {
+      playPromise.catch(err => {
+        // Autoplay blocked — likely missing the --autoplay-policy launcher flag
+        console.warn('Autoplay blocked:', err.message);
+        document.getElementById('audioIndicator').classList.add('muted');
+      });
+    }
+    showAudioIndicator(track.title || 'Music');
+  }
+
+  // Duck music volume when a video slide with unmuted audio is playing
+  function duckAudioForVideo(shouldDuck) {
+    isDucked = shouldDuck;
+    const audio = document.getElementById('bgAudio');
+    audio.volume = shouldDuck ? baseVolume * 0.15 : baseVolume;
   }
 
   // ─── Inline SVG cat — cycles through 4 states ───

@@ -1,11 +1,16 @@
 {
   "_meta": {
-    "schema_version": 2,
+    "schema_version": 3,
     "outlet": "Menara Optometry Centre — Mid Valley",
     "address": "LG-017, Mid Valley Megamall, Kuala Lumpur",
     "whatsapp": "+60 11-5419 7980",
     "wa_link": "https://wa.me/601154197980",
-    "last_updated": "2026-05-20"
+    "last_updated": "2026-05-22"
+  },
+  "audio": {
+    "volume": 0.25,
+    "shuffle": true,
+    "tracks": []
   },
   "weekly7DP": [
     {

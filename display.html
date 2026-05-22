@@ -1281,7 +1281,113 @@
     }
   }
 
-  // ─── Background music player ───
+  // ─── Procedural ambient music (Web Audio API) ───
+  //   Generates calming, slow, never-repeating ambient tones using
+  //   a pentatonic scale (C major pentatonic — sounds harmonious always).
+  //   No external files, no copyright, professional.
+  let ambientCtx = null;
+  let ambientGain = null;
+  let ambientStopFn = null;
+
+  function startProceduralAmbient(volume) {
+    if (ambientCtx) return;  // already running
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      ambientCtx = new AC();
+      const masterGain = ambientCtx.createGain();
+      masterGain.gain.value = volume || 0.12;  // very gentle
+      masterGain.connect(ambientCtx.destination);
+      ambientGain = masterGain;
+
+      // Soft reverb-ish chain: lowpass + delay feedback
+      const lowpass = ambientCtx.createBiquadFilter();
+      lowpass.type = 'lowpass';
+      lowpass.frequency.value = 1800;
+      const delay = ambientCtx.createDelay();
+      delay.delayTime.value = 0.45;
+      const feedback = ambientCtx.createGain();
+      feedback.gain.value = 0.35;
+      delay.connect(feedback);
+      feedback.connect(delay);
+      lowpass.connect(delay);
+      delay.connect(masterGain);
+      lowpass.connect(masterGain);
+
+      // C major pentatonic over 3 octaves (always sounds good)
+      const PENTATONIC = [
+        130.81, 146.83, 164.81, 196.00, 220.00,   // C3 D3 E3 G3 A3
+        261.63, 293.66, 329.63, 392.00, 440.00,   // C4 D4 E4 G4 A4
+        523.25, 587.33, 659.25, 783.99, 880.00    // C5 D5 E5 G5 A5
+      ];
+
+      function playNote(freq, when, duration, gain) {
+        const osc1 = ambientCtx.createOscillator();
+        const osc2 = ambientCtx.createOscillator();
+        osc1.type = 'sine';
+        osc2.type = 'triangle';
+        osc1.frequency.value = freq;
+        osc2.frequency.value = freq * 2.005;  // slight detune for shimmer
+
+        const env = ambientCtx.createGain();
+        env.gain.setValueAtTime(0, when);
+        env.gain.linearRampToValueAtTime(gain, when + duration * 0.15);
+        env.gain.exponentialRampToValueAtTime(0.0001, when + duration);
+
+        osc1.connect(env);
+        osc2.connect(env);
+        env.connect(lowpass);
+
+        osc1.start(when);
+        osc2.start(when);
+        osc1.stop(when + duration + 0.1);
+        osc2.stop(when + duration + 0.1);
+      }
+
+      // Schedule notes continuously — runs forever
+      let scheduled = 0;
+      let stopRequested = false;
+      function scheduler() {
+        if (stopRequested) return;
+        const now = ambientCtx.currentTime;
+        const lookahead = 8;  // schedule 8 sec ahead
+        while (scheduled < now + lookahead) {
+          // Pick a random note from the scale
+          const freq = PENTATONIC[Math.floor(Math.random() * PENTATONIC.length)];
+          const duration = 4 + Math.random() * 6;  // 4-10 sec sustain
+          const gain = 0.08 + Math.random() * 0.06;
+          playNote(freq, scheduled, duration, gain);
+          // Notes overlap — schedule next one every 1.5-3 sec
+          scheduled += 1.5 + Math.random() * 1.5;
+        }
+        setTimeout(scheduler, 2500);
+      }
+      scheduled = ambientCtx.currentTime + 0.2;
+      scheduler();
+
+      ambientStopFn = () => {
+        stopRequested = true;
+        masterGain.gain.linearRampToValueAtTime(0, ambientCtx.currentTime + 0.5);
+        setTimeout(() => {
+          ambientCtx.close();
+          ambientCtx = null;
+          ambientGain = null;
+        }, 700);
+      };
+
+      showAudioIndicator('Ambient · Live');
+    } catch (e) {
+      console.warn('Procedural audio init failed:', e);
+    }
+  }
+
+  function setProceduralVolume(vol) {
+    if (ambientGain) {
+      ambientGain.gain.linearRampToValueAtTime(vol, ambientCtx.currentTime + 0.3);
+    }
+  }
+
+  // ─── Background music player (MP3 files) ───
   let audioTracks = [];
   let audioIdx = 0;
   let baseVolume = 0.25;  // gentle default — mall is noisy but we don't want to blast customers
@@ -1307,11 +1413,18 @@
   }
 
   async function setupBackgroundMusic(audioConfig) {
-    if (!audioConfig || !Array.isArray(audioConfig.tracks) || audioConfig.tracks.length === 0) {
-      return;  // no music configured
-    }
-    audioTracks = audioConfig.tracks;
+    if (!audioConfig) return;
     baseVolume = (typeof audioConfig.volume === 'number') ? audioConfig.volume : 0.25;
+
+    // No MP3 tracks configured? Fall back to procedural ambient (or honor explicit mode)
+    const useProcedural = audioConfig.mode === 'procedural'
+      || (!Array.isArray(audioConfig.tracks) || audioConfig.tracks.length === 0);
+    if (useProcedural) {
+      startProceduralAmbient(baseVolume * 0.5);  // procedural already softer, halve
+      return;
+    }
+
+    audioTracks = audioConfig.tracks;
     const shuffle = audioConfig.shuffle !== false;
     if (shuffle) {
       // Fisher-Yates
@@ -1354,6 +1467,10 @@
     isDucked = shouldDuck;
     const audio = document.getElementById('bgAudio');
     audio.volume = shouldDuck ? baseVolume * 0.15 : baseVolume;
+    // Also duck procedural ambient if running
+    if (ambientGain) {
+      setProceduralVolume(shouldDuck ? baseVolume * 0.08 : baseVolume * 0.5);
+    }
   }
 
   // ─── Inline SVG cat — cycles through 4 states ───

@@ -1343,11 +1343,12 @@
       lp.connect(master);
 
       // C - Am - F - G  (each = {bass, [3 chord notes]})
+      // Bass moved up one octave (C3 instead of C2) so cheap speakers can reproduce it
       const CHORDS = [
-        { bass: 65.41,  notes: [261.63, 329.63, 392.00] },  // C  / C4 E4 G4
-        { bass: 55.00,  notes: [220.00, 261.63, 329.63] },  // Am / A3 C4 E4
-        { bass: 43.65,  notes: [174.61, 220.00, 261.63] },  // F  / F3 A3 C4
-        { bass: 49.00,  notes: [196.00, 246.94, 293.66] }   // G  / G3 B3 D4
+        { bass: 130.81, notes: [261.63, 329.63, 392.00] },  // C  / bass C3, chord C4 E4 G4
+        { bass: 110.00, notes: [220.00, 261.63, 329.63] },  // Am / bass A2, chord A3 C4 E4
+        { bass: 87.31,  notes: [174.61, 220.00, 261.63] },  // F  / bass F2, chord F3 A3 C4
+        { bass: 98.00,  notes: [196.00, 246.94, 293.66] }   // G  / bass G2, chord G3 B3 D4
       ];
       const SCALES = [
         [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25], // C
@@ -1368,11 +1369,13 @@
         o.start();
         return { osc: o, gain: g };
       }
-      const bass = makeOsc('sine', CHORDS[0].bass, 0.22);
+      // Bass uses 'triangle' (richer harmonics → survives cheap speakers).
+      // Pads slightly louder to provide audible foundation.
+      const bass = makeOsc('triangle', CHORDS[0].bass, 0.30);
       const pads = [
-        makeOsc('sine', CHORDS[0].notes[0], 0.085),
-        makeOsc('sine', CHORDS[0].notes[1], 0.085),
-        makeOsc('sine', CHORDS[0].notes[2], 0.085)
+        makeOsc('sine', CHORDS[0].notes[0], 0.13),
+        makeOsc('sine', CHORDS[0].notes[1], 0.13),
+        makeOsc('sine', CHORDS[0].notes[2], 0.13)
       ];
 
       // ───── Short melody note (rare — only ~2 per bar) ─────
@@ -1425,30 +1428,28 @@
           pads.forEach((p, i) => p.osc.frequency.setValueAtTime(c.notes[i], t));
 
           // Subtle gain pulse — rhythmic feel from persistent oscs too
-          bass.gain.gain.setValueAtTime(0.16, t);
-          bass.gain.gain.linearRampToValueAtTime(0.22, t + 0.3);
+          bass.gain.gain.setValueAtTime(0.22, t);
+          bass.gain.gain.linearRampToValueAtTime(0.30, t + 0.3);
           pads.forEach(p => {
-            p.gain.gain.setValueAtTime(0.06, t);
-            p.gain.gain.linearRampToValueAtTime(0.085, t + 0.4);
+            p.gain.gain.setValueAtTime(0.09, t);
+            p.gain.gain.linearRampToValueAtTime(0.13, t + 0.4);
           });
 
           // ── Walking bass STAB on beats 2 and 4 (the "fifth") ──
           const fifth = c.bass * 1.4983;
-          stab(fifth, t + BEAT * 1, BEAT * 0.7, 0.20, 'sine');
-          stab(fifth, t + BEAT * 3, BEAT * 0.7, 0.20, 'sine');
+          stab(fifth, t + BEAT * 1, BEAT * 0.7, 0.22, 'triangle');
+          stab(fifth, t + BEAT * 3, BEAT * 0.7, 0.22, 'triangle');
 
-          // ── Chord STABS on each beat (groove from off-beat accent) ──
-          // 1 osc per chord note × 3 chord notes × 4 beats = 12 oscs per bar
+          // ── Chord STABS on every 2nd beat (less density = less clutter) ──
           c.chord.forEach((n, i) => {
-            for (let b = 0; b < 4; b++) {
-              stab(n, t + BEAT * b + 0.04 + i * 0.01, BEAT * 0.35, 0.06, 'triangle');
-            }
+            stab(n, t + BEAT * 1 + 0.04 + i * 0.01, BEAT * 0.35, 0.07, 'triangle');
+            stab(n, t + BEAT * 3 + 0.04 + i * 0.01, BEAT * 0.35, 0.07, 'triangle');
           });
 
-          // ── Melody — 3 notes per bar on off-beats ──
-          [1.5, 2.5, 3.5].forEach(beatPos => {
-            const note = sc[Math.floor(Math.random() * sc.length)] * 2;
-            stab(note, t + beatPos * BEAT, BEAT * 0.7, 0.12, 'triangle');
+          // ── Melody — 2 notes per bar in mid-range (not pushed up an octave) ──
+          [1.5, 3.0].forEach(beatPos => {
+            const note = sc[Math.floor(Math.random() * sc.length)];
+            stab(note, t + beatPos * BEAT, BEAT * 0.7, 0.13, 'triangle');
           });
 
           bar++;

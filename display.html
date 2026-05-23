@@ -594,25 +594,24 @@
     line-height: 1.4;
   }
 
-  /* ────── WANDERING CAT (real cat video overlay, lives on the screen) ────── */
+  /* ────── WANDERING CAT (real cat video, walks AND climbs the screen) ────── */
   .cat-corner {
     position: fixed;
-    bottom: 80px;             /* above the footer, on the "floor" */
+    top: 50%;                 /* JS overrides */
     left: 50px;
-    width: 220px;             /* bigger for real-cat visibility */
+    width: 200px;
     height: auto;
-    z-index: 30;              /* above promos, like a pet in the foreground */
+    z-index: 30;
     pointer-events: none;
     filter: drop-shadow(0 8px 22px rgba(0,0,0,0.6));
-    transition: left 4s linear;  /* JS will adjust the duration per walk */
+    transition: left 4s linear, top 4s linear;  /* JS adjusts duration */
   }
   .cat-corner .cat-video {
     width: 100%;
     height: auto;
     display: block;
+    transition: transform 0.5s ease;
   }
-  /* Mirror horizontally when walking left */
-  .cat-corner.facing-left .cat-video { transform: scaleX(-1); }
   .cat-svg {
     width: 100%; height: 100%;
     overflow: visible;
@@ -1661,25 +1660,25 @@
     }
   }
 
-  // ─── Wandering cat — walks around the screen, occasionally stops to idle ───
-  const CAT_STATES = ['walking', 'sleeping', 'playing', 'eating'];
-  const CAT_W = 130;
-  const CAT_WALK_SPEED = 70;   // pixels per second
+  // ─── Wandering cat — walks AND climbs around the screen (2D) ───
+  const CAT_W = 200;
+  const CAT_H = 130;
+  const CAT_WALK_SPEED = 80;   // pixels per second
   let catPosX = 50;
-  let catFacing = 1;           // 1 = right, -1 = left
+  let catPosY = 0;             // set in startCat()
   let catBusy = false;
 
   function setCatState(state) {
-    const cat = document.getElementById('catCorner');
-    CAT_STATES.forEach(s => cat.classList.remove('cat-' + s));
-    cat.classList.add('cat-' + state);
     document.getElementById('catStateLabel').textContent = state;
-    cat.classList.add('show-label');
-    setTimeout(() => cat.classList.remove('show-label'), 2000);
   }
 
   function getCatBounds() {
-    return { minX: 10, maxX: window.innerWidth - CAT_W - 10 };
+    return {
+      minX: 10,
+      maxX: Math.max(20, window.innerWidth - CAT_W - 10),
+      minY: 60,                                  // below header
+      maxY: Math.max(80, window.innerHeight - CAT_H - 80)  // above footer
+    };
   }
 
   function getCatVideo() {
@@ -1687,55 +1686,76 @@
     return cat ? cat.querySelector('video') : null;
   }
 
+  function pickTarget() {
+    const b = getCatBounds();
+    return {
+      x: Math.round(Math.random() * (b.maxX - b.minX) + b.minX),
+      y: Math.round(Math.random() * (b.maxY - b.minY) + b.minY)
+    };
+  }
+
+  function applyCatTransform(dx, dy) {
+    // Determine the dominant axis to decide rotation & facing
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+    const v = getCatVideo();
+    if (!v) return;
+    let transform = '';
+    let stateLabel = 'walking';
+    if (absY > absX * 1.3) {
+      // Mostly vertical movement = climbing
+      if (dy < 0) {
+        transform = 'rotate(-90deg)';   // head pointing up
+        stateLabel = 'climbing up';
+      } else {
+        transform = 'rotate(90deg)';    // head pointing down
+        stateLabel = 'climbing down';
+      }
+    } else {
+      // Mostly horizontal = normal walking
+      if (dx < 0) {
+        transform = 'scaleX(-1)';        // mirror to face left
+      }
+    }
+    v.style.transform = transform;
+    setCatState(stateLabel);
+  }
+
   function walkRandomly() {
     if (catBusy) return;
     catBusy = true;
     const cat = document.getElementById('catCorner');
-    const b = getCatBounds();
+    const target = pickTarget();
+    const dx = target.x - catPosX;
+    const dy = target.y - catPosY;
 
-    // Decide target
-    const distance = 200 + Math.random() * 350;
-    let target;
-    if (catPosX <= b.minX + 50) {
-      target = Math.min(catPosX + distance, b.maxX);
-      catFacing = 1;
-    } else if (catPosX >= b.maxX - 50) {
-      target = Math.max(catPosX - distance, b.minX);
-      catFacing = -1;
-    } else if (Math.random() < 0.5) {
-      target = Math.min(catPosX + distance, b.maxX);
-      catFacing = 1;
-    } else {
-      target = Math.max(catPosX - distance, b.minX);
-      catFacing = -1;
-    }
+    applyCatTransform(dx, dy);
 
-    // Mirror sprite based on direction
-    if (catFacing === -1) cat.classList.add('facing-left');
-    else cat.classList.remove('facing-left');
-
-    // Resume video playback (walking)
+    // Resume video playback
     const v = getCatVideo();
     if (v) { try { v.play(); } catch(e){} }
-    setCatState('walking');
 
-    const dist = Math.abs(target - catPosX);
+    // Smooth diagonal/straight transition
+    const dist = Math.sqrt(dx * dx + dy * dy);
     const durationMs = Math.round((dist / CAT_WALK_SPEED) * 1000);
-    cat.style.transition = 'left ' + durationMs + 'ms linear';
-    requestAnimationFrame(() => { cat.style.left = target + 'px'; });
-    catPosX = target;
+    cat.style.transition = `left ${durationMs}ms linear, top ${durationMs}ms linear`;
+    requestAnimationFrame(() => {
+      cat.style.left = target.x + 'px';
+      cat.style.top  = target.y + 'px';
+    });
+    catPosX = target.x;
+    catPosY = target.y;
 
-    setTimeout(() => { catBusy = false; decideNext(); }, durationMs + 100);
+    setTimeout(() => { catBusy = false; decideNext(); }, durationMs + 200);
   }
 
   function idleAction() {
     if (catBusy) return;
     catBusy = true;
-    // Pause the video — cat freezes mid-step (looks like it stopped to look around)
+    // Pause the video — cat freezes mid-step
     const v = getCatVideo();
     if (v) { try { v.pause(); } catch(e){} }
     setCatState('idle');
-    // Idle for 4–8 sec (shorter than chibi version since video freeze is less natural)
     const duration = 4000 + Math.floor(Math.random() * 4000);
     setTimeout(() => { catBusy = false; decideNext(); }, duration);
   }
@@ -1747,9 +1767,11 @@
   }
 
   function startCat() {
-    // Start with a short pause, then begin wandering
+    // Start near the bottom-left, then begin wandering in 2D
     const cat = document.getElementById('catCorner');
+    catPosY = Math.max(80, window.innerHeight - CAT_H - 120);
     cat.style.left = catPosX + 'px';
+    cat.style.top  = catPosY + 'px';
     setTimeout(decideNext, 2000);
   }
 

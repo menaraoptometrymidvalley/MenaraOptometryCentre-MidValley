@@ -594,38 +594,31 @@
     line-height: 1.4;
   }
 
-  /* ────── WANDERING CAT (real cat video, walks naturally on the ground) ────── */
+  /* ────── WANDERING CAT (real cat video, bigger + smoother) ────── */
   .cat-corner {
     position: fixed;
-    bottom: 80px;             /* on the "floor" */
+    bottom: 70px;
     left: 50px;
-    width: 200px;
+    width: 320px;             /* bigger = more visible (was 200px) */
     height: auto;
     z-index: 30;
     pointer-events: none;
-    filter: drop-shadow(0 8px 22px rgba(0,0,0,0.6));
-    transition: left 5s cubic-bezier(0.45, 0, 0.55, 1);  /* gentle ease for natural feel */
+    filter: drop-shadow(0 10px 28px rgba(0,0,0,0.7));
+    transition: left 8s linear;   /* LINEAR matches the cat's constant walking pace in the video */
+  }
+  /* Inner flip wrapper — handles facing direction without fighting other transforms */
+  .cat-corner .cat-flip {
+    width: 100%;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+  .cat-corner.facing-left .cat-flip {
+    transform: scaleX(-1);
   }
   .cat-corner .cat-video {
     width: 100%;
     height: auto;
     display: block;
-    transition: transform 0.4s ease;
-  }
-  /* Subtle breathing bob — gives the cat life even when standing */
-  .cat-corner .cat-video {
-    animation: catBob 1.8s ease-in-out infinite;
-  }
-  @keyframes catBob {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-2px); }
-  }
-  .cat-corner.facing-left .cat-video {
-    animation: catBobFlip 1.8s ease-in-out infinite;
-  }
-  @keyframes catBobFlip {
-    0%, 100% { transform: scaleX(-1) translateY(0); }
-    50%      { transform: scaleX(-1) translateY(2px); }
   }
   .cat-svg {
     width: 100%; height: 100%;
@@ -785,9 +778,11 @@
   </div>
   <!-- Real Bengal cat walking, transparent WebM (chroma-keyed). Wanders across screen via JS. -->
   <div class="cat-corner" id="catCorner">
-    <video class="cat-video" autoplay loop muted playsinline>
-      <source src="assets/cat/cat-walking.webm" type="video/webm">
-    </video>
+    <div class="cat-flip">
+      <video class="cat-video" autoplay loop muted playsinline>
+        <source src="assets/cat/cat-walking.webm" type="video/webm">
+      </video>
+    </div>
     <div class="cat-state-label" id="catStateLabel" style="display:none"></div>
   </div>
 
@@ -1676,8 +1671,8 @@
   }
 
   // ─── Wandering cat — natural ground-level walking only ───
-  const CAT_W = 200;
-  const CAT_WALK_SPEED = 50;    // pixels per second — slow, leisurely cat
+  const CAT_W = 320;
+  const CAT_WALK_SPEED = 55;    // pixels per second — slow, leisurely cat (matches video pace)
   let catPosX = 50;
   let catFacing = 1;
   let catBusy = false;
@@ -1737,10 +1732,11 @@
     if (v) { try { v.play(); } catch(e){} }
     setCatState('walking');
 
-    // Slow, eased transition — feels organic
+    // LINEAR transition — constant speed matches the cat's constant walking pace in the video
+    // (eased transitions made the cat slide-and-stop unnaturally)
     const dist = Math.abs(target - catPosX);
     const durationMs = Math.round((dist / CAT_WALK_SPEED) * 1000);
-    cat.style.transition = `left ${durationMs}ms cubic-bezier(0.42, 0, 0.58, 1)`;
+    cat.style.transition = `left ${durationMs}ms linear`;
     requestAnimationFrame(() => { cat.style.left = target + 'px'; });
     catPosX = target;
 

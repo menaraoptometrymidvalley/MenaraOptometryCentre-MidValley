@@ -594,17 +594,20 @@
     line-height: 1.4;
   }
 
-  /* ────── CAT CORNER (inline SVG, CSS-animated) ────── */
+  /* ────── WANDERING CAT (lives on the screen) ────── */
   .cat-corner {
-    position: absolute;
-    bottom: 8px;
-    left: 8px;
-    width: 150px;
-    height: 150px;
-    z-index: 5;
+    position: fixed;
+    bottom: 105px;            /* above the footer, on the "floor" */
+    left: 50px;
+    width: 130px;
+    height: 130px;
+    z-index: 30;              /* above promos, like a pet in the foreground */
     pointer-events: none;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
+    filter: drop-shadow(0 6px 16px rgba(0,0,0,0.55));
+    transition: left 4s linear;  /* JS will adjust the duration per walk */
   }
+  /* Mirror horizontally when walking left */
+  .cat-corner.facing-left .cat-svg { transform: scaleX(-1); }
   .cat-svg {
     width: 100%; height: 100%;
     overflow: visible;
@@ -1645,10 +1648,13 @@
     }
   }
 
-  // ─── Inline SVG cat — cycles through 4 states ───
+  // ─── Wandering cat — walks around the screen, occasionally stops to idle ───
   const CAT_STATES = ['walking', 'sleeping', 'playing', 'eating'];
-  const CAT_STATE_INTERVAL = 14000;  // 14 sec per state
-  let catIdx = 0;
+  const CAT_W = 130;
+  const CAT_WALK_SPEED = 70;   // pixels per second
+  let catPosX = 50;
+  let catFacing = 1;           // 1 = right, -1 = left
+  let catBusy = false;
 
   function setCatState(state) {
     const cat = document.getElementById('catCorner');
@@ -1656,17 +1662,82 @@
     cat.classList.add('cat-' + state);
     document.getElementById('catStateLabel').textContent = state;
     cat.classList.add('show-label');
-    setTimeout(() => cat.classList.remove('show-label'), 2500);
+    setTimeout(() => cat.classList.remove('show-label'), 2000);
   }
 
-  function rotateCatState() {
-    catIdx = (catIdx + 1) % CAT_STATES.length;
-    setCatState(CAT_STATES[catIdx]);
+  function getCatBounds() {
+    return { minX: 10, maxX: window.innerWidth - CAT_W - 10 };
+  }
+
+  function walkRandomly() {
+    if (catBusy) return;
+    catBusy = true;
+    const cat = document.getElementById('catCorner');
+    const b = getCatBounds();
+
+    // Decide target — random distance, prefer staying in bounds
+    const distance = 200 + Math.random() * 350;     // 200–550 px walk
+    let target;
+    if (catPosX <= b.minX + 50) {
+      // Near left edge — must walk right
+      target = Math.min(catPosX + distance, b.maxX);
+      catFacing = 1;
+    } else if (catPosX >= b.maxX - 50) {
+      // Near right edge — must walk left
+      target = Math.max(catPosX - distance, b.minX);
+      catFacing = -1;
+    } else {
+      // 50/50 choice
+      if (Math.random() < 0.5) {
+        target = Math.min(catPosX + distance, b.maxX);
+        catFacing = 1;
+      } else {
+        target = Math.max(catPosX - distance, b.minX);
+        catFacing = -1;
+      }
+    }
+
+    // Apply facing direction (mirror sprite)
+    if (catFacing === -1) cat.classList.add('facing-left');
+    else cat.classList.remove('facing-left');
+
+    // Set walking state — legs animate via CSS keyframes
+    setCatState('walking');
+
+    // Match transition duration to distance (so walk speed is consistent)
+    const dist = Math.abs(target - catPosX);
+    const durationMs = Math.round((dist / CAT_WALK_SPEED) * 1000);
+    cat.style.transition = 'left ' + durationMs + 'ms linear';
+    // Reflow then update — ensures the new transition is applied
+    requestAnimationFrame(() => { cat.style.left = target + 'px'; });
+    catPosX = target;
+
+    setTimeout(() => { catBusy = false; decideNext(); }, durationMs + 100);
+  }
+
+  function idleAction() {
+    if (catBusy) return;
+    catBusy = true;
+    // Pick a random idle behavior
+    const idles = ['sleeping', 'playing', 'eating'];
+    const state = idles[Math.floor(Math.random() * idles.length)];
+    setCatState(state);
+    // Idle for 6–14 seconds
+    const duration = 6000 + Math.floor(Math.random() * 8000);
+    setTimeout(() => { catBusy = false; decideNext(); }, duration);
+  }
+
+  function decideNext() {
+    // 70% walk, 30% idle — feels natural for a pet
+    if (Math.random() < 0.7) walkRandomly();
+    else idleAction();
   }
 
   function startCat() {
-    setCatState(CAT_STATES[0]);
-    setInterval(rotateCatState, CAT_STATE_INTERVAL);
+    // Start with a short pause, then begin wandering
+    const cat = document.getElementById('catCorner');
+    cat.style.left = catPosX + 'px';
+    setTimeout(decideNext, 2000);
   }
 
   // Hard refresh every hour to pick up new promos.json

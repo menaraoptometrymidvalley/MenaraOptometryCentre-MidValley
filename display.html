@@ -606,20 +606,18 @@
     filter: drop-shadow(0 10px 28px rgba(0,0,0,0.7));
     transition: left 8s linear;   /* LINEAR matches the cat's constant walking pace in the video */
   }
-  /* Inner flip wrapper — handles facing direction without fighting other transforms */
   .cat-corner .cat-flip {
     width: 100%;
     display: block;
-    transition: transform 0.6s ease;
-  }
-  .cat-corner.facing-left .cat-flip {
-    transform: scaleX(-1);
   }
   .cat-corner .cat-video {
     width: 100%;
     height: auto;
     display: block;
   }
+  /* Fade in/out for off-screen loop (cat walks off right, fades, reappears at left) */
+  .cat-corner.fading { opacity: 0; transition: opacity 0.4s ease; }
+  .cat-corner.visible { opacity: 1; transition: opacity 0.5s ease; }
   .cat-svg {
     width: 100%; height: 100%;
     overflow: visible;
@@ -1670,11 +1668,10 @@
     }
   }
 
-  // ─── Wandering cat — natural ground-level walking only ───
+  // ─── Wandering cat — always walks RIGHT (no flip), loops around off-screen ───
   const CAT_W = 320;
-  const CAT_WALK_SPEED = 55;    // pixels per second — slow, leisurely cat (matches video pace)
-  let catPosX = 50;
-  let catFacing = 1;
+  const CAT_WALK_SPEED = 55;    // pixels per second — leisurely cat pace
+  let catPosX = -CAT_W;         // start off-screen left
   let catBusy = false;
 
   function setCatState(state) {
@@ -1686,61 +1683,55 @@
     return cat ? cat.querySelector('video') : null;
   }
 
-  function getCatBounds() {
-    return {
-      minX: 20,
-      maxX: Math.max(40, window.innerWidth - CAT_W - 20)
-    };
-  }
-
-  function applyFacing() {
-    const cat = document.getElementById('catCorner');
-    if (catFacing === -1) cat.classList.add('facing-left');
-    else cat.classList.remove('facing-left');
-  }
-
   function walkRandomly() {
     if (catBusy) return;
     catBusy = true;
     const cat = document.getElementById('catCorner');
-    const b = getCatBounds();
+    const screenW = window.innerWidth;
 
-    // Pick a natural walking distance (cats don't dart to far corners)
-    // Short walks (150-350px) feel more cat-like than dashes across the screen
-    const distance = 120 + Math.random() * 230;
-    let target;
+    // Pick walking distance (medium — cat walks for a while)
+    const distance = 200 + Math.random() * 400;
+    let target = catPosX + distance;
+    const offScreenRight = screenW + 60;  // cat fully exits right edge
 
-    // Decide direction based on position + slight randomness
-    const nearLeft  = catPosX <= b.minX + 100;
-    const nearRight = catPosX >= b.maxX - 100;
-    let goRight;
-    if (nearLeft) goRight = true;
-    else if (nearRight) goRight = false;
-    else goRight = (Math.random() < 0.5);
-
-    if (goRight) {
-      target = Math.min(catPosX + distance, b.maxX);
-      catFacing = 1;
-    } else {
-      target = Math.max(catPosX - distance, b.minX);
-      catFacing = -1;
+    if (target >= offScreenRight) {
+      // Cat will exit screen — walk to off-screen, then teleport back to left
+      target = offScreenRight;
     }
-    applyFacing();
 
-    // Resume video
     const v = getCatVideo();
     if (v) { try { v.play(); } catch(e){} }
     setCatState('walking');
 
-    // LINEAR transition — constant speed matches the cat's constant walking pace in the video
-    // (eased transitions made the cat slide-and-stop unnaturally)
     const dist = Math.abs(target - catPosX);
     const durationMs = Math.round((dist / CAT_WALK_SPEED) * 1000);
     cat.style.transition = `left ${durationMs}ms linear`;
     requestAnimationFrame(() => { cat.style.left = target + 'px'; });
     catPosX = target;
 
-    setTimeout(() => { catBusy = false; decideNext(); }, durationMs + 200);
+    setTimeout(() => {
+      // If exited screen, fade out + teleport back to off-screen left
+      if (catPosX >= offScreenRight) {
+        cat.classList.add('fading');
+        cat.classList.remove('visible');
+        setTimeout(() => {
+          // Re-position off-screen left (no transition for the teleport)
+          cat.style.transition = 'none';
+          catPosX = -CAT_W;
+          cat.style.left = catPosX + 'px';
+          // Force a reflow then make visible again
+          void cat.offsetWidth;
+          cat.classList.remove('fading');
+          cat.classList.add('visible');
+          catBusy = false;
+          // Pause briefly before walking back on
+          setTimeout(decideNext, 1500 + Math.random() * 2000);
+        }, 500);
+      } else {
+        catBusy = false;
+        decideNext();
+      }
+    }, durationMs + 200);
   }
 
   function idleAction() {
@@ -1750,8 +1741,7 @@
     const v = getCatVideo();
     if (v) { try { v.pause(); } catch(e){} }
     setCatState('looking around');
-    // Longer pauses — cats really do stand and stare for a while
-    const duration = 5000 + Math.floor(Math.random() * 9000);
+    const duration = 4000 + Math.floor(Math.random() * 7000);
     setTimeout(() => { catBusy = false; decideNext(); }, duration);
   }
 
@@ -1762,10 +1752,11 @@
   }
 
   function startCat() {
-    // Start at bottom-left, begin natural wandering after short pause
+    // Cat starts off-screen left, walks in naturally
     const cat = document.getElementById('catCorner');
     cat.style.left = catPosX + 'px';
-    setTimeout(decideNext, 2500);
+    cat.classList.add('visible');
+    setTimeout(decideNext, 1500);
   }
 
   // Hard refresh every hour to pick up new promos.json
